@@ -25,10 +25,10 @@ CUSRC=	simplePrintf.cu
 SRC=	main.cpp
 
 # Includes for CXX
-INC= -Iinclude
+INC= -Iinclude -Icuda_include
 
 # Includes for NVCC
-CUINC= -I $(CUDA_HOME)/samples/common/inc/
+CUINC= -I $(CUDA_HOME)/samples/common/inc/ -Icuda_include
 
 # objects from .cpp source files
 _OBJS=	$(SRC:.cpp=.o)
