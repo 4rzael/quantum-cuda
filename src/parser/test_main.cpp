@@ -4,15 +4,27 @@
 #include <sstream>
 #include <string>
 #include "spirit/home/x3.hpp"
+#include <boost/fusion/adapted/struct/adapt_struct.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
 
 using namespace boost::spirit::x3;
+
+struct s_bit {
+    std::string reg;
+    std::string value;
+};
+
+BOOST_FUSION_ADAPT_STRUCT(s_bit,
+    (std::string, reg)
+    (std::string, value)
+)
 
 namespace OpenQASMParser {
     /* Whitespace rules */
     auto WS = +(lit('\t') | '\f' | '\r' | '\n' | ' ');
     auto WS_INLINE = +(lit('\t') | '\f' | ' ');
     auto NEWLINE = +(-lit('\r') >> lit('\n'));
-    
+
     /* Whitespace-aware constructs */
     auto COMMA = *WS >> ',' >> *WS;
     auto PLUS = *WS >> '+' >> *WS;
@@ -27,13 +39,15 @@ namespace OpenQASMParser {
     auto RIGHT_BRACKET = *WS >> ']' >> *WS;
 
     /* Basic Types */
-    auto ID = char_("a-z") >> *(alnum | char_('_'));
+    auto ID = rule<class ID, std::string>()
+            = char_("a-z") >> *(alnum | char_('_'));
     auto FILENAME = +(alnum | '.' | '_' | '-');
-    auto FLOAT = (float_ | string("pi"));
+    auto FLOAT = ((+char_("0-9")) | string("pi")); // todo: change back
+    auto UINT = +char_("0-9"); // todo: change back
     auto UNARY_OP = string("sin") | string("cos") | string("tan") | string("exp") | string("ln") | string("sqrt");
 
     /* Complex types */
-    auto float_expr_basic = float_ | ID;
+    auto float_expr_basic = FLOAT | ID;
     rule<struct float_expr_class> const float_expr = "float_expr";
     rule<struct float_expr_factor_class> const float_expr_factor = "float_expr_factor";
     rule<struct float_expr_term_class> const float_expr_term = "float_expr_term";
@@ -53,7 +67,8 @@ namespace OpenQASMParser {
     BOOST_SPIRIT_DEFINE(float_expr_term)
     BOOST_SPIRIT_DEFINE(float_expr)
     
-    auto bit = ID >> LEFT_BRACKET >> uint_ >> RIGHT_BRACKET;
+    auto bit = rule<class bit, s_bit>()
+             = ID >> LEFT_BRACKET >> UINT >> RIGHT_BRACKET;
     auto reg = ID;
     auto variable = bit | reg;
     auto qargs = variable % COMMA;
@@ -86,8 +101,8 @@ namespace OpenQASMParser {
                             barrier_statement |
                             reset_statement |
                             gate_call_statement] >> ';';
-    auto comment = lexeme["//" >> WS_INLINE >> *(~char_('\n'))];
-    auto conditional_statement = lexeme["if" >> LEFT_PARENTHESIS >> reg >> *WS >> "==" >> *WS >> uint_ >> SPACED_RIGHT_PARENTHESIS >> statement];
+    auto comment = lexeme["//" >> *WS_INLINE >> *(~char_('\n'))];
+    auto conditional_statement = lexeme["if" >> LEFT_PARENTHESIS >> reg >> *WS >> "==" >> *WS >> UINT >> SPACED_RIGHT_PARENTHESIS >> statement];
 
     /* Gate declaration */
     auto gate_code_block = *WS >> '{' >> *(statement | WS | comment) >> '}' >> *WS;
@@ -120,7 +135,11 @@ int main(int ac, char **av) {
     auto iterEnd = str.end();
     // auto printAction = [&](auto& ctx) { std::cout << "parsed: " << _attr(ctx) << std::endl; };
 
-    phrase_parse(iter, iterEnd, start, WS);
+    // std::vector<std::string> res;
+    // std::pair<std::string, std::string> res;
+    // std::string res;
+    s_bit res;
+    /*phrase_*/parse(iter, iterEnd, bit, /*WS, */res);
     if (iter != iterEnd) {
         std::cerr << "Parsing failed at character:" << std::endl;
         std::stringstream errorStream(std::string(iter, iterEnd));
@@ -128,8 +147,11 @@ int main(int ac, char **av) {
         std::getline(errorStream, line);
         std::cerr << line << std::endl;
     }
-    // std::cout << "AST:" << std::endl;
-    // for (auto it = vec.begin(); it != vec.end(); ++it) {
+    std::cout << "AST:" << std::endl;
+    // std::cout << res << std::endl;
+    // std::cout << res.first << " " << res.second << std::endl;
+    std::cout << res.reg << " " << res.value << std::endl;
+    // for (auto it = res.begin(); it != res.end(); ++it) {
     //     std::cout << '\t' << "*" << *it << "*" << std::endl;
     // }
 }
