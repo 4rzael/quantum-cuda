@@ -1,10 +1,12 @@
 CXX=	g++
 
+CXXFLAGS= -std=c++14
+
 NVCC=	nvcc
 
 RM=	rm -rf
 
-NAME=	simplePrintf
+NAME=	build_gate
 
 # .cpp source files directory
 SDIR= src
@@ -19,10 +21,13 @@ ODIR=	obj
 CUODIR= cuda_obj
 
 # .cu source files
-CUSRC=	simplePrintf.cu
+CUSRC=
 
 # .cpp sources
-SRC=	main.cpp
+SRC=	build_gate.cpp \
+	naive_m_mult.cpp \
+	rotations.cpp \
+	main.cpp
 
 # Includes for CXX
 INC= -Iinclude -Icuda_include
@@ -48,7 +53,7 @@ $(ODIR):
 
 # create objects from .cpp source files
 $(ODIR)/%.o:	$(SDIR)/%.cpp
-		$(CXX) $(INC) -o $@ -c $<
+		$(CXX) $(CXXFLAGS) $(INC) -o $@ -c $<
 
 # create objects from .cu source files directory
 $(CUODIR):
@@ -59,7 +64,7 @@ $(CUODIR)/%.o:	$(CUSDIR)/%.cu
 		$(NVCC) $(CUINC) -o $@ -c $<
 
 $(NAME):	$(OBJS) $(CUOBJS)
-		$(CXX) -o $(NAME) $(OBJS) $(CUOBJS) $(LDIR)
+		$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS) $(CUOBJS) $(LDIR)
 
 clean:
 	$(RM) $(ODIR) $(CUODIR)
