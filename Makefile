@@ -38,7 +38,7 @@ OBJS=	$(patsubst %,$(ODIR)/%,$(_OBJS))
 _CUOBJS=	$(CUSRC:.cu=.o)
 CUOBJS=	$(patsubst %,$(CUODIR)/%,$(_CUOBJS))
 
-LDIR=	-L$(CUDA_HOME)/lib -lcuda -lcudart
+LDIR=	-L$(CUDA_HOME)/lib64 -lcuda -lcudart
 
 all:	$(ODIR) $(CUODIR) $(NAME)
 
