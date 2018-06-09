@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <boost/spirit/home/x3.hpp>
+#include <ctime>
 
 #include "ast.hpp"
 
@@ -155,5 +156,9 @@ int main(int ac, char **av) {
     }
     std::cout << "AST:" << std::endl;
     std::cout << res << std::endl;
+
+    std::string outputFilename = "logs/AST.log." + std::to_string(std::time(nullptr)) + ".xml";
+    std::ofstream os(outputFilename);
+    os << res << std::endl;
 }
 

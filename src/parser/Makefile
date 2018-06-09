@@ -14,7 +14,7 @@ ODIR=	.
 SRC=	test_main.cpp float_expr_ast.cpp
 
 # Includes for CXX
-INC= -I/usr/include/boost
+INC= -I/usr/include/boost -I../../include
 
 # objects from .cpp source files
 _OBJS=	$(SRC:.cpp=.o)

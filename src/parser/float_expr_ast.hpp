@@ -27,7 +27,6 @@ namespace Parser {
         {
             using base_type::base_type;
             using base_type::operator=;
-
         };
         std::ostream& operator<< (std::ostream& stream, const t_float_expr_operand& operand);
 
@@ -35,7 +34,6 @@ namespace Parser {
         {
             char sign;
             t_float_expr_operand operand_;
-
         };
         std::ostream& operator<< (std::ostream& stream, const t_float_expr_signed_& signed_);
 
@@ -43,7 +41,6 @@ namespace Parser {
         {
             char operator_;
             t_float_expr_operand operand_;
-
         };
         std::ostream& operator<< (std::ostream& stream, const t_float_expr_operation& operation);
 
@@ -51,7 +48,6 @@ namespace Parser {
         {
             t_float_expr_operand first;
             std::list<t_float_expr_operation> rest;
-
         };
         std::ostream& operator<< (std::ostream& stream, const t_float_expression& expression);
 
