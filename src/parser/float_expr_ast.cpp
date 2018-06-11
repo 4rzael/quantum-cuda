@@ -3,8 +3,8 @@
 using namespace boost::spirit;
 using namespace boost::spirit::x3;
 
-std::ostream& Parser::AST::operator<< (std::ostream& stream, const t_float_expr_signed_& signed_) {
-    return stream << "<float_expr_signed>" << signed_.sign << signed_.operand_ << "</float_expr_signed>";
+std::ostream& Parser::AST::operator<< (std::ostream& stream, const t_float_expr_unaried_operand& unop) {
+    return stream << "<float_expr_unaried_operand unary=\"" << unop.unary_ << "\">" << unop.operand_ << "</float_expr_unaried_operand>";
 }
 
 std::ostream& Parser::AST::operator<< (std::ostream& stream, const t_float_expr_operation& operation) {
@@ -30,12 +30,20 @@ std::ostream& Parser::AST::operator<< (std::ostream& stream, const t_float_expr_
 void Parser::AST::OperandPrinterVisitor::operator()(const t_float_expr_nil &nil) const {
     m_out << "null";
 }
-void Parser::AST::OperandPrinterVisitor::operator()(const unsigned int &i) const {
-    m_out << i;
+void Parser::AST::OperandPrinterVisitor::operator()(const ::boost::spirit::x3::variant<float, std::string> &v) const {
+    ::boost::apply_visitor(Parser::AST::TFloatPrinterVisitor(this->m_out), v);
 }
-void Parser::AST::OperandPrinterVisitor::operator()(const ::boost::spirit::x3::forward_ast<t_float_expr_signed_> &ast) const {
+void Parser::AST::OperandPrinterVisitor::operator()(const ::boost::spirit::x3::forward_ast<t_float_expr_unaried_operand> &ast) const {
     m_out << ast.get();
 }
 void Parser::AST::OperandPrinterVisitor::operator()(const ::boost::spirit::x3::forward_ast<t_float_expression> &ast) const {
     m_out << ast.get();
+}
+
+void Parser::AST::TFloatPrinterVisitor::operator()(const float &f) const {
+    m_out << f;
+}
+
+void Parser::AST::TFloatPrinterVisitor::operator()(const std::string &s) const {
+    m_out << s;
 }

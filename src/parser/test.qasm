@@ -1,4 +1,4 @@
-1 + 2 * (3-4) / 5
+1 + 2 * (3-4) / -sqrt(5 * 6)
 reset q;
 barrier q, vder234[231], g;
 measure q -> v;

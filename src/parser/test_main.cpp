@@ -10,18 +10,6 @@
 using namespace boost::spirit::x3;
 using namespace Parser::AST;
 
-// struct t_gate_call_statement {
-//     std::string name;
-//     std::optional<
-
-//     friend inline std::ostream& operator<< (std::ostream& stream, const t_gate_call_statement& gate_call) {
-//         return stream << "gate_call<" << gate_call.target << ">";
-//     }
-// };
-// BOOST_FUSION_ADAPT_STRUCT(t_gate_call_statement,
-//     (t_variable, target)
-// )
-
 namespace Parser {
     /* Whitespace rules */
     const auto WS = omit[+(lit('\t') | '\f' | '\r' | '\n' | ' ')];
@@ -42,31 +30,42 @@ namespace Parser {
     const auto RIGHT_BRACKET = *WS >> ']' >> *WS;
 
     /* Basic Types */
-    const auto ID = rule<class ID, std::string>()
+    const auto UNARY_OP = rule<class UNARY_OP, std::string>()
+                        = string("sin") | string("cos") | string("tan") | string("exp") | string("ln") | string("sqrt");
+    const auto RESERVED_ID = (omit[UNARY_OP] |
+        "U" | "CX" | "reset" | "creg" | "qreg" | "include" |
+        "measure" | "gate" | "barrier" | "OPENQASM");
+
+    const auto ID_BASE = rule<class ID_BASE, std::string>()
             = char_("a-z") >> *(alnum | char_('_'));
+    const auto ID = rule<class ID, std::string>()
+            = !RESERVED_ID >> ID_BASE;
+
     const auto FILENAME = +(alnum | char_('.') | char_('_') | char_('-'));
-    const auto FLOAT = ((+char_("0-9")) | string("pi")); // todo: change back
+    const auto FLOAT = rule<class FLOAT, t_float>()
+                     = (float_ | string("pi"));
     const auto UINT = uint_;
-    const auto UNARY_OP = string("sin") | string("cos") | string("tan") | string("exp") | string("ln") | string("sqrt");
 
     /* Complex types */
-    const auto float_expr_basic = UINT;
+
+    const auto float_expr_basic = rule<class float_expr_basic, t_float>()
+                                = FLOAT | ID;
     rule<struct float_expr_class, t_float_expression> const float_expr = "float_expr";
     rule<struct float_expr_term_class, t_float_expression> const float_expr_term = "float_expr_term";
     rule<struct float_expr_factor_class, t_float_expr_operand> const float_expr_factor = "float_expr_factor";
 
     const auto float_expr_def = float_expr_term >> *(
-            (PLUS >> float_expr_term) | (MINUS >> float_expr_term)        
+            (PLUS >> float_expr_term) | (MINUS >> float_expr_term)
     );
-
+    
     const auto float_expr_term_def = float_expr_factor >> *(
             (TIMES >> float_expr_factor) | (DIVIDE >> float_expr_factor) | (POWER >> float_expr_factor)
     );
 
     const auto float_expr_factor_def = float_expr_basic |
         (omit[LEFT_PARENTHESIS] >> float_expr >> omit[RIGHT_PARENTHESIS]) |
-        (char_('-') >> float_expr_factor);
-
+        (string("-") >> float_expr) |
+        (UNARY_OP >> omit[LEFT_PARENTHESIS] >> float_expr >> omit[RIGHT_PARENTHESIS]);
 
     BOOST_SPIRIT_DEFINE(float_expr)
     BOOST_SPIRIT_DEFINE(float_expr_term)

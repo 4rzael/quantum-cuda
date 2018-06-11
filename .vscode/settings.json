@@ -42,7 +42,18 @@
         "typeinfo": "cpp",
         "utility": "cpp",
         "algorithm": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "future": "cpp",
+        "csignal": "cpp",
+        "cstdarg": "cpp",
+        "strstream": "cpp",
+        "condition_variable": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "mutex": "cpp",
+        "system_error": "cpp",
+        "valarray": "cpp",
+        "*.ipp": "cpp"
     },
     "clang.executable": "clang-6.0"
 }

@@ -9,19 +9,22 @@
 /* Float expr AST */
 namespace Parser {
     namespace AST {
-        struct t_float_expr_signed_;
+        struct t_float_expr_unaried_operand;
         struct t_float_expr_operand;
         struct t_float_expression;
         class OperandPrinterVisitor;
 
+        typedef ::boost::spirit::x3::variant<float, std::string> t_float;
+        // typedef std::string t_float;
+        // typedef uint t_float;
 
         struct t_float_expr_nil {  
         };
 
         struct t_float_expr_operand : ::boost::spirit::x3::variant<
                 t_float_expr_nil
-                , unsigned int
-                , ::boost::spirit::x3::forward_ast<t_float_expr_signed_>
+                , t_float
+                , ::boost::spirit::x3::forward_ast<t_float_expr_unaried_operand>
                 , ::boost::spirit::x3::forward_ast<t_float_expression>
             >
         {
@@ -29,13 +32,6 @@ namespace Parser {
             using base_type::operator=;
         };
         std::ostream& operator<< (std::ostream& stream, const t_float_expr_operand& operand);
-
-        struct t_float_expr_signed_
-        {
-            char sign;
-            t_float_expr_operand operand_;
-        };
-        std::ostream& operator<< (std::ostream& stream, const t_float_expr_signed_& signed_);
 
         struct t_float_expr_operation
         {
@@ -51,6 +47,13 @@ namespace Parser {
         };
         std::ostream& operator<< (std::ostream& stream, const t_float_expression& expression);
 
+        struct t_float_expr_unaried_operand
+        {
+            std::string unary_;
+            t_float_expression operand_;
+        };
+        std::ostream& operator<< (std::ostream& stream, const t_float_expr_unaried_operand& unop);
+
         class OperandPrinterVisitor : public ::boost::static_visitor<>
         {
         private:
@@ -58,17 +61,27 @@ namespace Parser {
         public:
             OperandPrinterVisitor(std::ostream & out) : m_out(out) {}
             void operator()(const t_float_expr_nil &nil) const;
-            void operator()(const unsigned int &i) const;
-            void operator()(const ::boost::spirit::x3::forward_ast<t_float_expr_signed_> &ast) const;
+            void operator()(const ::boost::spirit::x3::variant<float, std::string> &v) const;
+            void operator()(const ::boost::spirit::x3::forward_ast<t_float_expr_unaried_operand> &ast) const;
             void operator()(const ::boost::spirit::x3::forward_ast<t_float_expression> &ast) const;
+        };
+
+        class TFloatPrinterVisitor : public ::boost::static_visitor<>
+        {
+        private:
+            std::ostream & m_out;
+        public:
+            TFloatPrinterVisitor(std::ostream & out) : m_out(out) {}
+            void operator()(const float &f) const;
+            void operator()(const std::string &s) const;
         };
     }
 }
 
 BOOST_FUSION_ADAPT_STRUCT(
-    Parser::AST::t_float_expr_signed_,
-    (char, sign)
-    (Parser::AST::t_float_expr_operand, operand_)
+    Parser::AST::t_float_expr_unaried_operand,
+    (std::string, unary_)
+    (Parser::AST::t_float_expression, operand_)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
