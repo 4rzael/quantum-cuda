@@ -21,17 +21,20 @@ std::ostream& Parser::AST::operator<< (std::ostream& stream, const t_float_expre
 }
 
 std::ostream& Parser::AST::operator<< (std::ostream& stream, const t_float_expr_operand& operand) {
-    stream << "<float_expr_operand>";
+    // stream << "<float_expr_operand>";
     ::boost::apply_visitor(Parser::AST::OperandPrinterVisitor(stream), operand);
-    return stream << "</float_expr_operand>";
+    // return stream << "</float_expr_operand>";
+    return stream;
 }
 
 
 void Parser::AST::OperandPrinterVisitor::operator()(const t_float_expr_nil &nil) const {
-    m_out << "null";
+    m_out << "<float_expr_operand value=\"null\"></float_expr_operand>";
 }
 void Parser::AST::OperandPrinterVisitor::operator()(const ::boost::spirit::x3::variant<float, std::string> &v) const {
-    ::boost::apply_visitor(Parser::AST::TFloatPrinterVisitor(this->m_out), v);
+    m_out << "<float_expr_operand value=\"";
+    ::boost::apply_visitor(Parser::AST::TFloatPrinterVisitor(m_out), v);
+    m_out << "\"></float_expr_operand>";
 }
 void Parser::AST::OperandPrinterVisitor::operator()(const ::boost::spirit::x3::forward_ast<t_float_expr_unaried_operand> &ast) const {
     m_out << ast.get();

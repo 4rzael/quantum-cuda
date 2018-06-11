@@ -2,6 +2,8 @@
 # define AST_HPP_
 
 #include <string>
+#include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 
@@ -12,7 +14,7 @@ namespace Parser {
         struct t_reg: public std::string {
             using std::string::string;
             friend inline std::ostream& operator<< (std::ostream& stream, const t_reg& reg) {
-                return stream << "<reg value=\"" + reg + "\"></reg>";
+                return stream << "<reg name=\"" + reg + "\"></reg>";
             }
         };
 
@@ -21,7 +23,7 @@ namespace Parser {
             uint value;
 
             friend inline std::ostream& operator<< (std::ostream& stream, const t_bit& bit) {
-                return stream << "<bit>" << bit.reg << "<" << bit.value << "></bit>";
+                return stream << "<bit>" << bit.reg << "<value=\"" << bit.value << "\"></value></bit>";
             }
         };
 
@@ -62,10 +64,10 @@ namespace Parser {
         };
 
         struct t_cx_statement {
-            t_qargs params;
+            t_qargs targets;
 
             friend inline std::ostream& operator<< (std::ostream& stream, const t_cx_statement& cx) {
-                return stream << "<CX>" << cx.params << "</CX>";
+                return stream << "<CX>" << cx.targets << "</CX>";
             }
         };
 
@@ -79,10 +81,10 @@ namespace Parser {
         };
 
         struct t_barrier_statement {
-            t_qargs params;
+            t_qargs targets;
 
             friend inline std::ostream& operator<< (std::ostream& stream, const t_barrier_statement& barrier) {
-                return stream << "<barrier>" << barrier.params << "</barrier>";
+                return stream << "<barrier>" << barrier.targets << "</barrier>";
             }
         };
 
@@ -94,14 +96,35 @@ namespace Parser {
             }
         };
 
-        // struct t_gate_call_statement {
-        //     std::string name;
-        //     // std::optional<
+        struct t_expr_list: public std::vector<t_float_expression> {
+            friend inline std::ostream& operator<< (std::ostream& stream, const t_expr_list& expr_list) {
+                stream << "<expr_list>";
+                for (const auto e: expr_list) {
+                    stream << e;
+                }
+                return stream << "</expr_list>";
+            }
+        };
 
-        //     friend inline std::ostream& operator<< (std::ostream& stream, const t_gate_call_statement& gate_call) {
-        //         return stream << "<gate_call name=\"" << gate_call.name << "\">" << gate_call.target << "</gate_call>";
-        //     }
-        // };
+        struct t_u_statement {
+            t_expr_list params;
+            t_variable target;
+
+            friend inline std::ostream& operator<< (std::ostream& stream, const t_u_statement& u) {
+                return stream << "<U>" << u.params << u.target << "</U>";
+            }
+        };
+
+
+        struct t_gate_call_statement {
+            std::string name;
+            boost::optional<t_expr_list> params;
+            t_qargs targets;
+
+            friend inline std::ostream& operator<< (std::ostream& stream, const t_gate_call_statement& gate_call) {
+                return stream << "<gate_call name=\"" << gate_call.name << "\">" << gate_call.params << gate_call.targets << "</gate_call>";
+            }
+        };
 
 
         typedef ::boost::variant<t_creg_statement,
@@ -110,7 +133,9 @@ namespace Parser {
                             t_cx_statement,
                             t_measure_statement,
                             t_barrier_statement,
-                            t_reset_statement> t_statement;
+                            t_reset_statement,
+                            t_u_statement,
+                            t_gate_call_statement> t_statement;
     }
 }
 
@@ -132,7 +157,7 @@ BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_include_statement,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_cx_statement,
-    (Parser::AST::t_qargs, params)
+    (Parser::AST::t_qargs, targets)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_measure_statement,
@@ -141,18 +166,22 @@ BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_measure_statement,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_barrier_statement,
-    (Parser::AST::t_qargs, params)
+    (Parser::AST::t_qargs, targets)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_reset_statement,
     (Parser::AST::t_variable, target)
 )
 
-// BOOST_FUSION_ADAPT_STRUCT(t_gate_call_statement,
-//     (t_variable, target)
-// )
+BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_u_statement,
+    (Parser::AST::t_expr_list, params)
+    (Parser::AST::t_variable, target)
+)
 
-
-
+BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_gate_call_statement,
+    (std::string, name)
+    (boost::optional<Parser::AST::t_expr_list>, params)
+    (Parser::AST::t_qargs, targets)
+)
 
 #endif /* AST_HPP_ */

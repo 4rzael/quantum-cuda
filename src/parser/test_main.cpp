@@ -4,7 +4,6 @@
 #include <sstream>
 #include <boost/spirit/home/x3.hpp>
 #include <ctime>
-
 #include "ast.hpp"
 
 using namespace boost::spirit::x3;
@@ -32,10 +31,10 @@ namespace Parser {
     /* Basic Types */
     const auto UNARY_OP = rule<class UNARY_OP, std::string>()
                         = string("sin") | string("cos") | string("tan") | string("exp") | string("ln") | string("sqrt");
+
     const auto RESERVED_ID = (omit[UNARY_OP] |
         "U" | "CX" | "reset" | "creg" | "qreg" | "include" |
         "measure" | "gate" | "barrier" | "OPENQASM");
-
     const auto ID_BASE = rule<class ID_BASE, std::string>()
             = char_("a-z") >> *(alnum | char_('_'));
     const auto ID = rule<class ID, std::string>()
@@ -46,8 +45,7 @@ namespace Parser {
                      = (float_ | string("pi"));
     const auto UINT = uint_;
 
-    /* Complex types */
-
+    /* Float expressions types */
     const auto float_expr_basic = rule<class float_expr_basic, t_float>()
                                 = FLOAT | ID;
     rule<struct float_expr_class, t_float_expression> const float_expr = "float_expr";
@@ -71,6 +69,7 @@ namespace Parser {
     BOOST_SPIRIT_DEFINE(float_expr_term)
     BOOST_SPIRIT_DEFINE(float_expr_factor)
     
+    /* Complex types */
     const auto bit = rule<class bit, t_bit>()
              = ID >> LEFT_BRACKET >> UINT >> RIGHT_BRACKET;
     const auto reg = ID;
@@ -78,7 +77,8 @@ namespace Parser {
                   = bit | reg;
     const auto qargs = rule<class qargs, t_qargs>()
                      = variable % COMMA;
-    const auto expr_list = float_expr % COMMA;
+    const auto expr_list = rule<class expr_list, t_expr_list>()
+                         = float_expr % COMMA;
     const auto id_list = variable % COMMA;
 
     /* Statements */
@@ -96,9 +96,12 @@ namespace Parser {
                                  = "barrier" >> WS >> qargs;
     const auto reset_statement = rule<class reset_statement, t_reset_statement>()
                                = "reset" >> WS >> variable;
-    const auto gate_call_statement =
-        (ID >> -(LEFT_PARENTHESIS >> -(expr_list) >> NONSPACED_RIGHT_PARENTHESIS) >> WS >> qargs);
-    const auto u_statement = "U" >> LEFT_PARENTHESIS >> expr_list >> NONSPACED_RIGHT_PARENTHESIS >> WS >> variable;
+    const auto u_statement = rule<class u_statement, t_u_statement>()
+                           = "U" >> omit[LEFT_PARENTHESIS] >> expr_list >> omit[NONSPACED_RIGHT_PARENTHESIS >> WS] >> variable;
+    const auto gate_call_statement = rule<class gate_call_statement, t_gate_call_statement>() 
+                                   = (ID >>
+                                        -(LEFT_PARENTHESIS >> -(expr_list) >> NONSPACED_RIGHT_PARENTHESIS) >>
+                                    WS >> qargs);
 
     /* Statement types */
     const auto statement = rule<class statement, t_statement>()
@@ -108,9 +111,9 @@ namespace Parser {
                             cx_statement |
                             measure_statement |
                             barrier_statement |
-                            reset_statement /* |
+                            reset_statement |
                             u_statement |
-                            gate_call_statement // */
+                            gate_call_statement
                     ] >> ';';
     const auto comment = omit[lexeme["//" >> *WS_INLINE >> *(~char_('\n'))]];
     const auto conditional_statement = lexeme["if" >> LEFT_PARENTHESIS >> reg >> *WS >> "==" >> *WS >> UINT >> NONSPACED_RIGHT_PARENTHESIS >> WS >> statement];
@@ -143,9 +146,9 @@ int main(int ac, char **av) {
 
     auto iter = str.begin();
     auto iterEnd = str.end();
-    // t_statement res;
-    t_float_expression res;
-    phrase_parse(iter, iterEnd, float_expr, WS, res);
+    t_statement res;
+    // t_float_expression res;
+    phrase_parse(iter, iterEnd, statement, WS, res);
     if (iter != iterEnd) {
         std::cerr << "Parsing failed at character:" << std::endl;
         std::stringstream errorStream(std::string(iter, iterEnd));
