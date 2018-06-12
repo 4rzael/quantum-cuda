@@ -1,19 +1,20 @@
 #ifndef AST_HPP_
 # define AST_HPP_
 
-#include <string>
-#include <boost/optional.hpp>
-#include <boost/optional/optional_io.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/spirit/home/x3/support/ast/variant.hpp>
+# include <vector>
+# include <string>
+# include <boost/optional.hpp>
+# include <boost/optional/optional_io.hpp>
+# include <boost/fusion/include/adapt_struct.hpp>
+# include <boost/spirit/home/x3/support/ast/variant.hpp>
 
-#include "float_expr_ast.hpp"
+# include "Parser/float_expr_ast.hpp"
 
 namespace Parser {
     namespace AST {
         struct t_reg: public std::string {
             using std::string::string;
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_reg& reg) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_reg& reg) {
                 return stream << "<reg name=\"" + reg + "\"></reg>";
             }
         };
@@ -22,7 +23,7 @@ namespace Parser {
             t_reg reg;
             uint value;
 
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_bit& bit) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_bit& bit) {
                 return stream << "<bit>" << bit.reg << "<value=\"" << bit.value << "\"></value></bit>";
             }
         };
@@ -32,7 +33,7 @@ namespace Parser {
         struct t_creg_statement {
             t_bit reg;
 
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_creg_statement& creg) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_creg_statement& creg) {
                 return stream << "<creg>" << creg.reg << "</creg>";
             }
         };
@@ -40,7 +41,7 @@ namespace Parser {
         struct t_qreg_statement {
             t_bit reg;
 
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_qreg_statement& qreg) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_qreg_statement& qreg) {
                 return stream << "<qreg>" << qreg.reg << "</qreg>";
             }
         };
@@ -48,13 +49,13 @@ namespace Parser {
         struct t_include_statement {
             std::string filename;
 
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_include_statement& include) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_include_statement& include) {
                 return stream << "<include filename=\"" << include.filename << "\"></include>";
             }
         };
 
         struct t_qargs: public std::vector<t_variable> {
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_qargs& qargs) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_qargs& qargs) {
                 stream << "<qargs>";
                 for (const auto q: qargs) {
                     stream << q;
@@ -64,7 +65,7 @@ namespace Parser {
         };
 
         struct t_id_list: public std::vector<t_reg> {
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_id_list& id_list) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_id_list& id_list) {
                 stream << "<id_list>";
                 for (const auto q: id_list) {
                     stream << q;
@@ -77,7 +78,7 @@ namespace Parser {
         struct t_cx_statement {
             t_qargs targets;
 
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_cx_statement& cx) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_cx_statement& cx) {
                 return stream << "<CX>" << cx.targets << "</CX>";
             }
         };
@@ -86,7 +87,7 @@ namespace Parser {
             t_variable source;
             t_variable dest;
 
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_measure_statement& measure) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_measure_statement& measure) {
                 return stream << "<measure>" << measure.source << measure.dest << "</measure>";
             }
         };
@@ -94,7 +95,7 @@ namespace Parser {
         struct t_barrier_statement {
             t_id_list targets;
 
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_barrier_statement& barrier) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_barrier_statement& barrier) {
                 return stream << "<barrier>" << barrier.targets << "</barrier>";
             }
         };
@@ -102,13 +103,13 @@ namespace Parser {
         struct t_reset_statement {
             t_variable target;
 
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_reset_statement& reset) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_reset_statement& reset) {
                 return stream << "<reset>" << reset.target << "</reset>";
             }
         };
 
         struct t_expr_list: public std::vector<t_float_expression> {
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_expr_list& expr_list) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_expr_list& expr_list) {
                 stream << "<expr_list>";
                 for (const auto e: expr_list) {
                     stream << e;
@@ -121,7 +122,7 @@ namespace Parser {
             t_expr_list params;
             t_variable target;
 
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_u_statement& u) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_u_statement& u) {
                 return stream << "<U>" << u.params << u.target << "</U>";
             }
         };
@@ -132,7 +133,7 @@ namespace Parser {
             boost::optional<t_expr_list> params;
             t_qargs targets;
 
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_gate_call_statement& gate_call) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_gate_call_statement& gate_call) {
                 return stream << "<gate_call name=\"" << gate_call.name << "\">" << gate_call.params << gate_call.targets << "</gate_call>";
             }
         };
@@ -153,7 +154,7 @@ namespace Parser {
             uint  value;
             t_statement statement;
 
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_conditional_statement& conditional_statement) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_conditional_statement& conditional_statement) {
                 return stream << "<conditional_statement value=\"" << conditional_statement.value << "\">" <<
                 conditional_statement.variable << 
                 conditional_statement.statement << "</gate_call>";
@@ -166,7 +167,7 @@ namespace Parser {
             t_id_list targets;
             std::vector<t_statement> statements;
 
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_gate_declaration& gate_decl) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_gate_declaration& gate_decl) {
                 stream << "<gate_decl name=\"" << gate_decl.name << "\">" << gate_decl.params << gate_decl.targets;
                 for (const auto & s: gate_decl.statements) {
                     stream << s;
@@ -190,7 +191,7 @@ namespace Parser {
             t_statement,
             t_conditional_statement,
             t_gate_declaration>> {
-            friend inline std::ostream& operator<< (std::ostream& stream, const t_openQASM& openQASM) {
+            friend std::ostream& operator<< (std::ostream& stream, const t_openQASM& openQASM) {
                 stream << "<openQASM>";
                 for (const auto q: openQASM) {
                     ::boost::apply_visitor(Parser::AST::OpenQASMPrintingVisitor(stream), q);

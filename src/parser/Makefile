@@ -11,7 +11,7 @@ SDIR= .
 ODIR=	.
 
 # .cpp sources
-SRC=	test_main.cpp float_expr_ast.cpp
+SRC=	test_main.cpp float_expr_ast.cpp ASTGenerator.cpp
 
 # Includes for CXX
 INC= -I/usr/include/boost -I../../include

@@ -53,7 +53,8 @@
         "mutex": "cpp",
         "system_error": "cpp",
         "valarray": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "iterator": "cpp"
     },
     "clang.executable": "clang-6.0"
 }
