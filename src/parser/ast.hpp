@@ -63,6 +63,17 @@ namespace Parser {
             }
         };
 
+        struct t_id_list: public std::vector<t_reg> {
+            friend inline std::ostream& operator<< (std::ostream& stream, const t_id_list& id_list) {
+                stream << "<id_list>";
+                for (const auto q: id_list) {
+                    stream << q;
+                }
+                return stream << "</id_list>";
+            }
+        };
+
+
         struct t_cx_statement {
             t_qargs targets;
 
@@ -81,7 +92,7 @@ namespace Parser {
         };
 
         struct t_barrier_statement {
-            t_qargs targets;
+            t_id_list targets;
 
             friend inline std::ostream& operator<< (std::ostream& stream, const t_barrier_statement& barrier) {
                 return stream << "<barrier>" << barrier.targets << "</barrier>";
@@ -136,6 +147,34 @@ namespace Parser {
                             t_reset_statement,
                             t_u_statement,
                             t_gate_call_statement> t_statement;
+
+        struct t_conditional_statement {
+            t_reg variable;
+            uint  value;
+            t_statement statement;
+
+            friend inline std::ostream& operator<< (std::ostream& stream, const t_conditional_statement& conditional_statement) {
+                return stream << "<conditional_statement value=\"" << conditional_statement.value << "\">" <<
+                conditional_statement.variable << 
+                conditional_statement.statement << "</gate_call>";
+            }
+        };
+
+        // struct t_gate_declaration {
+        //     std::string name;
+        //     boost::optional<t_id_list> params;
+        //     t_id_list targets;
+        //     std::vector<t_statement> statements;
+
+        //     friend inline std::ostream& operator<< (std::ostream& stream, const t_gate_declaration& gate_decl) {
+        //         stream << "<gate_decl name=\"" << gate_decl.name << "\">" << gate_decl.params << gate_decl.targets;
+        //         for (const auto & s: gate_decl.statements) {
+        //             stream << s;
+        //         }
+        //         return stream << "</gate_decl>";
+        //     }
+        // };
+        
     }
 }
 
@@ -166,7 +205,7 @@ BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_measure_statement,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_barrier_statement,
-    (Parser::AST::t_qargs, targets)
+    (Parser::AST::t_id_list, targets)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_reset_statement,
@@ -183,5 +222,19 @@ BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_gate_call_statement,
     (boost::optional<Parser::AST::t_expr_list>, params)
     (Parser::AST::t_qargs, targets)
 )
+
+BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_conditional_statement,
+    (Parser::AST::t_reg, variable)
+    (uint, value)
+    (Parser::AST::t_statement, statement)
+)
+
+// BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_gate_declaration,
+//     (std::string, name)
+//     (boost::optional<Parser::AST::t_id_list>, params)
+//     (Parser::AST::t_id_list, targets)
+//     (std::vector<Parser::AST::t_statement>, statements)
+// )
+
 
 #endif /* AST_HPP_ */

@@ -21,9 +21,7 @@ std::ostream& Parser::AST::operator<< (std::ostream& stream, const t_float_expre
 }
 
 std::ostream& Parser::AST::operator<< (std::ostream& stream, const t_float_expr_operand& operand) {
-    // stream << "<float_expr_operand>";
     ::boost::apply_visitor(Parser::AST::OperandPrinterVisitor(stream), operand);
-    // return stream << "</float_expr_operand>";
     return stream;
 }
 

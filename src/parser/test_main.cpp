@@ -79,7 +79,8 @@ namespace Parser {
                      = variable % COMMA;
     const auto expr_list = rule<class expr_list, t_expr_list>()
                          = float_expr % COMMA;
-    const auto id_list = variable % COMMA;
+    const auto id_list = rule<class id_list, t_id_list>()
+                       = reg % COMMA;
 
     /* Statements */
     const auto creg_statement = rule<class creg_statement, t_creg_statement>()
@@ -93,7 +94,7 @@ namespace Parser {
     const auto measure_statement = rule<class measure_statement, t_measure_statement>()
                                  = "measure" >> WS >> variable >> *WS >> "->" >> *WS >> variable;
     const auto barrier_statement = rule<class barrier_statement, t_barrier_statement>()
-                                 = "barrier" >> WS >> qargs;
+                                 = "barrier" >> WS >> id_list;
     const auto reset_statement = rule<class reset_statement, t_reset_statement>()
                                = "reset" >> WS >> variable;
     const auto u_statement = rule<class u_statement, t_u_statement>()
@@ -115,22 +116,39 @@ namespace Parser {
                             u_statement |
                             gate_call_statement
                     ] >> ';';
+
+    const auto gate_ops = rule<class statement, t_statement>()
+                   = lexeme[cx_statement |
+                            u_statement |
+                            barrier_statement |
+                            gate_call_statement
+                    ] >> ';';
+
     const auto comment = omit[lexeme["//" >> *WS_INLINE >> *(~char_('\n'))]];
-    const auto conditional_statement = lexeme["if" >> LEFT_PARENTHESIS >> reg >> *WS >> "==" >> *WS >> UINT >> NONSPACED_RIGHT_PARENTHESIS >> WS >> statement];
+    const auto conditional_statement = rule<class conditional_statement, t_conditional_statement>()
+                                     = lexeme["if" >> LEFT_PARENTHESIS >>
+                                        reg >>
+                                        *WS >> "==" >> *WS >>
+                                        UINT >> NONSPACED_RIGHT_PARENTHESIS >> WS >>
+                                        statement];
 
     /* Gate declaration */
-    const auto gate_code_block = *WS >> '{' >> *(statement | WS | comment) >> '}' >> *WS;
-    const auto gate_definition =
-        lexeme[("gate" >> WS >> ID >> LEFT_PARENTHESIS >> id_list >> RIGHT_PARENTHESIS >> id_list >> gate_code_block) |
-        ("gate" >> WS >> ID >> LEFT_PARENTHESIS >> RIGHT_PARENTHESIS >> id_list >> gate_code_block) |
-        ("gate" >> WS >> ID >> id_list >> gate_code_block)];
+    const auto gate_code_block = rule<class gate_code_block, std::vector<t_statement>>()
+                               = *WS >> '{' >> *(gate_ops | WS | comment) >> '}' >> *WS;
+    const auto gate_declaration // = rule<class gate_declaration, t_gate_declaration>()
+        = lexeme["debuuuuug"]; /*("gate" >> WS >>
+                ID >>
+                -(omit[LEFT_PARENTHESIS] >> -(id_list) >> omit[NONSPACED_RIGHT_PARENTHESIS]) >>
+                WS >> id_list >>
+                gate_code_block)];
+                */
 
     /* Code */
     const auto VERSION = omit[lexeme["OPENQASM 2.0;"]];
     const auto header = omit[VERSION >> NEWLINE];
 
     const auto start = rule<class start, std::vector<std::string>>()
-                     = VERSION >> *(statement | WS | conditional_statement | comment | gate_definition);
+                     = VERSION >> *(statement | WS | conditional_statement | comment | gate_declaration);
 }
 
 using namespace Parser;
@@ -146,9 +164,9 @@ int main(int ac, char **av) {
 
     auto iter = str.begin();
     auto iterEnd = str.end();
-    t_statement res;
+    t_conditional_statement res;
     // t_float_expression res;
-    phrase_parse(iter, iterEnd, statement, WS, res);
+    phrase_parse(iter, iterEnd, conditional_statement, WS, res);
     if (iter != iterEnd) {
         std::cerr << "Parsing failed at character:" << std::endl;
         std::stringstream errorStream(std::string(iter, iterEnd));

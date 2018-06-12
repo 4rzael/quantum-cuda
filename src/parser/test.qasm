@@ -1,4 +1,4 @@
-ninja(0, pi/2) a, b, x[3];
+if (a == 3) ninja(0, pi/2) a, b, x[3];
 U(1 + 2 * (3-4) / -sqrt(5 * 6), 0, pi/2) x;
 reset q;
 barrier q, vder234[231], g;
