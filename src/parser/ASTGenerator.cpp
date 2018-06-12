@@ -149,7 +149,7 @@ namespace Parser::Rules {
     const auto header = omit[lexeme[VERSION >> NEWLINE]];
 
     const auto openQASM = rule<class start, t_openQASM>()
-                     = header >> *(statement | WS | conditional_statement | comment | gate_declaration);    
+                     = header >> *(omit[comment | WS] | statement | conditional_statement | gate_declaration);    
 }
 
 t_openQASM ASTGenerator::operator()(std::string const &filename) {
@@ -181,7 +181,9 @@ ASTGenerator::ASTGenerator(bool log, std::string const &log_folder, std::string 
 : m_log(log) {
     auto fullName = log_folder + (log_folder.back() == '/' ? "" : "/") + log_file;
 
-    m_outputStream = std::ofstream(fullName);
+    if (m_log) {
+        m_outputStream = std::ofstream(fullName);
+    }
 }
 
 ASTGenerator::ASTGenerator(bool log, std::string const &log_folder) {

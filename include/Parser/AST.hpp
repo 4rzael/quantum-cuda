@@ -138,8 +138,15 @@ namespace Parser {
             }
         };
 
+        // Not a valid statement: can be ignored (WS or comment)
+        struct t_invalid_statement {
+            friend std::ostream& operator<< (std::ostream& stream, const t_invalid_statement& invalid) {
+                return stream << "<invalid_statement></invalid_statement>";
+            }
+        };
 
-        typedef ::boost::variant<t_creg_statement,
+        typedef boost::variant<t_invalid_statement,
+                            t_creg_statement,
                             t_qreg_statement,
                             t_include_statement,
                             t_cx_statement,

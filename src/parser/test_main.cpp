@@ -10,7 +10,7 @@ int main(int ac, char **av) {
         std::cout << "Need an argument" << std::endl;
     }
 
-    Parser::ASTGenerator gen(true);
+    Parser::ASTGenerator gen(false);
     auto ast = gen(av[1]);
     LOG(Logger::DEBUG, "AST created:" << std::endl << ast);
 }
