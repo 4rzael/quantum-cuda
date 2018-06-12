@@ -160,21 +160,44 @@ namespace Parser {
             }
         };
 
-        // struct t_gate_declaration {
-        //     std::string name;
-        //     boost::optional<t_id_list> params;
-        //     t_id_list targets;
-        //     std::vector<t_statement> statements;
+        struct t_gate_declaration {
+            std::string name;
+            boost::optional<t_id_list> params;
+            t_id_list targets;
+            std::vector<t_statement> statements;
 
-        //     friend inline std::ostream& operator<< (std::ostream& stream, const t_gate_declaration& gate_decl) {
-        //         stream << "<gate_decl name=\"" << gate_decl.name << "\">" << gate_decl.params << gate_decl.targets;
-        //         for (const auto & s: gate_decl.statements) {
-        //             stream << s;
-        //         }
-        //         return stream << "</gate_decl>";
-        //     }
-        // };
+            friend inline std::ostream& operator<< (std::ostream& stream, const t_gate_declaration& gate_decl) {
+                stream << "<gate_decl name=\"" << gate_decl.name << "\">" << gate_decl.params << gate_decl.targets;
+                for (const auto & s: gate_decl.statements) {
+                    stream << s;
+                }
+                return stream << "</gate_decl>";
+            }
+        };
         
+        class OpenQASMPrintingVisitor : public ::boost::static_visitor<>
+        {
+        private:
+            std::ostream & m_out;
+        public:
+            OpenQASMPrintingVisitor(std::ostream & out) : m_out(out) {}
+            void operator()(const t_statement &s) const {m_out << s;}
+            void operator()(const t_conditional_statement &s) const {m_out << s;}
+            void operator()(const t_gate_declaration &d) const {m_out << d;}            
+        };
+
+        struct t_openQASM: public std::vector<boost::spirit::x3::variant<
+            t_statement,
+            t_conditional_statement,
+            t_gate_declaration>> {
+            friend inline std::ostream& operator<< (std::ostream& stream, const t_openQASM& openQASM) {
+                stream << "<openQASM>";
+                for (const auto q: openQASM) {
+                    ::boost::apply_visitor(Parser::AST::OpenQASMPrintingVisitor(stream), q);
+                }
+                return stream << "</openQASM>";
+            }
+        };
     }
 }
 
@@ -229,12 +252,12 @@ BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_conditional_statement,
     (Parser::AST::t_statement, statement)
 )
 
-// BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_gate_declaration,
-//     (std::string, name)
-//     (boost::optional<Parser::AST::t_id_list>, params)
-//     (Parser::AST::t_id_list, targets)
-//     (std::vector<Parser::AST::t_statement>, statements)
-// )
+BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_gate_declaration,
+    (std::string, name)
+    (boost::optional<Parser::AST::t_id_list>, params)
+    (Parser::AST::t_id_list, targets)
+    (std::vector<Parser::AST::t_statement>, statements)
+)
 
 
 #endif /* AST_HPP_ */

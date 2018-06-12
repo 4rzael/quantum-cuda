@@ -135,20 +135,19 @@ namespace Parser {
     /* Gate declaration */
     const auto gate_code_block = rule<class gate_code_block, std::vector<t_statement>>()
                                = *WS >> '{' >> *(gate_ops | WS | comment) >> '}' >> *WS;
-    const auto gate_declaration // = rule<class gate_declaration, t_gate_declaration>()
-        = lexeme["debuuuuug"]; /*("gate" >> WS >>
+    const auto gate_declaration = rule<class gate_declaration, t_gate_declaration>()
+        = lexeme[("gate" >> WS >>
                 ID >>
                 -(omit[LEFT_PARENTHESIS] >> -(id_list) >> omit[NONSPACED_RIGHT_PARENTHESIS]) >>
                 WS >> id_list >>
                 gate_code_block)];
-                */
 
     /* Code */
     const auto VERSION = omit[lexeme["OPENQASM 2.0;"]];
-    const auto header = omit[VERSION >> NEWLINE];
+    const auto header = omit[lexeme[VERSION >> NEWLINE]];
 
-    const auto start = rule<class start, std::vector<std::string>>()
-                     = VERSION >> *(statement | WS | conditional_statement | comment | gate_declaration);
+    const auto openQASM = rule<class start, t_openQASM>()
+                     = header >> *(statement | WS | conditional_statement | comment | gate_declaration);
 }
 
 using namespace Parser;
@@ -164,9 +163,9 @@ int main(int ac, char **av) {
 
     auto iter = str.begin();
     auto iterEnd = str.end();
-    t_conditional_statement res;
+    t_openQASM res;
     // t_float_expression res;
-    phrase_parse(iter, iterEnd, conditional_statement, WS, res);
+    phrase_parse(iter, iterEnd, openQASM, WS, res);
     if (iter != iterEnd) {
         std::cerr << "Parsing failed at character:" << std::endl;
         std::stringstream errorStream(std::string(iter, iterEnd));
