@@ -2,6 +2,7 @@
 # define LOGGER_HPP_
 
 #include <string>
+#include <sstream>
 #include <iostream>
 
 class Logger {
@@ -21,7 +22,7 @@ public:
         };
         const auto reset = "\033[0m ";
 
-        std::cerr << prefixes[(int)importance] << "[\"" << file << "\" (line " << line <<")]" << message << reset << std::endl;
+        std::cerr << prefixes[(int)importance] << "[\"" << file << "\" (line " << line <<")] " << message << reset << std::endl;
     }
 };
 

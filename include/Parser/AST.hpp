@@ -20,11 +20,11 @@ namespace Parser {
         };
 
         struct t_bit {
-            t_reg reg;
+            t_reg name;
             uint value;
 
             friend std::ostream& operator<< (std::ostream& stream, const t_bit& bit) {
-                return stream << "<bit>" << bit.reg << "<value=\"" << bit.value << "\"></value></bit>";
+                return stream << "<bit>" << bit.name << "<value=\"" << bit.value << "\"></value></bit>";
             }
         };
 
@@ -210,7 +210,7 @@ namespace Parser {
 }
 
 BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_bit,
-    (std::string, reg)
+    (Parser::AST::t_reg, name)
     (uint, value)
 )
 
