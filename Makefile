@@ -1,12 +1,21 @@
+# @Author: Julien Vial-Detambel <vial-d_j>
+# @Date:   2018-06-12T11:58:18+01:00
+# @Email:  julien.vial-detambel@epitech.eu
+# @Project: CUDA-Based Simulator of Quantum Systems
+# @Filename: Makefile
+# @Last modified by:   vial-d_j
+# @Last modified time: 2018-06-13T14:50:03+01:00
+# @License: MIT License
+
 CXX=	g++
 
-CXXFLAGS= -std=c++14
+CXXFLAGS= -Wextra -Wall -g3 -std=c++14
 
 NVCC=	nvcc
 
 RM=	rm -rf
 
-NAME=	build_gate
+NAME=	quSim
 
 # .cpp source files directory
 SDIR= src
@@ -24,9 +33,11 @@ CUODIR= cuda_obj
 CUSRC=
 
 # .cpp sources
-SRC=	build_gate.cpp \
-	naive_m_mult.cpp \
-	rotations.cpp \
+SRC=	naive_dot.cpp \
+	naive_kron.cpp \
+	naive_trc.cpp \
+	naive_trs.cpp \
+	QuCircuit.cpp \
 	main.cpp
 
 # Includes for CXX
