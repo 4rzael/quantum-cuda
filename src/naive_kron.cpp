@@ -5,14 +5,14 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: naive_kron.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-13T15:59:04+01:00
+ * @Last modified time: 2018-06-15T11:21:30+01:00
  * @License: MIT License
  */
 
 #include <iostream>
 #include "naive_kron.h"
 
-Tvcplxd kron(Tvcplxd a, Tvcplxd b, int ma, int mb) {
+Tvcplxd naive_kron(Tvcplxd a, Tvcplxd b, int ma, int mb) {
   int na = a.size() / ma;
   int nb = b.size() / mb;
 

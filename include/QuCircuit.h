@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: QuCircuit.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-13T14:21:09+01:00
+ * @Last modified time: 2018-06-15T13:18:51+01:00
  * @License: MIT License
  */
 
@@ -13,7 +13,8 @@
 
 #include <valarray>
 #include <complex>
-#include <cstdint>
+
+#include "Matrix.h"
 
 /** A convenient typedef for std::valarray<std::complex<double>> */
 typedef std::valarray<std::complex<double>> Tvcplxd;
@@ -23,37 +24,28 @@ typedef std::valarray<std::complex<double>> Tvcplxd;
 */
 class QuCircuit
 {
-    private:
-      /**
-      * The circuit state dimensions
-      */
-      std::pair<int, int> _stateDimensions;
-      /**
-       * A valarray of complex double reprensenting the state.
-       */
-      Tvcplxd _state;
+  private:
+    /**
+     * A Matrix object representing the state.
+     */
+    Matrix _state;
 
-    public:
-      /**
-       * Construct a QuCircuit object from a given size of qubits in state |0>.
-       * @param size The number of qubits to create.
-       */
-      QuCircuit(int size);
-      /**
-       * State getter.
-       * @return Return the quantum circuit state.
-       */
-      Tvcplxd getState();
-      /**
-      * Draw state util function
-      */
-      void drawState();
-      /**
-       * Run the circuit
-       */
-      void run();
-      /**
-       * Measure
-       */
-      void measure();
+  public:
+    /**
+     * Construct a QuCircuit object from a given size of qubits in state |0>.
+     * @param size The number of qubits to create.
+     */
+    QuCircuit(int size);
+    /**
+    * Draw state util function
+    */
+    void drawState();
+    /**
+     * Run the circuit
+     */
+    void run();
+    /**
+     * Measure
+     */
+    void measure();
 };
