@@ -40,5 +40,4 @@ namespace CircuitBuilder{
     Circuit buildCircuit(const Parser::AST::t_openQASM &ast);
 }
 
-
 #endif /* CIRCUIT_BUILDER_HPP_ */

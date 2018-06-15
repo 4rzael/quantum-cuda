@@ -3,17 +3,39 @@
 
 # include <vector>
 # include <string>
+# include <boost/variant/variant.hpp>
+
+# include "Parser/AST.hpp"
 
 struct Circuit {
     struct Register {
-        Register(const std::string &n, const uint &s)
-        : name(n), size(s) {}
+        Register(const std::string &n, const uint &s) : name(n), size(s) {}
         std::string name;
         uint        size;
     };
 
+    struct Qubit {
+        Qubit(const std::string &n, const uint &e) : registerName(n), element(e) {}
+        Qubit(const Parser::AST::t_bit &b) : registerName(b.name), element(b.value) {}
+        std::string registerName;
+        uint        element;
+    };
+
+    struct CXGate {
+        CXGate(const Qubit &ctrl, const Qubit &trgt)
+        : control(ctrl), target(trgt) {}
+        Qubit control;
+        Qubit target;
+    };
+
+    struct UGate {
+    };
+
+    typedef std::vector<boost::variant<CXGate, UGate>> Step;
+
     std::vector<Register> creg;
     std::vector<Register> qreg;
+    std::vector<Step> steps;
 };
 
 #endif /* CIRCUIT_HPP_ */

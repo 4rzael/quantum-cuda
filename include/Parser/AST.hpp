@@ -10,6 +10,13 @@
 
 # include "Parser/float_expr_ast.hpp"
 
+/*
+ * Note: if you want to speedup this parser execution, you might want to change
+ * every boost::variant to boost::spirit::x3::variant. I did not chose to do so
+ * because boost::spirit::x3::variant can only be visited using boost::visitor
+ * classes, which sometimes seems overkill IMHO.
+ */
+
 namespace Parser {
     namespace AST {
         struct t_reg: public std::string {
@@ -28,6 +35,7 @@ namespace Parser {
             }
         };
 
+        enum class t_variableType: int {T_BIT, T_REG};
         typedef ::boost::variant<t_bit, t_reg> t_variable;
 
         struct t_creg_statement {
@@ -134,7 +142,8 @@ namespace Parser {
             t_qargs targets;
 
             friend std::ostream& operator<< (std::ostream& stream, const t_gate_call_statement& gate_call) {
-                return stream << "<gate_call name=\"" << gate_call.name << "\">" << gate_call.params << gate_call.targets << "</gate_call>";
+                return stream << "<gate_call name=\"" << gate_call.name << "\">"
+                              << gate_call.params << gate_call.targets << "</gate_call>";
             }
         };
 
@@ -162,9 +171,8 @@ namespace Parser {
             t_statement statement;
 
             friend std::ostream& operator<< (std::ostream& stream, const t_conditional_statement& conditional_statement) {
-                return stream << "<conditional_statement value=\"" << conditional_statement.value << "\">" <<
-                conditional_statement.variable << 
-                conditional_statement.statement << "</gate_call>";
+                return stream << "<conditional_statement value=\"" << conditional_statement.value << "\">"
+                << conditional_statement.variable << conditional_statement.statement << "</gate_call>";
             }
         };
 
@@ -194,7 +202,7 @@ namespace Parser {
             void operator()(const t_gate_declaration &d) const {m_out << d;}            
         };
 
-        struct t_openQASM: public std::vector<boost::spirit::x3::variant<
+        struct t_openQASM: public std::vector<boost::variant<
             t_statement,
             t_conditional_statement,
             t_gate_declaration>> {
