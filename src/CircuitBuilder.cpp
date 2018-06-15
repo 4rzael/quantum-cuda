@@ -55,7 +55,7 @@ void StatementVisitor::operator()(const Parser::AST::t_cx_statement &statement) 
     for (const auto &target: statement.targets) {
         auto regName = getRegisterName(m_circuit, target);
         if (!containsRegister(m_circuit, regName, RegisterType::QREG)) {
-            return LOG(Logger::ERROR, "QREG " << regName << "does not exist");
+            return LOG(Logger::ERROR, "QREG " << regName << " does not exist");
         }
     }
 

@@ -93,19 +93,31 @@ namespace Parser {
         const auto include_statement = rule<class include_statement, t_include_statement>()
                             = "include" >> WS >> '"' >> FILENAME >> '"';
         const auto cx_statement = rule<class cx_statement, t_cx_statement>()
-                                = "CX" >> WS >> qargs;
+                                = "cx" >> WS >> qargs;
         const auto measure_statement = rule<class measure_statement, t_measure_statement>()
                                     = "measure" >> WS >> variable >> *WS >> "->" >> *WS >> variable;
         const auto barrier_statement = rule<class barrier_statement, t_barrier_statement>()
                                     = "barrier" >> WS >> id_list;
         const auto reset_statement = rule<class reset_statement, t_reset_statement>()
                                 = "reset" >> WS >> variable;
-        const auto u_statement = rule<class u_statement, t_u_statement>()
-                            = "U" >> omit[LEFT_PARENTHESIS] >> expr_list >> omit[NONSPACED_RIGHT_PARENTHESIS >> WS] >> variable;
+
         const auto gate_call_statement = rule<class gate_call_statement, t_gate_call_statement>()
                                     = (ID >>
                                             -(LEFT_PARENTHESIS >> -(expr_list) >> NONSPACED_RIGHT_PARENTHESIS) >>
                                         WS >> qargs);
+
+        /* U Statements */
+        const auto u1_param = rule<class u1_param, t_expr_list>() = repeat(1,1)[float_expr];
+        const auto u1 = rule<class u1, t_u_statement>()
+                      = "u1" >> omit[LEFT_PARENTHESIS] >> u1_param >> omit[NONSPACED_RIGHT_PARENTHESIS >> WS] >> variable;
+        const auto u2_param = rule<class u2_param, t_expr_list>() = repeat(1,1)[float_expr] >> repeat(1,1)[omit[COMMA] >> float_expr];
+        const auto u2 = rule<class u2, t_u_statement>()
+                      = "u2" >> omit[LEFT_PARENTHESIS] >> u2_param >> omit[NONSPACED_RIGHT_PARENTHESIS >> WS] >> variable;
+        const auto u3_param = rule<class u3_param, t_expr_list>() = repeat(1,1)[float_expr] >> repeat(2,2)[omit[COMMA] >> float_expr];
+        const auto u3 = rule<class u3, t_u_statement>()
+                      = "u3" >> omit[LEFT_PARENTHESIS] >> u3_param >> omit[NONSPACED_RIGHT_PARENTHESIS >> WS] >> variable;
+
+        const auto u_statement = rule<class u_statement, t_u_statement>() = u1 | u2 | u3;
 
         /* Statement types */
         const auto statement = rule<class statement, t_statement>()
