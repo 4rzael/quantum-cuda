@@ -4,6 +4,7 @@
 #include "CircuitBuilder.hpp"
 #include "Circuit.hpp"
 #include "Parser/AST.hpp"
+#include "FloatExpressionEvaluator.hpp"
 
 using namespace CircuitBuilder;
 
@@ -97,7 +98,7 @@ void StatementVisitor::operator()(const Parser::AST::t_cx_statement &statement) 
         auto target = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
                             [&targetName](auto r) {return r.name == targetName; });
         if ((*control).size != (*target).size) {
-            return LOG(Logger::ERROR, "Registers " << controlName << " and " << targetName << " sizes differ.");
+            return LOG(Logger::ERROR, "QRegisters " << controlName << " and " << targetName << " sizes differ.");
         }
         for (int i = 0; i < (*control).size; ++i) {
             step.push_back(Circuit::CXGate(
@@ -122,6 +123,37 @@ void StatementVisitor::operator()(const Parser::AST::t_cx_statement &statement) 
         }
     }
 }
+void StatementVisitor::operator()(const Parser::AST::t_u_statement &statement) const {
+    using namespace Parser::AST;
+    auto regName = getRegisterName(m_circuit, statement.target);
+    if (!containsRegister(m_circuit, regName, RegisterType::QREG)) {
+        return LOG(Logger::ERROR, "QREG " << regName << " does not exist");
+    }
+
+    Circuit::Step step;
+    if ((statement.target.which() == (int)t_variableType::T_BIT)) {
+        step.push_back(Circuit::UGate(
+            FloatExpressionEvaluator::evaluate(statement.params[0]),
+            FloatExpressionEvaluator::evaluate(statement.params[1]),
+            FloatExpressionEvaluator::evaluate(statement.params[2]),
+            Circuit::Qubit(boost::get<t_bit>(statement.target))
+        ));
+    } else {
+        auto targetName = boost::get<t_reg>(statement.target);
+        auto target = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
+                        [&targetName](auto r) {return r.name == targetName; });
+
+        for (int i = 0; i < (*target).size; ++i) {
+            step.push_back(Circuit::UGate(
+                FloatExpressionEvaluator::evaluate(statement.params[0]),
+                FloatExpressionEvaluator::evaluate(statement.params[1]),
+                FloatExpressionEvaluator::evaluate(statement.params[2]),
+                Circuit::Qubit(targetName, i)
+            ));
+        }
+    }
+    m_circuit.steps.push_back(step);
+}
 void StatementVisitor::operator()(const Parser::AST::t_include_statement &statement) const {
 
 }
@@ -132,9 +164,6 @@ void StatementVisitor::operator()(const Parser::AST::t_barrier_statement &statem
 
 }
 void StatementVisitor::operator()(const Parser::AST::t_reset_statement &statement) const {
-
-}
-void StatementVisitor::operator()(const Parser::AST::t_u_statement &statement) const {
 
 }
 void StatementVisitor::operator()(const Parser::AST::t_gate_call_statement &statement) const {
@@ -150,6 +179,7 @@ std::string const &getRegisterName(const Circuit &circuit, const Parser::AST::t_
     case (int)t_variableType::T_REG:
         return boost::get<t_reg>(var);
     }
+    // Todo: Throw ?
 }
 
 bool containsRegister(const Circuit &circuit, const std::string &name, const RegisterType rtype) {

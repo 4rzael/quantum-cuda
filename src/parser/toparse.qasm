@@ -2,8 +2,8 @@ OPENQASM 2.0;
 include "coucou.g";
 qreg ninja[3]; // bla
 creg bla[2];
-cx bla, ninja[2];
-u3(0,pi/4, ((3/4)*(pi/2))) bla[0];
+CX ninja[1], ninja[2];
+U(0,pi/4, ((3/4)*(pi/2))) ninja[0];
 
 measure ninja -> bla;
 measure ninja[1] -> bla[2];
@@ -15,5 +15,5 @@ mygate() q1, q2;
 mygate q;
 
 gate testgate(a) qa, qb {
-    cx qa, qb;
+    CX qa, qb;
 }

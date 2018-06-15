@@ -29,6 +29,13 @@ struct Circuit {
     };
 
     struct UGate {
+        UGate(double t, double p, double l, const Qubit &trgt)
+        : theta(t), phi(p), lambda(l), target(trgt) {}
+        
+        double theta;
+        double phi;
+        double lambda;
+        Qubit  target;
     };
 
     typedef std::vector<boost::variant<CXGate, UGate>> Step;
@@ -36,6 +43,8 @@ struct Circuit {
     std::vector<Register> creg;
     std::vector<Register> qreg;
     std::vector<Step> steps;
+
+    friend std::ostream& operator<< (std::ostream& stream, const Circuit & c);
 };
 
 #endif /* CIRCUIT_HPP_ */

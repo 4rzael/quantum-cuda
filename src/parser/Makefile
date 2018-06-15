@@ -8,10 +8,15 @@ NAME=	parser
 SDIR= .
 
 # objects from .cpp sources directory
-ODIR=	.
+ODIR= .
 
 # .cpp sources
-SRC=	test_main.cpp float_expr_ast.cpp ASTGenerator.cpp ../CircuitBuilder.cpp
+SRC=	test_main.cpp \
+		float_expr_ast.cpp \
+		ASTGenerator.cpp \
+		../CircuitBuilder.cpp \
+		../FloatExpressionEvaluator.cpp \
+		../Circuit.cpp
 
 # Includes for CXX
 INC= -I/usr/include/boost -I../../include

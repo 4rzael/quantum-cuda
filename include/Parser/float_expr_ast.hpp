@@ -14,7 +14,7 @@ namespace Parser {
         struct t_float_expression;
         class OperandPrinterVisitor;
 
-        typedef ::boost::spirit::x3::variant<float, std::string> t_float;
+        typedef ::boost::spirit::x3::variant<double, std::string> t_float;
 
         struct t_float_expr_nil {  
         };

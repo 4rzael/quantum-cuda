@@ -17,5 +17,6 @@ int main(int ac, char **av) {
     LOG(Logger::DEBUG, "AST created:" << std::endl << ast);
 
     Circuit circuit = CircuitBuilder::buildCircuit(ast);
-    std::cout << "Circuit qreg length:" << circuit.qreg.size() << std::endl;
+    std::cout << circuit << std::endl;
+    // std::cout << "Circuit qreg length:" << circuit.qreg.size() << std::endl;
 }
