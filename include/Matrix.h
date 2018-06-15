@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-15T13:21:13+01:00
+ * @Last modified time: 2018-06-15T13:56:32+01:00
  * @License: MIT License
  */
 
@@ -13,6 +13,7 @@
 
 #include <valarray>
 #include <complex>
+#include <vector>
 
  /** A convenient typedef for std::valarray<std::complex<double>> */
  typedef std::valarray<std::complex<double>> Tvcplxd;
@@ -57,9 +58,9 @@ class Matrix {
     */
     Matrix operator*(const Matrix& other) const;
     /**
-    * Matrix kron operator
+    * Matrix kron operation
     */
-    Matrix kron(const Matrix& other) const;
+    static Matrix kron(std::vector<Matrix> m);
     /**
     * Matrix transpose
     */

@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-15T13:17:55+01:00
+ * @Last modified time: 2018-06-15T14:23:39+01:00
  * @License: MIT License
  */
 
@@ -39,11 +39,14 @@ Matrix Matrix::operator*(const Matrix& other) const {
   return result;
 }
 
-Matrix Matrix::kron(const Matrix& other) const {
-  Matrix result = Matrix(naive_kron(_content, other.getContent(),
-  _dim.first, other.getDimensions().first),
-  _dim.first * other.getDimensions().first,
-  _dim.second * other.getDimensions().second);
+Matrix Matrix::kron(std::vector<Matrix> m) {
+  Matrix result = m[0];
+  for (uint32_t i = 1; i < m.size(); i++) {
+    result = Matrix(naive_kron(result.getContent(), m[i].getContent(),
+    result.getDimensions().first, m[i].getDimensions().first),
+    result.getDimensions().first * m[i].getDimensions().first,
+    result.getDimensions().second * m[i].getDimensions().second);
+  }
   return result;
 }
 
