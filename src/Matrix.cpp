@@ -5,18 +5,14 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-15T14:23:39+01:00
+ * @Last modified time: 2018-06-16T09:55:52+01:00
  * @License: MIT License
  */
 
 #include <iostream>
 
-#include "naive_dot.h"
-#include "naive_kron.h"
-#include "naive_trs.h"
-#include "naive_trc.h"
-
 #include "Matrix.h"
+#include "CPUExecutor.h"
 
 Matrix::Matrix(Tvcplxd content, int m, int n) {
   _content = content;
@@ -32,7 +28,9 @@ std::pair<int, int> Matrix::getDimensions() const {
 }
 
 Matrix Matrix::operator*(const Matrix& other) const {
-  Matrix result = Matrix(dot(_content, other.getContent(),
+  Executor *exec = new CPUExecutor();
+
+  Matrix result = Matrix(exec->dot(_content, other.getContent(),
     _dim.first, other.getDimensions().first,
     _dim.second, other.getDimensions().second),
     other.getDimensions().first, _dim.second);
@@ -40,9 +38,11 @@ Matrix Matrix::operator*(const Matrix& other) const {
 }
 
 Matrix Matrix::kron(std::vector<Matrix> m) {
+  Executor *exec = new CPUExecutor();
+
   Matrix result = m[0];
   for (uint32_t i = 1; i < m.size(); i++) {
-    result = Matrix(naive_kron(result.getContent(), m[i].getContent(),
+    result = Matrix(exec->kron(result.getContent(), m[i].getContent(),
     result.getDimensions().first, m[i].getDimensions().first),
     result.getDimensions().first * m[i].getDimensions().first,
     result.getDimensions().second * m[i].getDimensions().second);
@@ -51,13 +51,17 @@ Matrix Matrix::kron(std::vector<Matrix> m) {
 }
 
 Matrix Matrix::T() const {
-  Matrix result = Matrix(trs(_content, _dim.first, _dim.second),
+  Executor *exec = new CPUExecutor();
+
+  Matrix result = Matrix(exec->T(_content, _dim.first, _dim.second),
   _dim.second, _dim.first);
   return result;
 }
 
 std::complex<double> Matrix::tr() const {
-  return trc(_content, _dim.first);
+  Executor *exec = new CPUExecutor();
+
+  return exec->tr(_content, _dim.first);
 }
 
 std::ostream& operator<<(std::ostream& os, const Matrix& m)

@@ -4,7 +4,7 @@
 # @Project: CUDA-Based Simulator of Quantum Systems
 # @Filename: Makefile
 # @Last modified by:   vial-d_j
-# @Last modified time: 2018-06-15T09:22:48+01:00
+# @Last modified time: 2018-06-16T09:53:33+01:00
 # @License: MIT License
 
 CXX=	g++
@@ -33,10 +33,7 @@ CUODIR= cuda_obj
 CUSRC=
 
 # .cpp sources
-SRC=	naive_dot.cpp \
-	naive_kron.cpp \
-	naive_trc.cpp \
-	naive_trs.cpp \
+SRC=	CPUExecutor.cpp \
 	Matrix.cpp \
 	QuCircuit.cpp \
 	main.cpp
