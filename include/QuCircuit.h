@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: QuCircuit.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-15T13:18:51+01:00
+ * @Last modified time: 2018-06-16T10:44:27+01:00
  * @License: MIT License
  */
 
