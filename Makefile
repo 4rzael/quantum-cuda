@@ -4,7 +4,7 @@
 # @Project: CUDA-Based Simulator of Quantum Systems
 # @Filename: Makefile
 # @Last modified by:   vial-d_j
-# @Last modified time: 2018-06-16T09:53:33+01:00
+# @Last modified time: 2018-06-16T10:09:59+01:00
 # @License: MIT License
 
 CXX=	g++
@@ -34,6 +34,7 @@ CUSRC=
 
 # .cpp sources
 SRC=	CPUExecutor.cpp \
+	ExecutorManager.cpp \
 	Matrix.cpp \
 	QuCircuit.cpp \
 	main.cpp

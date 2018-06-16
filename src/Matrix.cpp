@@ -5,13 +5,14 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-16T09:55:52+01:00
+ * @Last modified time: 2018-06-16T10:14:09+01:00
  * @License: MIT License
  */
 
 #include <iostream>
 
 #include "Matrix.h"
+#include "ExecutorManager.h"
 #include "CPUExecutor.h"
 
 Matrix::Matrix(Tvcplxd content, int m, int n) {
@@ -28,7 +29,7 @@ std::pair<int, int> Matrix::getDimensions() const {
 }
 
 Matrix Matrix::operator*(const Matrix& other) const {
-  Executor *exec = new CPUExecutor();
+  Executor *exec = ExecutorManager::getInstance().getExecutor();
 
   Matrix result = Matrix(exec->dot(_content, other.getContent(),
     _dim.first, other.getDimensions().first,
@@ -38,7 +39,7 @@ Matrix Matrix::operator*(const Matrix& other) const {
 }
 
 Matrix Matrix::kron(std::vector<Matrix> m) {
-  Executor *exec = new CPUExecutor();
+  Executor *exec = ExecutorManager::getInstance().getExecutor();
 
   Matrix result = m[0];
   for (uint32_t i = 1; i < m.size(); i++) {
@@ -51,7 +52,7 @@ Matrix Matrix::kron(std::vector<Matrix> m) {
 }
 
 Matrix Matrix::T() const {
-  Executor *exec = new CPUExecutor();
+  Executor *exec = ExecutorManager::getInstance().getExecutor();
 
   Matrix result = Matrix(exec->T(_content, _dim.first, _dim.second),
   _dim.second, _dim.first);
@@ -59,7 +60,7 @@ Matrix Matrix::T() const {
 }
 
 std::complex<double> Matrix::tr() const {
-  Executor *exec = new CPUExecutor();
+  Executor *exec = ExecutorManager::getInstance().getExecutor();
 
   return exec->tr(_content, _dim.first);
 }
