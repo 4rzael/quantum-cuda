@@ -7,6 +7,7 @@
 #include "FloatExpressionEvaluator.hpp"
 
 using namespace CircuitBuilder;
+using namespace Parser::AST;
 
 enum class RegisterType {ANY, CREG, QREG};
 bool containsRegister(const Circuit &circuit, const std::string &name, const RegisterType rtype=RegisterType::ANY);
@@ -47,8 +48,6 @@ void StatementVisitor::operator()(const Parser::AST::t_qreg_statement &statement
 }
 /* TODO: Check that the control and target of CX can't be the same*/
 void StatementVisitor::operator()(const Parser::AST::t_cx_statement &statement) const {
-    using namespace Parser::AST;
-
     if (statement.targets.size() != 2) {
         return LOG(Logger::ERROR, "CX expected 2 arguments, got " << statement.targets.size());
     }
@@ -124,7 +123,6 @@ void StatementVisitor::operator()(const Parser::AST::t_cx_statement &statement) 
     }
 }
 void StatementVisitor::operator()(const Parser::AST::t_u_statement &statement) const {
-    using namespace Parser::AST;
     auto regName = getRegisterName(m_circuit, statement.target);
     if (!containsRegister(m_circuit, regName, RegisterType::QREG)) {
         return LOG(Logger::ERROR, "QREG " << regName << " does not exist");
@@ -158,7 +156,17 @@ void StatementVisitor::operator()(const Parser::AST::t_include_statement &statem
 
 }
 void StatementVisitor::operator()(const Parser::AST::t_measure_statement &statement) const {
+    if (statement.source.which() == (int)t_variableType::T_BIT
+     && statement.dest.which() == (int)t_variableType::T_BIT) {
 
+     }
+     else if (statement.source.which() == (int)t_variableType::T_REG
+           && statement.dest.which() == (int)t_variableType::T_REG) {
+ 
+     }
+     else {
+         LOG(Logger::ERROR, "Measure cannot be called with a mix of registers and bits");
+     }
 }
 void StatementVisitor::operator()(const Parser::AST::t_barrier_statement &statement) const {
 
