@@ -1,10 +1,21 @@
+# @Author: Julien Vial-Detambel <vial-d_j>
+# @Date:   2018-06-12T11:58:18+01:00
+# @Email:  julien.vial-detambel@epitech.eu
+# @Project: CUDA-Based Simulator of Quantum Systems
+# @Filename: Makefile
+# @Last modified by:   vial-d_j
+# @Last modified time: 2018-06-16T10:09:59+01:00
+# @License: MIT License
+
 CXX=	g++
+
+CXXFLAGS= -Wextra -Wall -g3 -std=c++14
 
 NVCC=	nvcc
 
 RM=	rm -rf
 
-NAME=	simplePrintf
+NAME=	quSim
 
 # .cpp source files directory
 SDIR= src
@@ -19,10 +30,14 @@ ODIR=	obj
 CUODIR= cuda_obj
 
 # .cu source files
-CUSRC=	simplePrintf.cu
+CUSRC=
 
 # .cpp sources
-SRC=	main.cpp
+SRC=	CPUExecutor.cpp \
+	ExecutorManager.cpp \
+	Matrix.cpp \
+	QuCircuit.cpp \
+	main.cpp
 
 # Includes for CXX
 INC= -Iinclude -Icuda_include
@@ -48,7 +63,7 @@ $(ODIR):
 
 # create objects from .cpp source files
 $(ODIR)/%.o:	$(SDIR)/%.cpp
-		$(CXX) $(INC) -o $@ -c $<
+		$(CXX) $(CXXFLAGS) $(INC) -o $@ -c $<
 
 # create objects from .cu source files directory
 $(CUODIR):
@@ -59,7 +74,7 @@ $(CUODIR)/%.o:	$(CUSDIR)/%.cu
 		$(NVCC) $(CUINC) -o $@ -c $<
 
 $(NAME):	$(OBJS) $(CUOBJS)
-		$(CXX) -o $(NAME) $(OBJS) $(CUOBJS) $(LDIR)
+		$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS) $(CUOBJS) $(LDIR)
 
 clean:
 	$(RM) $(ODIR) $(CUODIR)
