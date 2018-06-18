@@ -1,9 +1,8 @@
-#ifndef AST_GENERATOR_HPP_
-# define AST_GENERATOR_HPP_
+#pragma once
 
-# include <fstream>
-# include <string>
-# include "Parser/AST.hpp"
+#include <fstream>
+#include <string>
+#include "Parser/AST.hpp"
 
 namespace Parser {
     class ASTGenerator {
@@ -16,5 +15,3 @@ namespace Parser {
         std::ofstream m_outputStream;
     };
 }
-
-#endif

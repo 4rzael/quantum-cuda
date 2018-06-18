@@ -1,11 +1,9 @@
-#ifndef CIRCUIT_HPP_
-# define CIRCUIT_HPP_
+#pragma once
+#include <vector>
+#include <string>
+#include <boost/variant/variant.hpp>
 
-# include <vector>
-# include <string>
-# include <boost/variant/variant.hpp>
-
-# include "Parser/AST.hpp"
+#include "Parser/AST.hpp"
 
 struct Circuit {
     struct Register {
@@ -38,7 +36,14 @@ struct Circuit {
         Qubit  target;
     };
 
-    typedef std::vector<boost::variant<CXGate, UGate>> Step;
+    struct Measurement {
+        Measurement(const Qubit &src, const Qubit &dst)
+        : source(src), dest(dst) {}
+        Qubit source;
+        Qubit dest;
+    };
+
+    typedef std::vector<boost::variant<CXGate, UGate, Measurement>> Step;
 
     std::vector<Register> creg;
     std::vector<Register> qreg;
@@ -46,5 +51,3 @@ struct Circuit {
 
     friend std::ostream& operator<< (std::ostream& stream, const Circuit & c);
 };
-
-#endif /* CIRCUIT_HPP_ */

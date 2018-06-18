@@ -6,13 +6,13 @@ using namespace Parser::AST;
 namespace FloatExpressionEvaluator {
     struct FloatBasicVisitor: boost::static_visitor<double> {
         double operator()(double d) const {return d;}
-        double operator()(std::string const &s) const {return M_PI;}
+        double operator()(__attribute__((unused)) std::string const &) const {return M_PI;}
     };
 
     struct FloatExpressionVisitor: boost::static_visitor<double> {
         typedef double result_type;
 
-        double operator()(t_float_expr_nil) const { BOOST_ASSERT(0); return 0; }
+        double operator()(__attribute__((unused)) t_float_expr_nil const &) const { BOOST_ASSERT(0); return 0; }
         double operator()(t_float const &f) const {
             return boost::apply_visitor(FloatBasicVisitor(), f);
         }

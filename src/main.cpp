@@ -14,12 +14,29 @@
 
 #include "QuCircuit.hpp"
 
-int main(int ac, char **av) {
-  QuCircuit circuit(2);
+#include "Parser/ASTGenerator.hpp"
+#include "Circuit.hpp"
+#include "Parser/CircuitBuilder.hpp"
+#include "Logger.hpp"
 
-  circuit.drawState();
-  circuit.run();
-  circuit.drawState();
-  circuit.measure();
+int main(int ac, char **av) {
+  if (ac <2) {
+      std::cout << "Need an argument" << std::endl;
+  }
+
+  Parser::ASTGenerator gen(false);
+  auto ast = gen(av[1]);
+  LOG(Logger::DEBUG, "AST created:" << std::endl << ast);
+
+  Circuit circuit = CircuitBuilder::buildCircuit(ast);
+  std::cout << circuit << std::endl;
+
+
+  // QuCircuit circuit(2);
+
+  // circuit.drawState();
+  // circuit.run();
+  // circuit.drawState();
+  // circuit.measure();
   return EXIT_SUCCESS;
 }
