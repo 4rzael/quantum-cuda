@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-15T13:56:32+01:00
+ * @Last modified time: 2018-06-18T09:35:32+01:00
  * @License: MIT License
  */
 
@@ -26,11 +26,11 @@ class Matrix {
     /**
     * The matrix dimensions
     */
-    std::pair<int, int> _dim;
+    std::pair<int, int> m_dim;
     /**
     * The matrix content state n dimension
     */
-    Tvcplxd _content;
+    Tvcplxd m_content;
   public:
     /**
      * Default matrix constructor

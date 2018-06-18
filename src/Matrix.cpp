@@ -5,36 +5,36 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-16T10:14:09+01:00
+ * @Last modified time: 2018-06-18T09:28:13+01:00
  * @License: MIT License
  */
 
 #include <iostream>
 
-#include "Matrix.h"
-#include "ExecutorManager.h"
-#include "CPUExecutor.h"
+#include "Matrix.hpp"
+#include "ExecutorManager.hpp"
+#include "CPUExecutor.hpp"
 
 Matrix::Matrix(Tvcplxd content, int m, int n) {
-  _content = content;
-  _dim = std::make_pair(m, n);
+  m_content = content;
+  m_dim = std::make_pair(m, n);
 }
 
 Tvcplxd Matrix::getContent() const {
-  return _content;
+  return m_content;
 }
 
 std::pair<int, int> Matrix::getDimensions() const {
-  return _dim;
+  return m_dim;
 }
 
 Matrix Matrix::operator*(const Matrix& other) const {
   Executor *exec = ExecutorManager::getInstance().getExecutor();
 
-  Matrix result = Matrix(exec->dot(_content, other.getContent(),
-    _dim.first, other.getDimensions().first,
-    _dim.second, other.getDimensions().second),
-    other.getDimensions().first, _dim.second);
+  Matrix result = Matrix(exec->dot(m_content, other.getContent(),
+    m_dim.first, other.getDimensions().first,
+    m_dim.second, other.getDimensions().second),
+    other.getDimensions().first, m_dim.second);
   return result;
 }
 
@@ -54,15 +54,14 @@ Matrix Matrix::kron(std::vector<Matrix> m) {
 Matrix Matrix::T() const {
   Executor *exec = ExecutorManager::getInstance().getExecutor();
 
-  Matrix result = Matrix(exec->T(_content, _dim.first, _dim.second),
-  _dim.second, _dim.first);
+  Matrix result = Matrix(exec->T(m_content, m_dim.first, m_dim.second),
+  m_dim.second, m_dim.first);
   return result;
 }
 
 std::complex<double> Matrix::tr() const {
   Executor *exec = ExecutorManager::getInstance().getExecutor();
-
-  return exec->tr(_content, _dim.first);
+  return exec->tr(m_content, m_dim.first);
 }
 
 std::ostream& operator<<(std::ostream& os, const Matrix& m)

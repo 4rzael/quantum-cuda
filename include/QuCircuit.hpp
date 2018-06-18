@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: QuCircuit.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-16T10:44:27+01:00
+ * @Last modified time: 2018-06-18T09:24:22+01:00
  * @License: MIT License
  */
 
@@ -14,7 +14,7 @@
 #include <valarray>
 #include <complex>
 
-#include "Matrix.h"
+#include "Matrix.hpp"
 
 /** A convenient typedef for std::valarray<std::complex<double>> */
 typedef std::valarray<std::complex<double>> Tvcplxd;
@@ -28,7 +28,7 @@ class QuCircuit
     /**
      * A Matrix object representing the state.
      */
-    Matrix _state;
+    Matrix m_state;
 
   public:
     /**

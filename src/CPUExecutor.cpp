@@ -5,12 +5,12 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CPUExecutor.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-16T09:50:44+01:00
+ * @Last modified time: 2018-06-18T09:19:14+01:00
  * @License: MIT License
  */
 
 
-#include "CPUExecutor.h"
+#include "CPUExecutor.hpp"
 
 Tvcplxd CPUExecutor::dot(Tvcplxd a, Tvcplxd b, int ma, int mb, int na, int nb) {
   Tvcplxd result(na * mb);

@@ -5,11 +5,11 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CPUExecutor.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-16T10:38:15+01:00
+ * @Last modified time: 2018-06-18T09:17:53+01:00
  * @License: MIT License
  */
 
-#include "Executor.h"
+#include "Executor.hpp"
 
 /** A convenient typedef for std::valarray<std::complex<double>> */
  typedef std::valarray<std::complex<double>> Tvcplxd;

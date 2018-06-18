@@ -1,10 +1,23 @@
+/**
+ * @Author: Julien Vial-Detambel <vial-d_j>
+ * @Date:   2018-06-18T12:03:07+01:00
+ * @Email:  julien.vial-detambel@epitech.eu
+ * @Project: CUDA-Based Simulator of Quantum Systems
+ * @Filename: CircuitBuilder.cpp
+ * @Last modified by:   vial-d_j
+ * @Last modified time: 2018-06-18T12:05:35+01:00
+ * @License: MIT License
+ */
+
+
+
 #include <algorithm>
 
 #include "Logger.hpp"
-#include "CircuitBuilder.hpp"
+#include "Parser/CircuitBuilder.hpp"
 #include "Circuit.hpp"
 #include "Parser/AST.hpp"
-#include "FloatExpressionEvaluator.hpp"
+#include "Parser/FloatExpressionEvaluator.hpp"
 
 using namespace CircuitBuilder;
 using namespace Parser::AST;
@@ -162,7 +175,7 @@ void StatementVisitor::operator()(const Parser::AST::t_measure_statement &statem
      }
      else if (statement.source.which() == (int)t_variableType::T_REG
            && statement.dest.which() == (int)t_variableType::T_REG) {
- 
+
      }
      else {
          LOG(Logger::ERROR, "Measure cannot be called with a mix of registers and bits");

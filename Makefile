@@ -4,12 +4,12 @@
 # @Project: CUDA-Based Simulator of Quantum Systems
 # @Filename: Makefile
 # @Last modified by:   vial-d_j
-# @Last modified time: 2018-06-16T10:09:59+01:00
+# @Last modified time: 2018-06-18T12:08:20+01:00
 # @License: MIT License
 
 CXX=	g++
 
-CXXFLAGS= -Wextra -Wall -g3 -std=c++14
+CXXFLAGS= -Wextra -Wall -std=c++14
 
 NVCC=	nvcc
 
@@ -33,14 +33,19 @@ CUODIR= cuda_obj
 CUSRC=
 
 # .cpp sources
-SRC=	CPUExecutor.cpp \
+SRC= Parser/float_expr_ast.cpp \
+	Parser/ASTGenerator.cpp \
+	Parser/CircuitBuilder.cpp \
+	Parser/FloatExpressionEvaluator.cpp \
+	Circuit.cpp \
+	CPUExecutor.cpp \
 	ExecutorManager.cpp \
 	Matrix.cpp \
 	QuCircuit.cpp \
 	main.cpp
 
 # Includes for CXX
-INC= -Iinclude -Icuda_include
+INC= -Iinclude -I/usr/include/boost -Icuda_include
 
 # Includes for NVCC
 CUINC= -I $(CUDA_HOME)/samples/common/inc/ -Icuda_include
@@ -60,6 +65,7 @@ all:	$(ODIR) $(CUODIR) $(NAME)
 # create objects from .cpp source files directory
 $(ODIR):
 	mkdir $(ODIR)
+	mkdir $(ODIR)/Parser
 
 # create objects from .cpp source files
 $(ODIR)/%.o:	$(SDIR)/%.cpp

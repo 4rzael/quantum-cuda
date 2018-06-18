@@ -5,14 +5,14 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: main.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-13T13:04:04+01:00
+ * @Last modified time: 2018-06-18T09:20:08+01:00
  * @License: MIT License
  */
 
 #include <iostream>
 #include <cmath>
 
-#include "QuCircuit.h"
+#include "QuCircuit.hpp"
 
 int main(int ac, char **av) {
   QuCircuit circuit(2);

@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: QuCircuit.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-15T14:18:49+01:00
+ * @Last modified time: 2018-06-18T09:29:38+01:00
  * @License: MIT License
  */
 
@@ -13,13 +13,13 @@
 #include <cstdio>
 #include <cmath>
 
-#include "Matrix.h"
+#include "Matrix.hpp"
 
-#include "QuCircuit.h"
+#include "QuCircuit.hpp"
 
 QuCircuit::QuCircuit(int size) {
   std::vector<Matrix> qubits(size, Matrix({1.0, 0.0}, 1, 2));
-  _state = Matrix::kron(qubits);
+  m_state = Matrix::kron(qubits);
 }
 
 void QuCircuit::run() {
@@ -28,7 +28,7 @@ void QuCircuit::run() {
 
   Matrix op = Matrix::kron({id, h});
   std::cout << "op = " << op << std::endl;
-  _state = op * _state;
+  m_state = op * m_state;
 }
 
 void QuCircuit::measure() {
@@ -43,11 +43,11 @@ void QuCircuit::measure() {
   Matrix x = Matrix::kron({proj_zero, id});
   std::cout << "x = " << x << std::endl;
 
-  Matrix y = x * _state;
+  Matrix y = x * m_state;
   std::cout << "y = " << y << std::endl;
   std::cout << y.tr() << std::endl;
 }
 
 void QuCircuit::drawState() {
-  std::cout << _state << std::endl;
+  std::cout << m_state << std::endl;
 }

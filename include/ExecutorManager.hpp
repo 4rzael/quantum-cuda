@@ -5,11 +5,11 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: ExecutorManager.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-16T10:44:20+01:00
+ * @Last modified time: 2018-06-18T09:25:49+01:00
  * @License: MIT License
  */
 
-#include "Executor.h"
+#include "Executor.hpp"
 
 /**
 * Matrix linear algebra executors singleton manager.
@@ -22,8 +22,8 @@ class ExecutorManager
     * @return The ExecutorManager singleton instance.
     */
     static ExecutorManager& getInstance() {
-      static ExecutorManager instance;
-      return instance;
+      static ExecutorManager m_instance;
+      return m_instance;
     }
     ExecutorManager(ExecutorManager const&) = delete;
     void operator=(ExecutorManager const&) = delete;
@@ -41,5 +41,5 @@ class ExecutorManager
     /**
     * The ExecutorManager executor object.
     */
-    Executor *_executor;
+    Executor *m_executor;
 };

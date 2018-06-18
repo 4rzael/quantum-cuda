@@ -5,18 +5,18 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: ExecutorManager.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-16T10:12:01+01:00
+ * @Last modified time: 2018-06-18T09:26:03+01:00
  * @License: MIT License
  */
 
-#include "CPUExecutor.h"
+#include "CPUExecutor.hpp"
 
-#include "ExecutorManager.h"
+#include "ExecutorManager.hpp"
 
 ExecutorManager::ExecutorManager() {
-  _executor = new CPUExecutor();
+  m_executor = new CPUExecutor();
 }
 
 Executor *ExecutorManager::getExecutor() {
-  return _executor;
+  return m_executor;
 }
