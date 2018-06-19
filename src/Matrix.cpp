@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-18T09:28:13+01:00
+ * @Last modified time: 2018-06-19T12:51:00+01:00
  * @License: MIT License
  */
 
@@ -66,15 +66,15 @@ std::complex<double> Matrix::tr() const {
 
 std::ostream& operator<<(std::ostream& os, const Matrix& m)
 {
-    os << "[\n";
+    os << "[" << std::endl;
     for (int j = 0; j < m.getDimensions().second; j++) {
       os << " [";
       for (int i = 0; i < m.getDimensions().first; i++) {
         os << " " << m.getContent()[j * m.getDimensions().first + i].real() <<
         "+" << m.getContent()[j * m.getDimensions().first + i].imag() << "i";
       }
-      os << " ],\n";
+      os << " ]," << std::endl;
     }
-    os << "]\n";
+    os << "]";
     return os;
 }
