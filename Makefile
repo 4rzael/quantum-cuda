@@ -9,7 +9,9 @@
 
 CXX=	g++
 
-CXXFLAGS= -Wextra -Wall -std=c++14
+OPTIFLAGS= -g3
+
+CXXFLAGS= -Wextra -Wall -std=c++14 $(OPTIFLAGS)
 
 NVCC=	nvcc
 
@@ -43,6 +45,8 @@ SRC= Parser/float_expr_ast.cpp \
 	Matrix.cpp \
 	QuCircuit.cpp \
 	main.cpp
+
+$(ODIR)/Parser/ASTGenerator.o: CXXFLAGS:=$(filter-out $(OPTIFLAGS),$(CXXFLAGS))
 
 # Includes for CXX
 INC= -Iinclude -I/usr/include/boost -Icuda_include
