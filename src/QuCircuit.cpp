@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: QuCircuit.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-19T12:45:16+01:00
+ * @Last modified time: 2018-06-21T08:50:41+01:00
  * @License: MIT License
  */
 
@@ -27,48 +27,76 @@ QuCircuit::QuCircuit(Circuit layout) {
   m_state = Matrix::kron(qubits);
 }
 
-
-using namespace std::complex_literals;
-struct StepVisitor : public boost::static_visitor<std::pair<int, Matrix>>
+struct StepsVisitor : public boost::static_visitor<>
 {
-  std::pair<int, Matrix> operator()(const Circuit::UGate& value, const std::map<std::string, int> &offsets) const {
-    Circuit::Qubit target = value.target;
-    int id = offsets.find(target.registerName)->second;
-    id += target.element;
+  private:
+    std::map<std::string, int> m_offsets;
+    std::vector<Matrix> lgates;
+    std::vector<Matrix> rgates;
 
-    return std::make_pair(id, Matrix({exp(-1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2),
-      -exp(-1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2),
-      exp(1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2),
-      exp(1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2)
-    }, 2, 2));
-  }
-  std::pair<int, Matrix> operator()(const Circuit::CXGate& value, const std::map<std::string, int> &offsets) const {
-    Circuit::Qubit control = value.control;
-    int controlId = offsets.find(control.registerName)->second;
-    controlId += control.element;
+  public:
+    StepsVisitor(int size, std::map<std::string, int>& offsets) : m_offsets(offsets) {
+      m_offsets = offsets;
+      lgates = std::vector<Matrix>(size, Matrix({1.0, 0.0, 0.0, 1.0}, 2, 2));
+      rgates = std::vector<Matrix>(size, Matrix({1.0, 0.0, 0.0, 1.0}, 2, 2));
+    }
 
-    Circuit::Qubit target = value.target;
-    int targetId = offsets.find(target.registerName)->second;
-    targetId += target.element;
-    std::cout << "CX not implemented yet!" << std::endl;
-    return std::make_pair(targetId, Matrix({1, 0, 0, 1}, 2, 2));
-  }
+    void operator()(const Circuit::UGate& value) {
+      Circuit::Qubit target = value.target;
+      int id = m_offsets.find(target.registerName)->second;
+      id += target.element;
+
+      using namespace std::complex_literals;
+      lgates[id] = Matrix({exp(-1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2),
+        -exp(-1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2),
+        exp(1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2),
+        exp(1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2)
+      }, 2, 2);
+    }
+
+    void operator()(const Circuit::CXGate& value) {
+      Circuit::Qubit control = value.control;
+      int controlId = m_offsets.find(control.registerName)->second;
+      controlId += control.element;
+
+      Matrix zero = Matrix({1.0, 0.0}, 1, 2);
+      Matrix proj_zero = zero * zero.T();
+
+      lgates[controlId] = proj_zero;
+
+      Circuit::Qubit target = value.target;
+      int targetId = m_offsets.find(target.registerName)->second;
+      targetId += target.element;
+
+      Matrix one = Matrix({0.0, 1.0}, 1, 2);
+      Matrix proj_one = one * one.T();
+      Matrix x = Matrix({0.0, 1.0, 1.0, 0.0}, 2, 2);
+
+      rgates[targetId] = proj_one;
+      rgates[targetId] = x;
+
+      //Matrix CNOT = Matrix::kron(*gates) + Matrix::kron(gates_copy);
+      std::cout << "CX not implemented yet!" << std::endl;
+    }
+
+    Matrix retrieve_operator() {
+      return Matrix::kron(lgates) + Matrix::kron(rgates);
+    }
 };
 
 void QuCircuit::run() {
   // Initializing a I gate for each qubits in the circuit
   std::vector<Matrix> gates(m_size, Matrix({1.0, 0.0, 0.0, 1.0}, 2, 2));
-  auto bound_visitor = std::bind(StepVisitor(), std::placeholders::_1, m_offsets);
+  auto visitor = StepsVisitor(m_size, m_offsets);
 
   for(std::vector<Circuit::Step>::iterator it = m_layout.steps.begin();
     it != m_layout.steps.end(); ++it) {
     for (auto &substep: *it) {
       // Setting defined gates
-      std::pair<int, Matrix> gate = boost::apply_visitor(bound_visitor, substep);
-      gates[gate.first] = gate.second;
+      boost::apply_visitor(visitor, substep);
     }
   }
-  Matrix op = Matrix::kron(gates);
+  Matrix op = visitor.retrieve_operator();
   m_state = op * m_state;
 }
 

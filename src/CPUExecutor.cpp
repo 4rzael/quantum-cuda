@@ -5,12 +5,22 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CPUExecutor.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-18T09:19:14+01:00
+ * @Last modified time: 2018-06-19T14:51:01+01:00
  * @License: MIT License
  */
 
-
 #include "CPUExecutor.hpp"
+
+Tvcplxd CPUExecutor::add(Tvcplxd a, Tvcplxd b, int m, int n) {
+  Tvcplxd result(n * m);
+
+  for (int j = 0; j < n; j++) {
+    for (int i = 0; i < m; i++) {
+      result[j * m + i] = a[j * m + i] + b[j * m + i];
+    }
+  }
+  return result;
+}
 
 Tvcplxd CPUExecutor::dot(Tvcplxd a, Tvcplxd b, int ma, int mb, int na, int nb) {
   Tvcplxd result(na * mb);

@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CPUExecutor.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-18T09:17:53+01:00
+ * @Last modified time: 2018-06-19T14:50:45+01:00
  * @License: MIT License
  */
 
@@ -28,6 +28,15 @@
    * CPUExecutor destructor
    */
    ~CPUExecutor(){}
+   /**
+   * Performs addition between std::valarray<std::complex<double>> a and b.
+   * @param a A matrix content.
+   * @param b B matrix content.
+   * @param m Matrices m dimension.
+   * @param n Matrices n dimension.
+   * @return The addition between matrices a and b.
+   */
+   Tvcplxd add(Tvcplxd a, Tvcplxd b, int m, int n);
    /**
    * Performs a dot product between std::valarray<std::complex<double>> a and b.
    * @param a A matrix content.

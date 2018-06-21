@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-18T09:35:32+01:00
+ * @Last modified time: 2018-06-19T15:22:31+01:00
  * @License: MIT License
  */
 
@@ -53,6 +53,10 @@ class Matrix {
     * @return Return the content of the matrix as a std::valarray<std::complex<double>>
     */
     Tvcplxd getContent() const;
+    /**
+    * Matrix addition operator overload
+    */
+    Matrix operator+(const Matrix& other) const;
     /**
     * Matrix multiplication operator overload
     */

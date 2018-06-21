@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Executor.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-16T10:41:15+01:00
+ * @Last modified time: 2018-06-19T14:44:54+01:00
  * @License: MIT License
  */
 
@@ -31,6 +31,15 @@ class Executor
     * Executor constructor
     */
     virtual ~Executor(){}
+    /**
+    * Performs addition between std::valarray<std::complex<double>> a and b.
+    * @param a A matrix content.
+    * @param b B matrix content.
+    * @param m Matrices m dimension.
+    * @param n Matrices n dimension.
+    * @return The addition between matrices a and b.
+    */
+    virtual Tvcplxd add(Tvcplxd a, Tvcplxd b, int m, int n) = 0;
     /**
     * Performs a dot product between std::valarray<std::complex<double>> a and b.
     * @param a A matrix content.
