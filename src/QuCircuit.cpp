@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: QuCircuit.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-21T10:25:49+01:00
+ * @Last modified time: 2018-06-21T12:37:24+01:00
  * @License: MIT License
  */
 
@@ -41,11 +41,11 @@ void QuCircuit::StepVisitor::operator()(const Circuit::UGate& value) {
   id += target.element;
 
   using namespace std::complex_literals;
-  m_lgates[id] = Matrix({exp(-1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2),
+  m_lgates[id] = Matrix(new Tvcplxd({exp(-1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2),
     -exp(-1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2),
     exp(1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2),
     exp(1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2)
-  }, 2, 2);
+  }), 2, 2);
 }
 
 void QuCircuit::StepVisitor::operator()(const Circuit::CXGate& value) {
@@ -69,7 +69,7 @@ Matrix QuCircuit::StepVisitor::retrieve_operator() {
 
 void QuCircuit::run() {
   // Initializing a I gate for each qubits in the circuit
-  std::vector<Matrix> gates(m_size, Matrix({1.0, 0.0, 0.0, 1.0}, 2, 2));
+  std::vector<Matrix> gates(m_size, Matrix(new Tvcplxd({1.0, 0.0, 0.0, 1.0}), 2, 2));
   auto visitor = StepVisitor(m_size, m_offsets);
 
   for(std::vector<Circuit::Step>::iterator it = m_layout.steps.begin();
