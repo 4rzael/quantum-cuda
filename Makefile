@@ -9,7 +9,7 @@
 
 CXX=	g++
 
-OPTIFLAGS= -g3
+OPTIFLAGS= -g
 
 CXXFLAGS= -Wextra -Wall -std=c++14 $(OPTIFLAGS)
 
@@ -38,6 +38,7 @@ CUSRC=
 SRC= Parser/float_expr_ast.cpp \
 	Parser/ASTGenerator.cpp \
 	Parser/CircuitBuilder.cpp \
+	Parser/CircuitBuilderUtils.cpp \
 	Parser/FloatExpressionEvaluator.cpp \
 	Circuit.cpp \
 	CPUExecutor.cpp \

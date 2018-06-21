@@ -1,5 +1,4 @@
-#ifndef LOGGER_HPP_
-# define LOGGER_HPP_
+#pragma once
 
 #include <string>
 #include <sstream>
@@ -26,8 +25,6 @@ public:
     }
 };
 
-#define LOG(importance, message) (Logger::log(importance, static_cast<std::ostringstream&>(\
+#define LOG(importance, message) do {Logger::log(importance, static_cast<std::ostringstream&>(\
       std::ostringstream().flush() << message  \
-    ).str(), __FILE__, __LINE__))
-
-#endif /* LOGGER_HPP_ */
+    ).str(), __FILE__, __LINE__);} while (0)

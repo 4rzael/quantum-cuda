@@ -10,10 +10,12 @@ measure ninja[1] -> bla[2];
 
 barrier ninja, bla;
 if (bla == 5) creg pizza[1];
-mygate(1, 2, 3) q;
-mygate() q1, q2;
-mygate q;
 
-gate testgate(a) qa, qb {
+gate mygate(a) qa, qb {
     CX qa, qb;
 }
+
+
+mygate(1) q1, q2;
+mygate() q1, q2;
+mygate q;
