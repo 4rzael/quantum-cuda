@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: QuCircuit.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-21T08:50:41+01:00
+ * @Last modified time: 2018-06-21T09:51:10+01:00
  * @License: MIT License
  */
 
@@ -27,67 +27,58 @@ QuCircuit::QuCircuit(Circuit layout) {
   m_state = Matrix::kron(qubits);
 }
 
-struct StepsVisitor : public boost::static_visitor<>
-{
-  private:
-    std::map<std::string, int> m_offsets;
-    std::vector<Matrix> lgates;
-    std::vector<Matrix> rgates;
+QuCircuit::StepVisitor::StepVisitor(int size, std::map<std::string, int>& offsets) : m_offsets(offsets) {
+  m_offsets = offsets;
+  m_lgates = std::vector<Matrix>(size, Matrix({1.0, 0.0, 0.0, 1.0}, 2, 2));
+  m_rgates = std::vector<Matrix>(size, Matrix({1.0, 0.0, 0.0, 1.0}, 2, 2));
+}
 
-  public:
-    StepsVisitor(int size, std::map<std::string, int>& offsets) : m_offsets(offsets) {
-      m_offsets = offsets;
-      lgates = std::vector<Matrix>(size, Matrix({1.0, 0.0, 0.0, 1.0}, 2, 2));
-      rgates = std::vector<Matrix>(size, Matrix({1.0, 0.0, 0.0, 1.0}, 2, 2));
-    }
+void QuCircuit::StepVisitor::operator()(const Circuit::UGate& value) {
+  Circuit::Qubit target = value.target;
+  int id = m_offsets.find(target.registerName)->second;
+  id += target.element;
 
-    void operator()(const Circuit::UGate& value) {
-      Circuit::Qubit target = value.target;
-      int id = m_offsets.find(target.registerName)->second;
-      id += target.element;
+  using namespace std::complex_literals;
+  m_lgates[id] = Matrix({exp(-1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2),
+    -exp(-1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2),
+    exp(1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2),
+    exp(1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2)
+  }, 2, 2);
+}
 
-      using namespace std::complex_literals;
-      lgates[id] = Matrix({exp(-1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2),
-        -exp(-1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2),
-        exp(1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2),
-        exp(1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2)
-      }, 2, 2);
-    }
+void QuCircuit::StepVisitor::operator()(const Circuit::CXGate& value) {
+  Circuit::Qubit control = value.control;
+  int controlId = m_offsets.find(control.registerName)->second;
+  controlId += control.element;
 
-    void operator()(const Circuit::CXGate& value) {
-      Circuit::Qubit control = value.control;
-      int controlId = m_offsets.find(control.registerName)->second;
-      controlId += control.element;
+  Matrix zero = Matrix({1.0, 0.0}, 1, 2);
+  Matrix proj_zero = zero * zero.T();
 
-      Matrix zero = Matrix({1.0, 0.0}, 1, 2);
-      Matrix proj_zero = zero * zero.T();
+  m_lgates[controlId] = proj_zero;
 
-      lgates[controlId] = proj_zero;
+  Circuit::Qubit target = value.target;
+  int targetId = m_offsets.find(target.registerName)->second;
+  targetId += target.element;
 
-      Circuit::Qubit target = value.target;
-      int targetId = m_offsets.find(target.registerName)->second;
-      targetId += target.element;
+  Matrix one = Matrix({0.0, 1.0}, 1, 2);
+  Matrix proj_one = one * one.T();
+  Matrix x = Matrix({0.0, 1.0, 1.0, 0.0}, 2, 2);
 
-      Matrix one = Matrix({0.0, 1.0}, 1, 2);
-      Matrix proj_one = one * one.T();
-      Matrix x = Matrix({0.0, 1.0, 1.0, 0.0}, 2, 2);
+  m_rgates[targetId] = proj_one;
+  m_rgates[targetId] = x;
 
-      rgates[targetId] = proj_one;
-      rgates[targetId] = x;
+  //Matrix CNOT = Matrix::kron(*gates) + Matrix::kron(gates_copy);
+  std::cout << "CX not implemented yet!" << std::endl;
+}
 
-      //Matrix CNOT = Matrix::kron(*gates) + Matrix::kron(gates_copy);
-      std::cout << "CX not implemented yet!" << std::endl;
-    }
-
-    Matrix retrieve_operator() {
-      return Matrix::kron(lgates) + Matrix::kron(rgates);
-    }
-};
+Matrix QuCircuit::StepVisitor::retrieve_operator() {
+  return Matrix::kron(m_lgates) + Matrix::kron(m_rgates);
+}
 
 void QuCircuit::run() {
   // Initializing a I gate for each qubits in the circuit
   std::vector<Matrix> gates(m_size, Matrix({1.0, 0.0, 0.0, 1.0}, 2, 2));
-  auto visitor = StepsVisitor(m_size, m_offsets);
+  auto visitor = StepVisitor(m_size, m_offsets);
 
   for(std::vector<Circuit::Step>::iterator it = m_layout.steps.begin();
     it != m_layout.steps.end(); ++it) {
