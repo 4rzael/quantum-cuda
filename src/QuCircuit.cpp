@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: QuCircuit.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-21T09:51:10+01:00
+ * @Last modified time: 2018-06-21T10:25:49+01:00
  * @License: MIT License
  */
 
@@ -13,8 +13,10 @@
 #include <cstdio>
 #include <cmath>
 
-#include "QuCircuit.hpp"
 #include <boost/foreach.hpp>
+
+#include "MatrixStore.hpp"
+#include "QuCircuit.hpp"
 
 QuCircuit::QuCircuit(Circuit layout) {
   m_layout = layout;
@@ -23,14 +25,14 @@ QuCircuit::QuCircuit(Circuit layout) {
     m_offsets.insert(make_pair(reg.name, m_size));
     m_size += reg.size;
   }
-  std::vector<Matrix> qubits(m_size, Matrix({1.0, 0.0}, 1, 2));
+  std::vector<Matrix> qubits(m_size, MatrixStore::k0);
   m_state = Matrix::kron(qubits);
 }
 
 QuCircuit::StepVisitor::StepVisitor(int size, std::map<std::string, int>& offsets) : m_offsets(offsets) {
   m_offsets = offsets;
-  m_lgates = std::vector<Matrix>(size, Matrix({1.0, 0.0, 0.0, 1.0}, 2, 2));
-  m_rgates = std::vector<Matrix>(size, Matrix({1.0, 0.0, 0.0, 1.0}, 2, 2));
+  m_lgates = std::vector<Matrix>(size, MatrixStore::i2);
+  m_rgates = std::vector<Matrix>(size, MatrixStore::i2);
 }
 
 void QuCircuit::StepVisitor::operator()(const Circuit::UGate& value) {
@@ -51,24 +53,14 @@ void QuCircuit::StepVisitor::operator()(const Circuit::CXGate& value) {
   int controlId = m_offsets.find(control.registerName)->second;
   controlId += control.element;
 
-  Matrix zero = Matrix({1.0, 0.0}, 1, 2);
-  Matrix proj_zero = zero * zero.T();
-
-  m_lgates[controlId] = proj_zero;
+  m_lgates[controlId] = MatrixStore::pk0;
 
   Circuit::Qubit target = value.target;
   int targetId = m_offsets.find(target.registerName)->second;
   targetId += target.element;
 
-  Matrix one = Matrix({0.0, 1.0}, 1, 2);
-  Matrix proj_one = one * one.T();
-  Matrix x = Matrix({0.0, 1.0, 1.0, 0.0}, 2, 2);
-
-  m_rgates[targetId] = proj_one;
-  m_rgates[targetId] = x;
-
-  //Matrix CNOT = Matrix::kron(*gates) + Matrix::kron(gates_copy);
-  std::cout << "CX not implemented yet!" << std::endl;
+  m_rgates[targetId] = MatrixStore::pk1;
+  m_rgates[targetId] = MatrixStore::x;
 }
 
 Matrix QuCircuit::StepVisitor::retrieve_operator() {

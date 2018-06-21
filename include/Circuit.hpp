@@ -1,3 +1,14 @@
+/**
+ * @Author: Maxime Agor <agor_m>
+ * @Date:   2018-06-19T08:36:15+01:00
+ * @Email:  maxime.agor@epitech.eu
+ * @Project: CUDA-Based Simulator of Quantum Systems
+ * @Filename: Circuit.hpp
+ * @Last modified by:   vial-d_j
+ * @Last modified time: 2018-06-19T08:36:50+01:00
+ * @License: MIT License
+ */
+
 #ifndef CIRCUIT_HPP_
 # define CIRCUIT_HPP_
 
@@ -31,7 +42,7 @@ struct Circuit {
     struct UGate {
         UGate(double t, double p, double l, const Qubit &trgt)
         : theta(t), phi(p), lambda(l), target(trgt) {}
-        
+
         double theta;
         double phi;
         double lambda;
