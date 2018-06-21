@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-19T15:23:13+01:00
+ * @Last modified time: 2018-06-21T11:54:35+01:00
  * @License: MIT License
  */
 
@@ -31,7 +31,7 @@ std::pair<int, int> Matrix::getDimensions() const {
 Matrix Matrix::operator+(const Matrix& other) const {
   Executor *exec = ExecutorManager::getInstance().getExecutor();
 
-  Matrix result = Matrix(exec->add(m_content, other.getContent(),
+  Matrix result = Matrix(*exec->add(m_content, other.getContent(),
     m_dim.first, m_dim.second),
     other.getDimensions().first, m_dim.second);
   return result;
@@ -40,7 +40,7 @@ Matrix Matrix::operator+(const Matrix& other) const {
 Matrix Matrix::operator*(const Matrix& other) const {
   Executor *exec = ExecutorManager::getInstance().getExecutor();
 
-  Matrix result = Matrix(exec->dot(m_content, other.getContent(),
+  Matrix result = Matrix(*exec->dot(m_content, other.getContent(),
     m_dim.first, other.getDimensions().first,
     m_dim.second, other.getDimensions().second),
     other.getDimensions().first, m_dim.second);
@@ -52,7 +52,7 @@ Matrix Matrix::kron(std::vector<Matrix> m) {
 
   Matrix result = m[0];
   for (uint32_t i = 1; i < m.size(); i++) {
-    result = Matrix(exec->kron(result.getContent(), m[i].getContent(),
+    result = Matrix(*exec->kron(result.getContent(), m[i].getContent(),
     result.getDimensions().first, m[i].getDimensions().first),
     result.getDimensions().first * m[i].getDimensions().first,
     result.getDimensions().second * m[i].getDimensions().second);
@@ -63,7 +63,7 @@ Matrix Matrix::kron(std::vector<Matrix> m) {
 Matrix Matrix::T() const {
   Executor *exec = ExecutorManager::getInstance().getExecutor();
 
-  Matrix result = Matrix(exec->T(m_content, m_dim.first, m_dim.second),
+  Matrix result = Matrix(*exec->T(m_content, m_dim.first, m_dim.second),
   m_dim.second, m_dim.first);
   return result;
 }
