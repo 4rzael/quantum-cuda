@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-22T13:22:44+01:00
+ * @Last modified time: 2018-06-22T14:17:39+01:00
  * @License: MIT License
  */
 
@@ -20,7 +20,7 @@
 
 Simulator::Simulator(Circuit& circuit) : m_circuit(circuit) {
   // Allocating the c registers;
-  for (auto &reg: circuit.qreg) {
+  for (auto &reg: circuit.creg) {
     bool* arr = new bool[reg.size];
     std::memset(arr, 0, reg.size);
     m_cReg.insert(make_pair(reg.name, arr));
@@ -97,7 +97,6 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
     gates[sourceId] = MatrixStore::pk1;
     m_simulator.m_state = Matrix::kron(gates) * m_simulator.m_state;
   };
-  std::cout << m_simulator.m_cReg.find(value.dest.registerName)->second[value.dest.element] << std::endl;
 }
 
 Matrix Simulator::StepVisitor::retrieve_operator() {
@@ -121,6 +120,22 @@ void Simulator::simulate() {
   }
 }
 
-void Simulator::drawState() {
-  std::cout << m_state << std::endl;
+void Simulator::print(std::ostream &os) const {
+  os << "Simulator creg:" << std::endl;
+  for (auto &reg: m_circuit.creg) {
+    int j = 0;
+    os << reg.name << "=\"";
+    for (uint i = 0; i < reg.size; i++) {
+      j <<= 1;
+      j +=  m_cReg.find(reg.name)->second[i];
+      os << m_cReg.find(reg.name)->second[i];
+    }
+    os << "\"" << "(" << j << ");";
+  }
+}
+
+std::ostream& operator<<(std::ostream& os, const Simulator& sim)
+{
+  sim.print(os);
+  return os;
 }

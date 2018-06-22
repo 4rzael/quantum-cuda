@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-21T12:29:25+01:00
+ * @Last modified time: 2018-06-22T13:39:57+01:00
  * @License: MIT License
  */
 
@@ -76,6 +76,6 @@ class Matrix {
 };
 
 /**
-* Matrix left redirection operator overload.
+* Matrix redirection to ostream overload.
 */
 std::ostream& operator<<(std::ostream& os, const Matrix& matrix);

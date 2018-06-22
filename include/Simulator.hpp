@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-22T12:15:36+01:00
+ * @Last modified time: 2018-06-22T13:58:24+01:00
  * @License: MIT License
  */
 
@@ -102,4 +102,13 @@ class Simulator
      * Run the circuit
      */
     void simulate();
+    /**
+    * Print object to ostream in a readable manner.
+    */
+    void print(std::ostream &os) const;
 };
+
+/**
+* Simulator redirection to ostream overload.
+*/
+std::ostream& operator<<(std::ostream& os, const Simulator& sim);

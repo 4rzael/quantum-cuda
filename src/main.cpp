@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: main.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-22T13:07:03+01:00
+ * @Last modified time: 2018-06-22T13:42:03+01:00
  * @License: MIT License
  */
 
@@ -36,6 +36,6 @@ int main(int ac, char **av) {
   std::cout << circuit << std::endl;
   Simulator simulator = Simulator(circuit);
   simulator.simulate();
-  simulator.drawState();
+  std::cout << simulator << std::endl;
   return EXIT_SUCCESS;
 }
