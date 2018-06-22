@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: main.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-19T12:48:13+01:00
+ * @Last modified time: 2018-06-22T09:22:07+01:00
  * @License: MIT License
  */
 
@@ -16,7 +16,7 @@
 #include "Circuit.hpp"
 #include "Parser/CircuitBuilder.hpp"
 #include "Logger.hpp"
-#include "QuCircuit.hpp"
+#include "Simulator.hpp"
 
 #include "Parser/ASTGenerator.hpp"
 #include "Circuit.hpp"
@@ -34,9 +34,9 @@ int main(int ac, char **av) {
 
   Circuit circuit = CircuitBuilder::buildCircuit(ast);
   std::cout << circuit << std::endl;
-  QuCircuit quCircuit = QuCircuit(circuit);
-  quCircuit.drawState();
-  quCircuit.run();
-  quCircuit.drawState();
+  Simulator simulator = Simulator(circuit);
+  simulator.drawState();
+  simulator.run();
+  simulator.drawState();
   return EXIT_SUCCESS;
 }
