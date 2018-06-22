@@ -10,7 +10,6 @@
  */
 
 
-
 #include <algorithm>
 
 #include "Logger.hpp"
@@ -21,6 +20,16 @@
 #include "Parser/FloatExpressionEvaluator.hpp"
 
 using namespace Parser::AST;
+
+Parser::AST::t_variable const &defaultTargetSubstituter(Parser::AST::t_variable const &v) {
+    return v;
+}
+
+t_float_expression const &defaultParamSubstituter(std::string s) {
+    LOG(Logger::ERROR, "No substitution found for param " << s);
+    throw OpenQASMError();
+}
+
 
 Circuit CircuitBuilder::build(const Parser::AST::t_openQASM &ast) {
     for (const auto &node : ast) {
@@ -147,30 +156,31 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_cx_statem
     }
 }
 void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_u_statement &statement) const {
-    auto regName = getRegisterName(statement.target);
+    auto statementTarget = m_substituteTarget(statement.target);
+    auto regName = getRegisterName(statementTarget);
     if (!containsRegister(m_circuit, regName, RegisterType::QREG)) {
         LOG(Logger::ERROR, "QREG " << regName << " does not exist");
         throw OpenQASMError();
     }
 
     Circuit::Step step;
-    if ((statement.target.which() == (int)t_variableType::T_BIT)) {
+    if ((statementTarget.which() == (int)t_variableType::T_BIT)) {
         step.push_back(Circuit::UGate(
-            FloatExpressionEvaluator::evaluate(statement.params[0]),
-            FloatExpressionEvaluator::evaluate(statement.params[1]),
-            FloatExpressionEvaluator::evaluate(statement.params[2]),
-            Circuit::Qubit(boost::get<t_bit>(statement.target))
+            FloatExpressionEvaluator::evaluate(statement.params[0], m_substituteParams),
+            FloatExpressionEvaluator::evaluate(statement.params[1], m_substituteParams),
+            FloatExpressionEvaluator::evaluate(statement.params[2], m_substituteParams),
+            Circuit::Qubit(boost::get<t_bit>(statementTarget))
         ));
     } else {
-        auto targetName = boost::get<t_reg>(statement.target);
+        auto targetName = boost::get<t_reg>(statementTarget);
         auto target = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
                         [&targetName](auto r) {return r.name == targetName; });
 
         for (uint i = 0; i < (*target).size; ++i) {
             step.push_back(Circuit::UGate(
-                FloatExpressionEvaluator::evaluate(statement.params[0]),
-                FloatExpressionEvaluator::evaluate(statement.params[1]),
-                FloatExpressionEvaluator::evaluate(statement.params[2]),
+                FloatExpressionEvaluator::evaluate(statement.params[0], m_substituteParams),
+                FloatExpressionEvaluator::evaluate(statement.params[1], m_substituteParams),
+                FloatExpressionEvaluator::evaluate(statement.params[2], m_substituteParams),
                 Circuit::Qubit(targetName, i)
             ));
         }
@@ -254,7 +264,6 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_gate_call
     }
 
     const auto substituteTarget = [&statement, &gate](t_variable const &target) -> Parser::AST::t_variable const & {
-        LOG(Logger::DEBUG, "Substitution started for target " << target);
         if (target.which() == (int)t_variableType::T_BIT) {
             LOG(Logger::ERROR, "Cannot dereference registers in the body of a gate");
             throw OpenQASMError();
@@ -268,9 +277,24 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_gate_call
         LOG(Logger::ERROR, "No substitution found for target " << (std::string)(boost::get<t_reg>(target)));
         throw OpenQASMError();
     };
+
+    const auto substituteParam = [&statement, &gate](std::string const &target) -> t_float_expression const &{
+        if (!gate.params || !statement.params) {
+            LOG(Logger::ERROR, "No substitution found for param " << target);
+            throw OpenQASMError();
+        } else {
+            for (uint i = 0; i < gate.params.get().size(); ++i) {
+                if (target == (std::string)gate.params.get()[i])
+                    return statement.params.get()[i];
+            }
+        }
+        LOG(Logger::ERROR, "No substitution found for param " << target);
+        throw OpenQASMError();
+    };
     
     for (auto const &s: gate.statements) {
         boost::apply_visitor(StatementVisitor(m_circuitBuilder, m_circuit,
-                                              substituteTarget), s);
+                                              substituteTarget,
+                                              substituteParam), s);
     }
 }

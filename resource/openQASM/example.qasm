@@ -13,9 +13,10 @@ if (bla == 5) creg pizza[1];
 
 gate mygate(a) qa, qb {
     CX qa, qb;
+    U(0,pi/4, ((a/4)*(pi/2))) qa;
 }
 
 
-mygate(1) q1, q2;
-mygate() q1, q2;
-mygate q;
+mygate(100) ninja[0], ninja[2];
+//mygate() q1, q2;
+//mygate q;

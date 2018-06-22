@@ -45,12 +45,12 @@ namespace Parser {
 
         const auto FILENAME = +(alnum | char_('.') | char_('_') | char_('-'));
         const auto FLOAT = rule<class FLOAT, t_float>()
-                        = (double_ | string("pi"));
+                        = (double_ | ID);
         const auto UINT = uint_;
 
         /* Float expressions types */
         const auto float_expr_basic = rule<class float_expr_basic, t_float>()
-                                    = FLOAT | ID;
+                                    = FLOAT;
         rule<struct float_expr_class, t_float_expression> const float_expr = "float_expr";
         rule<struct float_expr_term_class, t_float_expression> const float_expr_term = "float_expr_term";
         rule<struct float_expr_factor_class, t_float_expr_operand> const float_expr_factor = "float_expr_factor";
@@ -129,6 +129,7 @@ namespace Parser {
                                 gate_call_statement
                         ] >> ';';
 
+        /* Operations available inside the body of a gate */
         const auto gate_ops = rule<class statement, t_statement>()
                     = lexeme[cx_statement |
                                 u_statement |

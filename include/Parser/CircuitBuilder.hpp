@@ -3,21 +3,30 @@
 #include <functional>
 #include "Parser/AST.hpp"
 #include "Circuit.hpp"
+#include "Logger.hpp"
+#include "Parser/CircuitBuilderUtils.hpp"
+
+typedef std::function<Parser::AST::t_variable const &(Parser::AST::t_variable const &)> TargetSubstituter;
+typedef std::function<Parser::AST::t_float_expression const &(std::string const &)> StringFloatSubstituter;
+
+Parser::AST::t_variable const &defaultTargetSubstituter(Parser::AST::t_variable const &v);
+Parser::AST::t_float_expression const &defaultParamSubstituter(std::string s);
 
 class CircuitBuilder {
     class StatementVisitor : public ::boost::static_visitor<> {
-        typedef std::function<Parser::AST::t_variable const &(Parser::AST::t_variable const &)> TargetSubstitutioner;
+
     private:
         CircuitBuilder &m_circuitBuilder;
         ::Circuit &m_circuit;
-        TargetSubstitutioner m_substituteTarget;
+        TargetSubstituter m_substituteTarget;
+        StringFloatSubstituter m_substituteParams;
+
     public:
         StatementVisitor(CircuitBuilder &circuitBuilder, ::Circuit &c,
-                         TargetSubstitutioner substituteTarget)
-        : m_circuitBuilder(circuitBuilder), m_circuit(c), m_substituteTarget(substituteTarget) {}
-        StatementVisitor(CircuitBuilder &circuitBuilder, ::Circuit &c)
+                         TargetSubstituter substituteTarget=defaultTargetSubstituter,
+                         StringFloatSubstituter substituteParams=defaultParamSubstituter)
         : m_circuitBuilder(circuitBuilder), m_circuit(c),
-          m_substituteTarget([](Parser::AST::t_variable const &v) -> Parser::AST::t_variable const & {return v;}) {}
+          m_substituteTarget(substituteTarget), m_substituteParams(substituteParams) {}
 
         void operator()(const Parser::AST::t_invalid_statement &) const;
         void operator()(const Parser::AST::t_creg_statement &) const;
