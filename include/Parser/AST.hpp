@@ -1,14 +1,13 @@
-#ifndef AST_HPP_
-# define AST_HPP_
+#pragma once
 
-# include <vector>
-# include <string>
-# include <boost/optional.hpp>
-# include <boost/optional/optional_io.hpp>
-# include <boost/fusion/include/adapt_struct.hpp>
-# include <boost/spirit/home/x3/support/ast/variant.hpp>
+#include <vector>
+#include <string>
+#include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/spirit/home/x3/support/ast/variant.hpp>
 
-# include "Parser/float_expr_ast.hpp"
+#include "Parser/float_expr_ast.hpp"
 
 /*
  * Note: if you want to speedup this parser execution, you might want to change
@@ -149,7 +148,7 @@ namespace Parser {
 
         // Not a valid statement: can be ignored (WS or comment)
         struct t_invalid_statement {
-            friend std::ostream& operator<< (std::ostream& stream, const t_invalid_statement& invalid) {
+            friend std::ostream& operator<< (std::ostream& stream, __attribute__((unused)) const t_invalid_statement&) {
                 return stream << "<invalid_statement></invalid_statement>";
             }
         };
@@ -274,6 +273,3 @@ BOOST_FUSION_ADAPT_STRUCT(Parser::AST::t_gate_declaration,
     (Parser::AST::t_id_list, targets)
     (std::vector<Parser::AST::t_statement>, statements)
 )
-
-
-#endif /* AST_HPP_ */

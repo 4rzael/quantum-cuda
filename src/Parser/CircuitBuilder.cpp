@@ -24,7 +24,8 @@ using namespace Parser::AST;
 
 enum class RegisterType {ANY, CREG, QREG};
 bool containsRegister(const Circuit &circuit, const std::string &name, const RegisterType rtype=RegisterType::ANY);
-std::string const &getRegisterName(const Circuit &circuit, const Parser::AST::t_variable &var);
+std::string getRegisterName(const Parser::AST::t_variable &var);
+uint getRegisterSize(const Circuit &circuit, const Parser::AST::t_variable &var);
 
 Circuit CircuitBuilder::buildCircuit(const Parser::AST::t_openQASM &ast) {
     Circuit c;
@@ -38,13 +39,13 @@ Circuit CircuitBuilder::buildCircuit(const Parser::AST::t_openQASM &ast) {
 void OpenQASMInstructionVisitor::operator()(const Parser::AST::t_statement &s) const {
     ::boost::apply_visitor(StatementVisitor(m_circuit), s);
 }
-void OpenQASMInstructionVisitor::operator()(const Parser::AST::t_conditional_statement &s) const {
+void OpenQASMInstructionVisitor::operator()(__attribute__((unused)) const Parser::AST::t_conditional_statement &s) const {
 }
-void OpenQASMInstructionVisitor::operator()(const Parser::AST::t_gate_declaration &d) const {
+void OpenQASMInstructionVisitor::operator()(__attribute__((unused)) const Parser::AST::t_gate_declaration &d) const {
 }
 
 /* Statement Visitor */
-void StatementVisitor::operator()(const Parser::AST::t_invalid_statement &statement) const {}
+void StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_invalid_statement &statement) const {}
 void StatementVisitor::operator()(const Parser::AST::t_creg_statement &statement) const {
     if (!containsRegister(m_circuit, statement.reg.name)) {
         m_circuit.creg.push_back(Circuit::Register(statement.reg.name, statement.reg.value));
@@ -66,7 +67,7 @@ void StatementVisitor::operator()(const Parser::AST::t_cx_statement &statement) 
     }
     /* Check the registers exist and are QREGs (Cannot perform CX on CREGs) */
     for (const auto &target: statement.targets) {
-        auto regName = getRegisterName(m_circuit, target);
+        auto regName = getRegisterName(target);
         if (!containsRegister(m_circuit, regName, RegisterType::QREG)) {
             return LOG(Logger::ERROR, "QREG " << regName << " does not exist");
         }
@@ -91,7 +92,7 @@ void StatementVisitor::operator()(const Parser::AST::t_cx_statement &statement) 
         auto targetName = boost::get<t_reg>(statement.targets[1]);
         auto reg = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
                                 [&targetName](auto r) {return r.name == targetName; });
-        for (int i = 0; i < (*reg).size; ++i) {
+        for (uint i = 0; i < (*reg).size; ++i) {
             step.push_back(Circuit::CXGate(
                 Circuit::Qubit(control),
                 Circuit::Qubit(targetName, i)
@@ -112,7 +113,7 @@ void StatementVisitor::operator()(const Parser::AST::t_cx_statement &statement) 
         if ((*control).size != (*target).size) {
             return LOG(Logger::ERROR, "QRegisters " << controlName << " and " << targetName << " sizes differ.");
         }
-        for (int i = 0; i < (*control).size; ++i) {
+        for (uint i = 0; i < (*control).size; ++i) {
             step.push_back(Circuit::CXGate(
                 Circuit::Qubit(controlName, i),
                 Circuit::Qubit(targetName, i)
@@ -125,7 +126,7 @@ void StatementVisitor::operator()(const Parser::AST::t_cx_statement &statement) 
         auto target = boost::get<t_bit>(statement.targets[1]);
         auto control = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
                                 [&controlName](auto r) {return r.name == controlName; });
-        for (int i = 0; i < (*control).size; ++i) {
+        for (uint i = 0; i < (*control).size; ++i) {
             Circuit::Step step;
             step.push_back(Circuit::CXGate(
                 Circuit::Qubit(controlName, i),
@@ -136,7 +137,7 @@ void StatementVisitor::operator()(const Parser::AST::t_cx_statement &statement) 
     }
 }
 void StatementVisitor::operator()(const Parser::AST::t_u_statement &statement) const {
-    auto regName = getRegisterName(m_circuit, statement.target);
+    auto regName = getRegisterName(statement.target);
     if (!containsRegister(m_circuit, regName, RegisterType::QREG)) {
         return LOG(Logger::ERROR, "QREG " << regName << " does not exist");
     }
@@ -154,7 +155,7 @@ void StatementVisitor::operator()(const Parser::AST::t_u_statement &statement) c
         auto target = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
                         [&targetName](auto r) {return r.name == targetName; });
 
-        for (int i = 0; i < (*target).size; ++i) {
+        for (uint i = 0; i < (*target).size; ++i) {
             step.push_back(Circuit::UGate(
                 FloatExpressionEvaluator::evaluate(statement.params[0]),
                 FloatExpressionEvaluator::evaluate(statement.params[1]),
@@ -165,42 +166,76 @@ void StatementVisitor::operator()(const Parser::AST::t_u_statement &statement) c
     }
     m_circuit.steps.push_back(step);
 }
-void StatementVisitor::operator()(const Parser::AST::t_include_statement &statement) const {
+void StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_include_statement &statement) const {
 
 }
 void StatementVisitor::operator()(const Parser::AST::t_measure_statement &statement) const {
+    Circuit::Step step;
     if (statement.source.which() == (int)t_variableType::T_BIT
      && statement.dest.which() == (int)t_variableType::T_BIT) {
+        step.push_back(Circuit::Measurement(
+           Circuit::Qubit(boost::get<t_bit>(statement.source)),
+           Circuit::Qubit(boost::get<t_bit>(statement.dest))
+        ));
+    }
+    else if (statement.source.which() == (int)t_variableType::T_REG
+          && statement.dest.which() == (int)t_variableType::T_REG) {
+        if (getRegisterSize(m_circuit, statement.source) != getRegisterSize(m_circuit, statement.dest)) {
+            return LOG(Logger::ERROR, "QRegisters " << getRegisterName(statement.source)
+                                   << " and " << getRegisterName(statement.dest) << " sizes differ.");
+        }
 
-     }
-     else if (statement.source.which() == (int)t_variableType::T_REG
-           && statement.dest.which() == (int)t_variableType::T_REG) {
+        const uint size = getRegisterSize(m_circuit, statement.source);
+        for (uint i = 0; i < size; ++i) {
+            step.push_back(Circuit::Measurement(
+                Circuit::Qubit(getRegisterName(statement.source), i),
+                Circuit::Qubit(getRegisterName(statement.dest), i)
+            ));
+        }
+    }
+    else {
+        return LOG(Logger::ERROR, "Measure cannot be called with a mix of registers and bits");
+    }
 
-     }
-     else {
-         LOG(Logger::ERROR, "Measure cannot be called with a mix of registers and bits");
-     }
+    m_circuit.steps.push_back(step);
 }
-void StatementVisitor::operator()(const Parser::AST::t_barrier_statement &statement) const {
+void StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_barrier_statement &statement) const {
 
 }
-void StatementVisitor::operator()(const Parser::AST::t_reset_statement &statement) const {
+void StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_reset_statement &statement) const {
 
 }
-void StatementVisitor::operator()(const Parser::AST::t_gate_call_statement &statement) const {
+void StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_gate_call_statement &statement) const {
 
 }
 
 /* Utils */
-std::string const &getRegisterName(const Circuit &circuit, const Parser::AST::t_variable &var) {
-    using namespace Parser::AST;
+uint getRegisterSize(const Circuit &circuit, const Parser::AST::t_variable &var) {
+    const std::string &name = getRegisterName(var);
+    const auto nameEquals = [&circuit, &name](Circuit::Register r) {
+        return name == r.name;
+    };
+    const auto &inCreg = std::find_if(circuit.creg.begin(), circuit.creg.end(), nameEquals);
+    if (inCreg != circuit.creg.end()) {
+        return (*inCreg).size;
+    }
+    const auto &inQreg = std::find_if(circuit.qreg.begin(), circuit.qreg.end(), nameEquals);
+    if (inQreg != circuit.qreg.end()) {
+        return (*inQreg).size;
+    }
+    BOOST_ASSERT(0);
+    return 0;
+}
+
+std::string getRegisterName(const Parser::AST::t_variable &var) {
     switch (var.which()) {
     case (int)t_variableType::T_BIT:
         return boost::get<t_bit>(var).name;
     case (int)t_variableType::T_REG:
         return boost::get<t_reg>(var);
     }
-    // Todo: Throw ?
+    BOOST_ASSERT(0);
+    return "";
 }
 
 bool containsRegister(const Circuit &circuit, const std::string &name, const RegisterType rtype) {
@@ -217,4 +252,6 @@ bool containsRegister(const Circuit &circuit, const std::string &name, const Reg
         case RegisterType::QREG:
             return (std::find_if(circuit.qreg.begin(), circuit.qreg.end(), nameEquals) != circuit.qreg.end());
     }
+    BOOST_ASSERT(0);
+    return false;
 };

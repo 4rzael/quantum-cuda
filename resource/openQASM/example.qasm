@@ -1,7 +1,7 @@
 OPENQASM 2.0;
 include "coucou.g";
 qreg ninja[3]; // bla
-creg bla[2];
+creg bla[3];
 CX ninja[1], ninja[2];
 U(0,pi/4, ((3/4)*(pi/2))) ninja[0];
 

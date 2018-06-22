@@ -46,6 +46,18 @@ public:
         << "[" << U.target.element << "]" << std::endl;
         --m_tabs;
     }
+
+    void operator()(const Circuit::Measurement &measurement) const {
+        m_stream << m_tabs << "Measurement:" << std::endl;
+        ++m_tabs;
+        m_stream << m_tabs << "source: "
+        << measurement.source.registerName 
+        << "[" << measurement.source.element << "]" << std::endl;
+        m_stream << m_tabs << "dest: "
+        << measurement.dest.registerName 
+        << "[" << measurement.dest.element << "]" << std::endl;
+        --m_tabs;
+    }
 };
 
 std::ostream& operator<< (std::ostream& stream, const Circuit & c) {
@@ -64,7 +76,7 @@ std::ostream& operator<< (std::ostream& stream, const Circuit & c) {
     }
     --tabs;
     stream << tabs << "Steps:" << std::endl;
-    for (int i = 0; i < c.steps.size(); ++i) {
+    for (uint i = 0; i < c.steps.size(); ++i) {
         stream << tabs << "Step " << i << ":" << std::endl;
 
         ++tabs;

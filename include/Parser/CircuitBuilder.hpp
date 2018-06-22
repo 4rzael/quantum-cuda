@@ -1,8 +1,7 @@
-#ifndef CIRCUIT_BUILDER_HPP_
-# define CIRCUIT_BUILDER_HPP_
+#pragma once
 
-# include "Parser/AST.hpp"
-# include "Circuit.hpp"
+#include "Parser/AST.hpp"
+#include "Circuit.hpp"
 
 namespace CircuitBuilder{
     class StatementVisitor : public ::boost::static_visitor<> {
@@ -39,5 +38,3 @@ namespace CircuitBuilder{
 
     Circuit buildCircuit(const Parser::AST::t_openQASM &ast);
 }
-
-#endif /* CIRCUIT_BUILDER_HPP_ */

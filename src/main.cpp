@@ -18,14 +18,13 @@
 #include "Logger.hpp"
 #include "QuCircuit.hpp"
 
-int main(int ac, char **av) {
-  /* QuCircuit circuit(2);
+#include "Parser/ASTGenerator.hpp"
+#include "Circuit.hpp"
+#include "Parser/CircuitBuilder.hpp"
+#include "Logger.hpp"
 
-  circuit.drawState();
-  circuit.run();
-  circuit.drawState();
-  circuit.measure(); */
-  if (ac < 2) {
+int main(int ac, char **av) {
+  if (ac <2) {
       std::cout << "Need an argument" << std::endl;
   }
 
@@ -39,6 +38,5 @@ int main(int ac, char **av) {
   quCircuit.drawState();
   quCircuit.run();
   quCircuit.drawState();
-  // std::cout << "Circuit qreg length:" << circuit.qreg.size() << std::endl;
   return EXIT_SUCCESS;
 }
