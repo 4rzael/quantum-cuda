@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-22T10:01:49+01:00
+ * @Last modified time: 2018-06-22T12:15:36+01:00
  * @License: MIT License
  */
 
@@ -101,5 +101,5 @@ class Simulator
     /**
      * Run the circuit
      */
-    void run();
+    void simulate();
 };

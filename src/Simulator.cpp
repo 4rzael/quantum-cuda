@@ -5,13 +5,13 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-22T11:49:56+01:00
+ * @Last modified time: 2018-06-22T13:22:44+01:00
  * @License: MIT License
  */
 
 #include <iostream>
-#include <cstdio>
 #include <cmath>
+#include <random>
 
 #include <boost/foreach.hpp>
 
@@ -81,25 +81,30 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
   std::vector<Matrix> gates = std::vector<Matrix>(m_simulator.m_size,
     MatrixStore::i2);
   gates[sourceId] = MatrixStore::pk0;
-  Matrix x = Matrix::kron(gates) * m_simulator.m_state;
-  std::complex<double> p0 = x.tr();
+  Matrix x = m_simulator.m_state * m_simulator.m_state.T();
+  Matrix y = Matrix::kron(gates) * x;
+  std::complex<double> p0 = y.tr();
 
   // Simulate measurement by randomizing outcome according to p0.
-  if (((double)rand() / RAND_MAX) < p0.real()) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> dis(0.0, 1.0);
+  if (dis(gen) < p0.real()) {
     m_simulator.m_cReg.find(value.dest.registerName)->second[value.dest.element] = false;
-    m_simulator.m_state = x;
+    m_simulator.m_state = Matrix::kron(gates) * m_simulator.m_state;
   } else {
     m_simulator.m_cReg.find(value.dest.registerName)->second[value.dest.element] = true;
     gates[sourceId] = MatrixStore::pk1;
     m_simulator.m_state = Matrix::kron(gates) * m_simulator.m_state;
   };
+  std::cout << m_simulator.m_cReg.find(value.dest.registerName)->second[value.dest.element] << std::endl;
 }
 
 Matrix Simulator::StepVisitor::retrieve_operator() {
   return Matrix::kron(m_lgates) + Matrix::kron(m_rgates);
 }
 
-void Simulator::run() {
+void Simulator::simulate() {
   // Initializing a I gate for each qubits in the circuit
   std::vector<Matrix> gates(m_size, Matrix(new Tvcplxd({1.0, 0.0, 0.0, 1.0}),
     2, 2));
@@ -111,9 +116,9 @@ void Simulator::run() {
       // Setting defined gates
       boost::apply_visitor(visitor, substep);
     }
+    Matrix op = visitor.retrieve_operator();
+    m_state = op * m_state;
   }
-  Matrix op = visitor.retrieve_operator();
-  m_state = op * m_state;
 }
 
 void Simulator::drawState() {
