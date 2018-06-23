@@ -76,10 +76,11 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_gate_call
                    m_substituteTarget);
 
     t_expr_list statementParams;
-    std::transform(statement.params.get().begin(), statement.params.get().end(),
-                   std::back_inserter(statementParams),
-                   FloatExpressionEvaluator::FloatExpressionVisitor(m_substituteParams));
-
+    if (statement.params) {
+        std::transform(statement.params.get().begin(), statement.params.get().end(),
+                    std::back_inserter(statementParams),
+                    FloatExpressionEvaluator::FloatExpressionVisitor(m_substituteParams));
+    }
     
     /* Create the substitution function for targets that will be used in the body of the gate */
     const auto substituteTarget = [&statementTargets, &gate](t_variable const &target) -> Parser::AST::t_variable const & {
