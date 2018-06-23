@@ -1,3 +1,14 @@
+/**
+ * @Author: Maxime Agor (4rzael)
+ * @Date:   Sat Jun 23 2018
+ * @Email:  maxime.agor23@gmail.com
+ * @Project: Parser
+ * @Filename: float_expr_ast.hpp
+ * @Last modified by:   4rzael
+ * @Last modified time: Sat Jun 23 2018, 11:24:47
+ * @License: MIT License
+ */
+
 #pragma once
 
 #include <list>

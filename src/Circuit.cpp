@@ -1,3 +1,14 @@
+/**
+ * @Author: Maxime Agor (4rzael)
+ * @Date:   Sat Jun 23 2018
+ * @Email:  maxime.agor23@gmail.com
+ * @Project: src
+ * @Filename: Circuit.cpp
+ * @Last modified by:   4rzael
+ * @Last modified time: Sat Jun 23 2018, 11:25:50
+ * @License: MIT License
+ */
+
 #include <iostream>
 #include "Circuit.hpp"
 

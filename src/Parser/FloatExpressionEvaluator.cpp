@@ -1,3 +1,14 @@
+/**
+ * @Author: Maxime Agor (4rzael)
+ * @Date:   Sat Jun 23 2018
+ * @Email:  maxime.agor23@gmail.com
+ * @Project: Parser
+ * @Filename: FloatExpressionEvaluator.cpp
+ * @Last modified by:   4rzael
+ * @Last modified time: Sat Jun 23 2018, 11:25:37
+ * @License: MIT License
+ */
+
 #include <cmath>
 #include "Parser/CircuitBuilder.hpp"
 #include "Parser/float_expr_ast.hpp"

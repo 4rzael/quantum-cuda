@@ -1,3 +1,14 @@
+/**
+ * @Author: Maxime Agor (4rzael)
+ * @Date:   Sat Jun 23 2018
+ * @Email:  maxime.agor23@gmail.com
+ * @Project: Parser
+ * @Filename: CircuitBuilderUtils.hpp
+ * @Last modified by:   4rzael
+ * @Last modified time: Sat Jun 23 2018, 11:24:45
+ * @License: MIT License
+ */
+
 #pragma once
 
 #include <boost/assert.hpp>

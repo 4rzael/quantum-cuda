@@ -1,14 +1,13 @@
 /**
- * @Author: Julien Vial-Detambel <vial-d_j>
- * @Date:   2018-06-18T12:03:07+01:00
- * @Email:  julien.vial-detambel@epitech.eu
- * @Project: CUDA-Based Simulator of Quantum Systems
+ * @Author: Maxime Agor (4rzael)
+ * @Date:   Sat Jun 23 2018
+ * @Email:  maxime.agor23@gmail.com
+ * @Project: Parser
  * @Filename: CircuitBuilder.cpp
- * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-18T12:05:35+01:00
+ * @Last modified by:   4rzael
+ * @Last modified time: Sat Jun 23 2018, 11:25:21
  * @License: MIT License
  */
-
 
 #include <algorithm>
 
