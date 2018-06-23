@@ -171,7 +171,7 @@ namespace Parser {
 
         /* Code */
         const auto VERSION = omit[lexeme["OPENQASM 2.0;"]];
-        const auto header = omit[lexeme[VERSION >> NEWLINE]];
+        const auto header = omit[lexeme[*(comment | WS) >> VERSION >> NEWLINE]];
 
         const auto openQASM = rule<class start, t_openQASM>()
                             = header >> *(omit[comment | WS] | statement | conditional_statement | gate_declaration);

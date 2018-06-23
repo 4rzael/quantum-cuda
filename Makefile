@@ -9,7 +9,7 @@
 
 CXX=	g++
 
-OPTIFLAGS= -g
+OPTIFLAGS= -g3
 
 CXXFLAGS= -Wextra -Wall -std=c++14 $(OPTIFLAGS)
 
