@@ -36,16 +36,21 @@ CUSRC=
 
 # .cpp sources
 SRC= Parser/float_expr_ast.cpp \
-	Parser/ASTGenerator.cpp \
-	Parser/CircuitBuilder.cpp \
-	Parser/CircuitBuilderUtils.cpp \
-	Parser/FloatExpressionEvaluator.cpp \
-	Circuit.cpp \
-	CPUExecutor.cpp \
-	ExecutorManager.cpp \
-	Matrix.cpp \
-	QuCircuit.cpp \
-	main.cpp
+	 Parser/ASTGenerator.cpp \
+	 Parser/CircuitBuilder/CXBuilder.cpp \
+	 Parser/CircuitBuilder/MeasureBuilder.cpp \
+	 Parser/CircuitBuilder/RegisterDeclarationBuilder.cpp \
+	 Parser/CircuitBuilder/UBuilder.cpp \
+	 Parser/CircuitBuilder/UserDefinedGateBuilder.cpp \
+	 Parser/CircuitBuilder/CircuitBuilder.cpp \
+	 Parser/CircuitBuilder/CircuitBuilderUtils.cpp \
+	 Parser/FloatExpressionEvaluator.cpp \
+	 CircuitPrinter.cpp \
+	 CPUExecutor.cpp \
+	 ExecutorManager.cpp \
+	 Matrix.cpp \
+	 QuCircuit.cpp \
+	 main.cpp
 
 $(ODIR)/Parser/ASTGenerator.o: CXXFLAGS:=$(filter-out $(OPTIFLAGS),$(CXXFLAGS))
 
@@ -71,6 +76,7 @@ all:	$(ODIR) $(CUODIR) $(NAME)
 $(ODIR):
 	mkdir $(ODIR)
 	mkdir $(ODIR)/Parser
+	mkdir $(ODIR)/Parser/CircuitBuilder
 
 # create objects from .cpp source files
 $(ODIR)/%.o:	$(SDIR)/%.cpp

@@ -2,11 +2,16 @@
  * @Author: Maxime Agor (4rzael)
  * @Date:   Sat Jun 23 2018
  * @Email:  maxime.agor23@gmail.com
- * @Project: Parser
+ * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: float_expr_ast.hpp
  * @Last modified by:   4rzael
- * @Last modified time: Sat Jun 23 2018, 11:24:47
+ * @Last modified time: Sat Jun 23 2018, 14:30:47
  * @License: MIT License
+ */
+
+/**
+ * The float expression evaluator is highly inspired from theses codes:
+ * https://github.com/djowel/spirit_x3/tree/master/example/x3
  */
 
 #pragma once
@@ -48,6 +53,11 @@ namespace Parser {
         };
         std::ostream& operator<< (std::ostream& stream, const t_float_expr_operation& operation);
 
+        /**
+         * @brief The AST node representing a floating-point expression
+         * 
+         * Example: (3/4) * pi + (-a ^ 2)
+         */
         struct t_float_expression
         {
             t_float_expr_operand first;

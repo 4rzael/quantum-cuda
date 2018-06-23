@@ -2,10 +2,10 @@
  * @Author: Maxime Agor (4rzael)
  * @Date:   Sat Jun 23 2018
  * @Email:  maxime.agor23@gmail.com
- * @Project: Parser
+ * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CircuitBuilderUtils.cpp
  * @Last modified by:   4rzael
- * @Last modified time: Sat Jun 23 2018, 11:25:28
+ * @Last modified time: Sat Jun 23 2018, 14:31:17
  * @License: MIT License
  */
 

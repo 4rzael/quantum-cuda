@@ -24,13 +24,9 @@ int main(int ac, char **av) {
       std::cout << "Need an argument" << std::endl;
   }
 
-  Parser::ASTGenerator gen(false);
-  auto ast = gen(av[1]);
-  LOG(Logger::DEBUG, "AST created:" << std::endl << ast);
-
-  Circuit circuit = CircuitBuilder().build(ast);
-  std::cout << circuit << std::endl;
-
+  auto ast = Parser::ASTGenerator()(av[1]);
+  Circuit circuit = CircuitBuilder()(ast);
+  LOG(Logger::DEBUG, "Generated circuit:" << std::endl << circuit);
 
   // QuCircuit circuit(2);
 

@@ -2,10 +2,10 @@
  * @Author: Maxime Agor (4rzael)
  * @Date:   Sat Jun 23 2018
  * @Email:  maxime.agor23@gmail.com
- * @Project: Parser
+ * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: ASTGenerator.cpp
  * @Last modified by:   4rzael
- * @Last modified time: Sat Jun 23 2018, 11:25:12
+ * @Last modified time: Sat Jun 23 2018, 14:31:04
  * @License: MIT License
  */
 
@@ -23,10 +23,13 @@ using namespace Parser;
 using namespace Parser::AST;
 
 namespace Parser {
+    /* This describes the grammar, which will be parsed using the library boost spirit x3
+     * It can probably be simplified, by using the skip[] operation instead of the *WS,
+     * which might even make compilation faster.
+     */
     namespace Rules {
         /* Whitespace rules */
         const auto WS = omit[+(lit('\t') | '\f' | '\r' | '\n' | ' ')];
-        const auto WS_INLINE = omit[+(lit('\t') | '\f' | ' ')];
         const auto NEWLINE = omit[+(-lit('\r') >> lit('\n'))];
 
         /* Whitespace-aware constructs */
@@ -148,7 +151,7 @@ namespace Parser {
                                 gate_call_statement
                         ] >> ';';
 
-        const auto comment = omit[lexeme["//" >> *WS_INLINE >> *(~char_('\n'))]];
+        const auto comment = omit[lexeme["//" >> *(~char_('\n'))]];
         const auto conditional_statement = rule<class conditional_statement, t_conditional_statement>()
                                         = lexeme["if" >> LEFT_PARENTHESIS >>
                                             reg >>
@@ -176,6 +179,7 @@ namespace Parser {
 }
 
 t_openQASM ASTGenerator::operator()(std::string const &filename) {
+    /* Reads the file */
     std::ifstream file(filename);
     std::stringstream ss;
     ss << file.rdbuf();
@@ -184,9 +188,11 @@ t_openQASM ASTGenerator::operator()(std::string const &filename) {
     auto iter = str.begin();
     auto iterEnd = str.end();
 
+    /* Parse the AST */
     t_openQASM res;
     phrase_parse(iter, iterEnd, Parser::Rules::openQASM, Parser::Rules::WS, res);
 
+    /* If some of the content have not been parsed, it means that the parser failed */
     if (iter != iterEnd) {
         std::stringstream errorStream(std::string(iter, iterEnd));
         std::string line;
@@ -200,8 +206,8 @@ t_openQASM ASTGenerator::operator()(std::string const &filename) {
     return res;
 }
 
-ASTGenerator::ASTGenerator(bool log, std::string const &log_folder, std::string const &log_file)
-: m_log(log) {
+ASTGenerator::ASTGenerator(std::string const &log_folder, std::string const &log_file)
+: m_log(true) {
     auto fullName = log_folder + (log_folder.back() == '/' ? "" : "/") + log_file;
 
     if (m_log) {
@@ -209,7 +215,9 @@ ASTGenerator::ASTGenerator(bool log, std::string const &log_folder, std::string 
     }
 }
 
-ASTGenerator::ASTGenerator(bool log, std::string const &log_folder) {
+ASTGenerator::ASTGenerator(std::string const &log_folder) {
     auto filename = "AST.log." + std::to_string(std::time(nullptr)) + ".xml";
-    ASTGenerator(log, log_folder, filename);
+    ASTGenerator(log_folder, filename);
 }
+
+ASTGenerator::ASTGenerator() : m_log(false) {}
