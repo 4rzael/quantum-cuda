@@ -10,8 +10,8 @@
  */
 
 #pragma once
-#include <vector>
 #include <string>
+#include <vector>
 #include <boost/variant/variant.hpp>
 
 #include "Parser/AST.hpp"
@@ -40,7 +40,7 @@ struct Circuit {
     struct UGate {
         UGate(double t, double p, double l, const Qubit &trgt)
         : theta(t), phi(p), lambda(l), target(trgt) {}
-        
+
         double theta;
         double phi;
         double lambda;

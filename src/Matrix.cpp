@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-18T09:28:13+01:00
+ * @Last modified time: 2018-06-21T12:32:26+01:00
  * @License: MIT License
  */
 
@@ -15,17 +15,26 @@
 #include "ExecutorManager.hpp"
 #include "CPUExecutor.hpp"
 
-Matrix::Matrix(Tvcplxd content, int m, int n) {
+Matrix::Matrix(Tvcplxd* content, int m, int n) {
   m_content = content;
   m_dim = std::make_pair(m, n);
 }
 
-Tvcplxd Matrix::getContent() const {
+Tvcplxd* Matrix::getContent() const {
   return m_content;
 }
 
 std::pair<int, int> Matrix::getDimensions() const {
   return m_dim;
+}
+
+Matrix Matrix::operator+(const Matrix& other) const {
+  Executor *exec = ExecutorManager::getInstance().getExecutor();
+
+  Matrix result = Matrix(exec->add(m_content, other.getContent(),
+    m_dim.first, m_dim.second),
+    other.getDimensions().first, m_dim.second);
+  return result;
 }
 
 Matrix Matrix::operator*(const Matrix& other) const {
@@ -66,15 +75,15 @@ std::complex<double> Matrix::tr() const {
 
 std::ostream& operator<<(std::ostream& os, const Matrix& m)
 {
-    os << "[\n";
+    os << "[" << std::endl;
     for (int j = 0; j < m.getDimensions().second; j++) {
       os << " [";
       for (int i = 0; i < m.getDimensions().first; i++) {
-        os << " " << m.getContent()[j * m.getDimensions().first + i].real() <<
-        "+" << m.getContent()[j * m.getDimensions().first + i].imag() << "i";
+        os << " " << (*m.getContent())[j * m.getDimensions().first + i].real() <<
+        "+" << (*m.getContent())[j * m.getDimensions().first + i].imag() << "i";
       }
-      os << " ],\n";
+      os << " ]," << std::endl;
     }
-    os << "]\n";
+    os << "]";
     return os;
 }

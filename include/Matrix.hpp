@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-18T09:35:32+01:00
+ * @Last modified time: 2018-06-21T12:29:25+01:00
  * @License: MIT License
  */
 
@@ -30,7 +30,7 @@ class Matrix {
     /**
     * The matrix content state n dimension
     */
-    Tvcplxd m_content;
+    Tvcplxd* m_content;
   public:
     /**
      * Default matrix constructor
@@ -42,7 +42,7 @@ class Matrix {
      * @param m The m dimension of the matrix
      * @param n The n dimension of the matrix
      */
-    Matrix(Tvcplxd matrix, int m, int n);
+    Matrix(Tvcplxd* matrix, int m, int n);
     /**
      * Matrix dimensions getter
      * @return Return the matrix dimensions as a pair of integers
@@ -52,7 +52,11 @@ class Matrix {
     * Matrix content getter
     * @return Return the content of the matrix as a std::valarray<std::complex<double>>
     */
-    Tvcplxd getContent() const;
+    Tvcplxd* getContent() const;
+    /**
+    * Matrix addition operator overload
+    */
+    Matrix operator+(const Matrix& other) const;
     /**
     * Matrix multiplication operator overload
     */
