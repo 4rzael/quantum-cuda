@@ -29,7 +29,7 @@ std::ostream& Parser::AST::operator<< (std::ostream& stream, const t_float_expr_
 void Parser::AST::OperandPrinterVisitor::operator()(__attribute__((unused)) const t_float_expr_nil &) const {
     m_out << "<float_expr_operand value=\"null\"></float_expr_operand>";
 }
-void Parser::AST::OperandPrinterVisitor::operator()(const ::boost::spirit::x3::variant<double, std::string> &v) const {
+void Parser::AST::OperandPrinterVisitor::operator()(const t_float &v) const {
     m_out << "<float_expr_operand value=\"";
     ::boost::apply_visitor(Parser::AST::TFloatPrinterVisitor(m_out), v);
     m_out << "\"></float_expr_operand>";

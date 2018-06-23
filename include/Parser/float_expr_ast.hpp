@@ -13,7 +13,7 @@ namespace Parser {
         struct t_float_expression;
         class OperandPrinterVisitor;
 
-        typedef ::boost::spirit::x3::variant<double, std::string> t_float;
+        typedef ::boost::variant<double, std::string> t_float;
 
         struct t_float_expr_nil {  
         };
@@ -41,6 +41,8 @@ namespace Parser {
         {
             t_float_expr_operand first;
             std::list<t_float_expr_operation> rest;
+            t_float_expression(double op) : first(op) {}
+            t_float_expression() {}
         };
         std::ostream& operator<< (std::ostream& stream, const t_float_expression& expression);
 
@@ -58,7 +60,7 @@ namespace Parser {
         public:
             OperandPrinterVisitor(std::ostream & out) : m_out(out) {}
             void operator()(const t_float_expr_nil &nil) const;
-            void operator()(const ::boost::spirit::x3::variant<double, std::string> &v) const;
+            void operator()(const t_float &v) const;
             void operator()(const ::boost::spirit::x3::forward_ast<t_float_expr_unaried_operand> &ast) const;
             void operator()(const ::boost::spirit::x3::forward_ast<t_float_expression> &ast) const;
         };
