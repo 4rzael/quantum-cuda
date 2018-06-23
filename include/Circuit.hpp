@@ -1,13 +1,14 @@
 /**
- * @Author: Maxime Agor <agor_m>
- * @Date:   2018-06-19T08:36:15+01:00
- * @Email:  maxime.agor@epitech.eu
- * @Project: CUDA-Based Simulator of Quantum Systems
+ * @Author: Maxime Agor (4rzael)
+ * @Date:   Sat Jun 23 2018
+ * @Email:  maxime.agor23@gmail.com
+ * @Project: include
  * @Filename: Circuit.hpp
- * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-19T08:36:50+01:00
+ * @Last modified by:   4rzael
+ * @Last modified time: Sat Jun 23 2018, 11:24:56
  * @License: MIT License
  */
+
 #pragma once
 #include <string>
 #include <vector>

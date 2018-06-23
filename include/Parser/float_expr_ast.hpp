@@ -1,3 +1,19 @@
+/**
+ * @Author: Maxime Agor (4rzael)
+ * @Date:   Sat Jun 23 2018
+ * @Email:  maxime.agor23@gmail.com
+ * @Project: CUDA-Based Simulator of Quantum Systems
+ * @Filename: float_expr_ast.hpp
+ * @Last modified by:   4rzael
+ * @Last modified time: Sat Jun 23 2018, 14:30:47
+ * @License: MIT License
+ */
+
+/**
+ * The float expression evaluator is highly inspired from theses codes:
+ * https://github.com/djowel/spirit_x3/tree/master/example/x3
+ */
+
 #pragma once
 
 #include <list>
@@ -13,7 +29,7 @@ namespace Parser {
         struct t_float_expression;
         class OperandPrinterVisitor;
 
-        typedef ::boost::spirit::x3::variant<double, std::string> t_float;
+        typedef ::boost::variant<double, std::string> t_float;
 
         struct t_float_expr_nil {  
         };
@@ -37,10 +53,17 @@ namespace Parser {
         };
         std::ostream& operator<< (std::ostream& stream, const t_float_expr_operation& operation);
 
+        /**
+         * @brief The AST node representing a floating-point expression
+         * 
+         * Example: (3/4) * pi + (-a ^ 2)
+         */
         struct t_float_expression
         {
             t_float_expr_operand first;
             std::list<t_float_expr_operation> rest;
+            t_float_expression(double op) : first(op) {}
+            t_float_expression() {}
         };
         std::ostream& operator<< (std::ostream& stream, const t_float_expression& expression);
 
@@ -58,7 +81,7 @@ namespace Parser {
         public:
             OperandPrinterVisitor(std::ostream & out) : m_out(out) {}
             void operator()(const t_float_expr_nil &nil) const;
-            void operator()(const ::boost::spirit::x3::variant<double, std::string> &v) const;
+            void operator()(const t_float &v) const;
             void operator()(const ::boost::spirit::x3::forward_ast<t_float_expr_unaried_operand> &ast) const;
             void operator()(const ::boost::spirit::x3::forward_ast<t_float_expression> &ast) const;
         };

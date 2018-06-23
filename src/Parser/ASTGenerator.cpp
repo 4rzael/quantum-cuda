@@ -1,3 +1,14 @@
+/**
+ * @Author: Maxime Agor (4rzael)
+ * @Date:   Sat Jun 23 2018
+ * @Email:  maxime.agor23@gmail.com
+ * @Project: CUDA-Based Simulator of Quantum Systems
+ * @Filename: ASTGenerator.cpp
+ * @Last modified by:   4rzael
+ * @Last modified time: Sat Jun 23 2018, 14:31:04
+ * @License: MIT License
+ */
+
 #include <string>
 #include <fstream>
 #include <ctime>
@@ -12,10 +23,13 @@ using namespace Parser;
 using namespace Parser::AST;
 
 namespace Parser {
+    /* This describes the grammar, which will be parsed using the library boost spirit x3
+     * It can probably be simplified, by using the skip[] operation instead of the *WS,
+     * which might even make compilation faster.
+     */
     namespace Rules {
         /* Whitespace rules */
         const auto WS = omit[+(lit('\t') | '\f' | '\r' | '\n' | ' ')];
-        const auto WS_INLINE = omit[+(lit('\t') | '\f' | ' ')];
         const auto NEWLINE = omit[+(-lit('\r') >> lit('\n'))];
 
         /* Whitespace-aware constructs */
@@ -45,12 +59,12 @@ namespace Parser {
 
         const auto FILENAME = +(alnum | char_('.') | char_('_') | char_('-'));
         const auto FLOAT = rule<class FLOAT, t_float>()
-                        = (double_ | string("pi"));
+                        = (double_ | ID);
         const auto UINT = uint_;
 
         /* Float expressions types */
         const auto float_expr_basic = rule<class float_expr_basic, t_float>()
-                                    = FLOAT | ID;
+                                    = FLOAT;
         rule<struct float_expr_class, t_float_expression> const float_expr = "float_expr";
         rule<struct float_expr_term_class, t_float_expression> const float_expr_term = "float_expr_term";
         rule<struct float_expr_factor_class, t_float_expr_operand> const float_expr_factor = "float_expr_factor";
@@ -129,6 +143,7 @@ namespace Parser {
                                 gate_call_statement
                         ] >> ';';
 
+        /* Operations available inside the body of a gate */
         const auto gate_ops = rule<class statement, t_statement>()
                     = lexeme[cx_statement |
                                 u_statement |
@@ -136,7 +151,7 @@ namespace Parser {
                                 gate_call_statement
                         ] >> ';';
 
-        const auto comment = omit[lexeme["//" >> *WS_INLINE >> *(~char_('\n'))]];
+        const auto comment = omit[lexeme["//" >> *(~char_('\n'))]];
         const auto conditional_statement = rule<class conditional_statement, t_conditional_statement>()
                                         = lexeme["if" >> LEFT_PARENTHESIS >>
                                             reg >>
@@ -156,7 +171,7 @@ namespace Parser {
 
         /* Code */
         const auto VERSION = omit[lexeme["OPENQASM 2.0;"]];
-        const auto header = omit[lexeme[VERSION >> NEWLINE]];
+        const auto header = omit[lexeme[*(comment | WS) >> VERSION >> NEWLINE]];
 
         const auto openQASM = rule<class start, t_openQASM>()
                             = header >> *(omit[comment | WS] | statement | conditional_statement | gate_declaration);
@@ -164,6 +179,7 @@ namespace Parser {
 }
 
 t_openQASM ASTGenerator::operator()(std::string const &filename) {
+    /* Reads the file */
     std::ifstream file(filename);
     std::stringstream ss;
     ss << file.rdbuf();
@@ -172,9 +188,11 @@ t_openQASM ASTGenerator::operator()(std::string const &filename) {
     auto iter = str.begin();
     auto iterEnd = str.end();
 
+    /* Parse the AST */
     t_openQASM res;
     phrase_parse(iter, iterEnd, Parser::Rules::openQASM, Parser::Rules::WS, res);
 
+    /* If some of the content have not been parsed, it means that the parser failed */
     if (iter != iterEnd) {
         std::stringstream errorStream(std::string(iter, iterEnd));
         std::string line;
@@ -188,8 +206,8 @@ t_openQASM ASTGenerator::operator()(std::string const &filename) {
     return res;
 }
 
-ASTGenerator::ASTGenerator(bool log, std::string const &log_folder, std::string const &log_file)
-: m_log(log) {
+ASTGenerator::ASTGenerator(std::string const &log_folder, std::string const &log_file)
+: m_log(true) {
     auto fullName = log_folder + (log_folder.back() == '/' ? "" : "/") + log_file;
 
     if (m_log) {
@@ -197,7 +215,9 @@ ASTGenerator::ASTGenerator(bool log, std::string const &log_folder, std::string 
     }
 }
 
-ASTGenerator::ASTGenerator(bool log, std::string const &log_folder) {
+ASTGenerator::ASTGenerator(std::string const &log_folder) {
     auto filename = "AST.log." + std::to_string(std::time(nullptr)) + ".xml";
-    ASTGenerator(log, log_folder, filename);
+    ASTGenerator(log_folder, filename);
 }
+
+ASTGenerator::ASTGenerator() : m_log(false) {}

@@ -1,3 +1,14 @@
+/**
+ * @Author: Maxime Agor (4rzael)
+ * @Date:   Sat Jun 23 2018
+ * @Email:  maxime.agor23@gmail.com
+ * @Project: CUDA-Based Simulator of Quantum Systems
+ * @Filename: float_expr_ast.cpp
+ * @Last modified by:   4rzael
+ * @Last modified time: Sat Jun 23 2018, 14:31:23
+ * @License: MIT License
+ */
+
 #include "Parser/float_expr_ast.hpp"
 
 using namespace boost::spirit;
@@ -29,7 +40,7 @@ std::ostream& Parser::AST::operator<< (std::ostream& stream, const t_float_expr_
 void Parser::AST::OperandPrinterVisitor::operator()(__attribute__((unused)) const t_float_expr_nil &) const {
     m_out << "<float_expr_operand value=\"null\"></float_expr_operand>";
 }
-void Parser::AST::OperandPrinterVisitor::operator()(const ::boost::spirit::x3::variant<double, std::string> &v) const {
+void Parser::AST::OperandPrinterVisitor::operator()(const t_float &v) const {
     m_out << "<float_expr_operand value=\"";
     ::boost::apply_visitor(Parser::AST::TFloatPrinterVisitor(m_out), v);
     m_out << "\"></float_expr_operand>";

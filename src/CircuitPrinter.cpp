@@ -1,6 +1,24 @@
+/**
+ * @Author: Maxime Agor (4rzael)
+ * @Date:   Sat Jun 23 2018
+ * @Email:  maxime.agor23@gmail.com
+ * @Project: CUDA-Based Simulator of Quantum Systems
+ * @Filename: Circuit.cpp
+ * @Last modified by:   4rzael
+ * @Last modified time: Sat Jun 23 2018, 14:31:39
+ * @License: MIT License
+ */
+
 #include <iostream>
 #include "Circuit.hpp"
 
+/**
+ * @brief This file contains code used to print the circuit
+ */
+
+/**
+ * @brief Handles tabulations
+ */
 struct Tabs {
 private:
     int t = 0;
@@ -15,6 +33,9 @@ public:
     }
 };
 
+/**
+ * @brief Handles the printing of gates in the circuit
+ */
 struct GatePrinterVisitor: boost::static_visitor<> {
 private:
     std::ostream &m_stream;
@@ -60,6 +81,9 @@ public:
     }
 };
 
+/**
+ * @brief Prints the circuit
+ */
 std::ostream& operator<< (std::ostream& stream, const Circuit & c) {
     Tabs tabs;
     stream << "Circuit:" << std::endl;

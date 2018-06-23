@@ -1,5 +1,15 @@
-#ifndef LOGGER_HPP_
-# define LOGGER_HPP_
+/**
+ * @Author: Maxime Agor (4rzael)
+ * @Date:   Sat Jun 23 2018
+ * @Email:  maxime.agor23@gmail.com
+ * @Project: include
+ * @Filename: Logger.hpp
+ * @Last modified by:   4rzael
+ * @Last modified time: Sat Jun 23 2018, 11:25:03
+ * @License: MIT License
+ */
+
+#pragma once
 
 #include <string>
 #include <sstream>
@@ -26,8 +36,6 @@ public:
     }
 };
 
-#define LOG(importance, message) (Logger::log(importance, static_cast<std::ostringstream&>(\
+#define LOG(importance, message) do {Logger::log(importance, static_cast<std::ostringstream&>(\
       std::ostringstream().flush() << message  \
-    ).str(), __FILE__, __LINE__))
-
-#endif /* LOGGER_HPP_ */
+    ).str(), __FILE__, __LINE__);} while (0)
