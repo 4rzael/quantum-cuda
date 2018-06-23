@@ -5,19 +5,28 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CPUExecutor.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-21T12:09:53+01:00
+ * @Last modified time: 2018-06-23T14:35:13+01:00
  * @License: MIT License
  */
 
+#include <iostream>
+
 #include "CPUExecutor.hpp"
 
-Tvcplxd* CPUExecutor::add(Tvcplxd* a, Tvcplxd* b, int m, int n) {
-  Tvcplxd* result = new Tvcplxd(n * m);
+Tvcplxd* CPUExecutor::add(Tvcplxd* a, Tvcplxd* b) {
+  Tvcplxd* result = new Tvcplxd(a->size());
 
-  for (int j = 0; j < n; j++) {
-    for (int i = 0; i < m; i++) {
-      (*result)[j * m + i] = (*a)[j * m + i] + (*b)[j * m + i];
-    }
+  for (uint i = 0; i < a->size(); i++) {
+    (*result)[i] = (*a)[i] + (*b)[i];
+  }
+  return result;
+}
+
+Tvcplxd* CPUExecutor::mult_scalar(Tvcplxd* a, std::complex<double> s) {
+  Tvcplxd* result = new Tvcplxd(a->size());
+
+  for (uint i = 0; i < a->size(); i++) {
+    (*result)[i] = (*a)[i] * s;
   }
   return result;
 }
@@ -67,6 +76,23 @@ Tvcplxd* CPUExecutor::T(Tvcplxd* a, int m, int n) {
     for (int i = 0; i < m; i++) {
       (*result)[i * n + j] = (*a)[j * m + i];
     }
+  }
+  return result;
+}
+
+Tvcplxd* CPUExecutor::normalize(Tvcplxd* a) {
+  Tvcplxd* result = new Tvcplxd(a->size());
+  std::complex<double> sum = 0;
+
+  for (uint i = 0; i < a->size(); i++) {
+    sum += pow((*a)[i], 2);
+  }
+  if (sum == std::complex<double>(0)) {
+    sum = 1;
+  }
+  sum = sqrt(sum);
+  for (uint j = 0; j < a->size(); j++) {
+    (*result)[j] = (*a)[j] / sum.real();
   }
   return result;
 }

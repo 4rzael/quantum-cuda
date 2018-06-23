@@ -5,11 +5,12 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-21T12:32:26+01:00
+ * @Last modified time: 2018-06-23T14:33:57+01:00
  * @License: MIT License
  */
 
 #include <iostream>
+#include <iomanip>
 
 #include "Matrix.hpp"
 #include "ExecutorManager.hpp"
@@ -31,9 +32,16 @@ std::pair<int, int> Matrix::getDimensions() const {
 Matrix Matrix::operator+(const Matrix& other) const {
   Executor *exec = ExecutorManager::getInstance().getExecutor();
 
-  Matrix result = Matrix(exec->add(m_content, other.getContent(),
-    m_dim.first, m_dim.second),
-    other.getDimensions().first, m_dim.second);
+  Matrix result = Matrix(exec->add(m_content, other.getContent()),
+    m_dim.first, m_dim.second);
+  return result;
+}
+
+Matrix Matrix::operator*(const std::complex<double>& scalar) const {
+  Executor *exec = ExecutorManager::getInstance().getExecutor();
+
+  Matrix result = Matrix(exec->mult_scalar(m_content, scalar),
+    m_dim.first, m_dim.second);
   return result;
 }
 
@@ -68,6 +76,13 @@ Matrix Matrix::T() const {
   return result;
 }
 
+Matrix Matrix::normalize() const {
+  Executor* exec = ExecutorManager::getInstance().getExecutor();
+
+  Matrix result = Matrix(exec->normalize(m_content), m_dim.first, m_dim.second);
+  return result;
+}
+
 std::complex<double> Matrix::tr() const {
   Executor *exec = ExecutorManager::getInstance().getExecutor();
   return exec->tr(m_content, m_dim.first);
@@ -79,10 +94,10 @@ std::ostream& operator<<(std::ostream& os, const Matrix& m)
     for (int j = 0; j < m.getDimensions().second; j++) {
       os << " [";
       for (int i = 0; i < m.getDimensions().first; i++) {
-        os << " " << (*m.getContent())[j * m.getDimensions().first + i].real() <<
-        "+" << (*m.getContent())[j * m.getDimensions().first + i].imag() << "i";
+        os << "\t" << std::fixed << std::setprecision(2) << (*m.getContent())[j * m.getDimensions().first + i].real() <<
+        "+" << std::fixed << std::setprecision(2) << (*m.getContent())[j * m.getDimensions().first + i].imag() << "i";
       }
-      os << " ]," << std::endl;
+      os << "\t]," << std::endl;
     }
     os << "]";
     return os;

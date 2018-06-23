@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-22T14:17:39+01:00
+ * @Last modified time: 2018-06-23T15:13:32+01:00
  * @License: MIT License
  */
 
@@ -32,30 +32,29 @@ Simulator::Simulator(Circuit& circuit) : m_circuit(circuit) {
     m_qRegOffsets.insert(make_pair(reg.name, m_size));
     m_size += reg.size;
   }
-
   // Initializing simulator state.with each qubits at |0>.
   m_state = Matrix::kron(std::vector<Matrix>(m_size, MatrixStore::k0));
 }
 
 Simulator::StepVisitor::StepVisitor(Simulator& simulator) :
-  m_simulator(simulator) {
-  // Initializing left and right gates set (For the sake of cnot simulations).
-  m_lgates = std::vector<Matrix>(m_simulator.m_size, MatrixStore::i2);
-  m_rgates = std::vector<Matrix>(m_simulator.m_size, MatrixStore::i2);
-}
+m_simulator(simulator) {}
 
 void Simulator::StepVisitor::operator()(const Circuit::UGate& value) {
   Circuit::Qubit target = value.target;
   int id = m_simulator.m_qRegOffsets.find(target.registerName)->second;
   id += target.element;
 
+  std::vector<Matrix> gates = std::vector<Matrix>(m_simulator.m_size, MatrixStore::i2);
   using namespace std::complex_literals;
-  m_lgates[id] = Matrix(new Tvcplxd({exp(-1i * (value.phi + value.lambda) / 2.0)
-    * cos(value.theta / 2),
-    -exp(-1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2),
-    exp(1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2),
-    exp(1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2)
+  gates[id] = Matrix(new Tvcplxd({exp(-1i * (value.phi + value.lambda) / 2.0)
+    * cos(value.theta / 2.0),
+    -exp(-1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2.0),
+    exp(1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2.0),
+    exp(1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2.0)
   }), 2, 2);
+
+  Matrix op = Matrix::kron(gates);
+  m_simulator.m_state = op * m_simulator.m_state;
 }
 
 void Simulator::StepVisitor::operator()(const Circuit::CXGate& value) {
@@ -63,20 +62,24 @@ void Simulator::StepVisitor::operator()(const Circuit::CXGate& value) {
   int controlId = m_simulator.m_qRegOffsets.find(control.registerName)->second;
   controlId += control.element;
 
-  m_lgates[controlId] = MatrixStore::pk0;
+  std::vector<Matrix> lgates = std::vector<Matrix>(m_simulator.m_size, MatrixStore::i2);
+  std::vector<Matrix> rgates = std::vector<Matrix>(m_simulator.m_size, MatrixStore::i2);
+  lgates[controlId] = MatrixStore::pk0;
+  rgates[controlId] = MatrixStore::pk1;
 
   Circuit::Qubit target = value.target;
   int targetId = m_simulator.m_qRegOffsets.find(target.registerName)->second;
   targetId += target.element;
 
-  m_rgates[targetId] = MatrixStore::pk1;
-  m_rgates[targetId] = MatrixStore::x;
+  rgates[targetId] = MatrixStore::x;
+
+  Matrix op = Matrix::kron(lgates) + Matrix::kron(rgates);
+  m_simulator.m_state = op * m_simulator.m_state;
 }
 
 void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
   int sourceId = m_simulator.m_qRegOffsets.find(value.source.registerName)->second;
   sourceId += value.source.element;
-
   // Computing probability p0 to measure 0 at qubits sourceId.
   std::vector<Matrix> gates = std::vector<Matrix>(m_simulator.m_size,
     MatrixStore::i2);
@@ -89,39 +92,28 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> dis(0.0, 1.0);
-  if (dis(gen) < p0.real()) {
+  if (dis(gen) < fabs(p0.real())) {
     m_simulator.m_cReg.find(value.dest.registerName)->second[value.dest.element] = false;
-    m_simulator.m_state = Matrix::kron(gates) * m_simulator.m_state;
   } else {
     m_simulator.m_cReg.find(value.dest.registerName)->second[value.dest.element] = true;
-    gates[sourceId] = MatrixStore::pk1;
-    m_simulator.m_state = Matrix::kron(gates) * m_simulator.m_state;
   };
 }
 
-Matrix Simulator::StepVisitor::retrieve_operator() {
-  return Matrix::kron(m_lgates) + Matrix::kron(m_rgates);
-}
-
 void Simulator::simulate() {
-  // Initializing a I gate for each qubits in the circuit
-  std::vector<Matrix> gates(m_size, Matrix(new Tvcplxd({1.0, 0.0, 0.0, 1.0}),
-    2, 2));
   auto visitor = StepVisitor(*this);
-
-  for(std::vector<Circuit::Step>::iterator it = m_circuit.steps.begin();
+  // Looping through each steps of the circuit.
+  for (std::vector<Circuit::Step>::iterator it = m_circuit.steps.begin();
     it != m_circuit.steps.end(); ++it) {
+    // Setting default I transformation in the visitor.
     for (auto &substep: *it) {
-      // Setting defined gates
+      // Applying defined tranformations in the visitor.
       boost::apply_visitor(visitor, substep);
     }
-    Matrix op = visitor.retrieve_operator();
-    m_state = op * m_state;
   }
 }
 
 void Simulator::print(std::ostream &os) const {
-  os << "Simulator creg:" << std::endl;
+  os << "creg:(";
   for (auto &reg: m_circuit.creg) {
     int j = 0;
     os << reg.name << "=\"";
@@ -132,6 +124,7 @@ void Simulator::print(std::ostream &os) const {
     }
     os << "\"" << "(" << j << ");";
   }
+  os << ")";
 }
 
 std::ostream& operator<<(std::ostream& os, const Simulator& sim)

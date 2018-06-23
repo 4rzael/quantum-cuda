@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Executor.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-21T12:01:06+01:00
+ * @Last modified time: 2018-06-23T13:40:48+01:00
  * @License: MIT License
  */
 
@@ -35,11 +35,16 @@ class Executor
     * Performs addition between std::valarray<std::complex<double>> a and b.
     * @param a A matrix content.
     * @param b B matrix content.
-    * @param m Matrices m dimension.
-    * @param n Matrices n dimension.
     * @return The addition between matrices a and b.
     */
-    virtual Tvcplxd* add(Tvcplxd* a, Tvcplxd* b, int m, int n) = 0;
+    virtual Tvcplxd* add(Tvcplxd* a, Tvcplxd* b) = 0;
+    /**
+    * Performs a multiplication of the matrix by a scalar.
+    * @param a A matrix content.
+    * @param s A complex scalar.
+    * @return The multiplication result as a std::valarray<std::complex<double>>.
+    */
+    virtual Tvcplxd* mult_scalar(Tvcplxd* a, std::complex<double> s) = 0;
     /**
     * Performs a dot product between std::valarray<std::complex<double>> a and b.
     * @param a A matrix content.
@@ -75,4 +80,10 @@ class Executor
     * @return The transpose as a std::valarray<std::complex<double>>.
     */
     virtual Tvcplxd* T(Tvcplxd* a, int m, int n) = 0;
+    /**
+    * Compute the normalized std::valarray<std::complex<double>>.
+    * @param a A matrix content.
+    * @return The normalized matrix.
+    */
+    virtual Tvcplxd* normalize(Tvcplxd* a) = 0;
 };

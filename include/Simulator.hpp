@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-22T13:58:24+01:00
+ * @Last modified time: 2018-06-23T15:08:19+01:00
  * @License: MIT License
  */
 
@@ -35,12 +35,6 @@ class Simulator
         * The simulator parent instance;
         */
         Simulator& m_simulator;
-        /**
-        * Transformation of each qubits (left and right side for CNOT gate
-        * handling)
-        */
-        std::vector<Matrix> m_lgates;
-        std::vector<Matrix> m_rgates;
       public:
         /**
         * Construct a visitor object from the parent simulator instance.
@@ -62,11 +56,6 @@ class Simulator
         * @param value The Measurement to perform..
         */
         void operator()(const Circuit::Measurement& value);
-        /**
-        * Retrieve the state transformation operator.
-        * @return The transformation operator as a matrix.
-        */
-        Matrix retrieve_operator();
     };
     /**
     * The circuit layout object;

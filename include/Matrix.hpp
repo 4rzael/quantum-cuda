@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-22T13:39:57+01:00
+ * @Last modified time: 2018-06-23T13:40:45+01:00
  * @License: MIT License
  */
 
@@ -60,11 +60,16 @@ class Matrix {
     /**
     * Matrix multiplication operator overload
     */
+    Matrix operator*(const std::complex<double>& scalar) const;
     Matrix operator*(const Matrix& other) const;
     /**
     * Matrix kron operation
     */
     static Matrix kron(std::vector<Matrix> m);
+    /**
+    * Matrix kron operation
+    */
+    Matrix normalize() const;
     /**
     * Matrix transpose
     */
