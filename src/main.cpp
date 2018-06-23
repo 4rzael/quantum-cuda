@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: main.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-19T12:48:13+01:00
+ * @Last modified time: 2018-06-22T14:22:51+01:00
  * @License: MIT License
  */
 
@@ -16,7 +16,7 @@
 #include "Circuit.hpp"
 #include "Parser/CircuitBuilder.hpp"
 #include "Logger.hpp"
-#include "QuCircuit.hpp"
+#include "Simulator.hpp"
 
 #include "Parser/ASTGenerator.hpp"
 #include "Circuit.hpp"
@@ -31,9 +31,8 @@ int main(int ac, char **av) {
   auto ast = Parser::ASTGenerator()(av[1]);
   Circuit circuit = CircuitBuilder()(ast);
   LOG(Logger::DEBUG, "Generated circuit:" << std::endl << circuit);
-  QuCircuit quCircuit = QuCircuit(circuit);
-  quCircuit.drawState();
-  quCircuit.run();
-  quCircuit.drawState();
+  Simulator simulator = Simulator(circuit);
+  simulator.simulate();
+  LOG(Logger::INFO, "Simulator:" << std::endl << simulator);
   return EXIT_SUCCESS;
 }

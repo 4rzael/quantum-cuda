@@ -4,7 +4,7 @@
 # @Project: CUDA-Based Simulator of Quantum Systems
 # @Filename: Makefile
 # @Last modified by:   vial-d_j
-# @Last modified time: 2018-06-18T12:08:20+01:00
+# @Last modified time: 2018-06-22T09:03:42+01:00
 # @License: MIT License
 
 CXX=	g++
@@ -49,7 +49,7 @@ SRC= Parser/float_expr_ast.cpp \
 	 CPUExecutor.cpp \
 	 ExecutorManager.cpp \
 	 Matrix.cpp \
-	 QuCircuit.cpp \
+     Simulator.cpp \
 	 main.cpp
 
 $(ODIR)/Parser/ASTGenerator.o: CXXFLAGS:=$(filter-out $(OPTIFLAGS),$(CXXFLAGS))
