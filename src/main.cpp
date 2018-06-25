@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: main.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-22T14:22:51+01:00
+ * @Last modified time: 2018-06-25T10:16:32+01:00
  * @License: MIT License
  */
 
@@ -18,11 +18,6 @@
 #include "Logger.hpp"
 #include "Simulator.hpp"
 
-#include "Parser/ASTGenerator.hpp"
-#include "Circuit.hpp"
-#include "Parser/CircuitBuilder.hpp"
-#include "Logger.hpp"
-
 int main(int ac, char **av) {
   if (ac <2) {
       std::cout << "Need an argument" << std::endl;
@@ -33,6 +28,6 @@ int main(int ac, char **av) {
   LOG(Logger::DEBUG, "Generated circuit:" << std::endl << circuit);
   Simulator simulator = Simulator(circuit);
   simulator.simulate();
-  LOG(Logger::INFO, "Simulator:" << std::endl << simulator);
+  LOG(Logger::INFO, "Simulator in final state:" << std::endl << simulator);
   return EXIT_SUCCESS;
 }

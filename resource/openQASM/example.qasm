@@ -21,6 +21,6 @@ gate mygate2(ah) bla1, bla2 {
 }
 
 
-mygate2(100) ninja[0], ninja[2];
+mygate2(100) ninja[0], ninja[1];
 //mygate() q1, q2;
 //mygate q;

@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-23T15:13:32+01:00
+ * @Last modified time: 2018-06-25T10:59:35+01:00
  * @License: MIT License
  */
 
@@ -17,6 +17,7 @@
 
 #include "MatrixStore.hpp"
 #include "Simulator.hpp"
+#include "Logger.hpp"
 
 Simulator::Simulator(Circuit& circuit) : m_circuit(circuit) {
   // Allocating the c registers;
@@ -54,7 +55,15 @@ void Simulator::StepVisitor::operator()(const Circuit::UGate& value) {
   }), 2, 2);
 
   Matrix op = Matrix::kron(gates);
+  Matrix beforeState = m_simulator.m_state;
   m_simulator.m_state = op * m_simulator.m_state;
+
+  LOG(Logger::DEBUG, "Applying a U Gate:" << "\nU Gate:\n\ttheta: "
+    << value.theta << ", phi: " << value.phi << ", lambda: " << value.lambda
+    << "\n\ttarget: " << value.target.registerName << "["
+    << value.target.element << "]\nState before operation:("
+    << beforeState << ";),\nApplied operation:(" << op
+    << ";),\nState after operation:(" << m_simulator.m_state << std::endl);
 }
 
 void Simulator::StepVisitor::operator()(const Circuit::CXGate& value) {
@@ -74,7 +83,15 @@ void Simulator::StepVisitor::operator()(const Circuit::CXGate& value) {
   rgates[targetId] = MatrixStore::x;
 
   Matrix op = Matrix::kron(lgates) + Matrix::kron(rgates);
+  Matrix beforeState = m_simulator.m_state;
   m_simulator.m_state = op * m_simulator.m_state;
+
+  LOG(Logger::DEBUG, "Applying a CX Gate:" << "\nCX Gate:\n\tcontrol: "
+    << value.control.registerName << "[" << value.control.element
+    << "]\n\ttarget: " << value.target.registerName << "["
+    << value.target.element << "]\nState before operation:("
+    << beforeState << ";),\nApplied operation:(" << op
+    << ";),\nState after operation:(" << m_simulator.m_state << std::endl);
 }
 
 void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
@@ -84,8 +101,9 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
   std::vector<Matrix> gates = std::vector<Matrix>(m_simulator.m_size,
     MatrixStore::i2);
   gates[sourceId] = MatrixStore::pk0;
+  Matrix op = Matrix::kron(gates);
   Matrix x = m_simulator.m_state * m_simulator.m_state.T();
-  Matrix y = Matrix::kron(gates) * x;
+  Matrix y = op * x;
   std::complex<double> p0 = y.tr();
 
   // Simulate measurement by randomizing outcome according to p0.
@@ -96,7 +114,18 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
     m_simulator.m_cReg.find(value.dest.registerName)->second[value.dest.element] = false;
   } else {
     m_simulator.m_cReg.find(value.dest.registerName)->second[value.dest.element] = true;
+    gates[sourceId] = MatrixStore::pk1;
+    op = Matrix::kron(gates);
   };
+
+  Matrix beforeState = m_simulator.m_state;
+  m_simulator.m_state = op * m_simulator.m_state;
+
+  LOG(Logger::DEBUG, "Performing a measurement:" << "\nMeasurement:\n\tsource: "
+    << value.source.registerName << "[" << value.source.element << "]\n\tdest: "
+    << value.dest.registerName << "[" << value.dest.element
+    << "]\nState before operation:(" << beforeState << ";),\nApplied operation:("
+    << op << ";),\nState after operation:(" << m_simulator.m_state << std::endl);
 }
 
 void Simulator::simulate() {
@@ -113,18 +142,20 @@ void Simulator::simulate() {
 }
 
 void Simulator::print(std::ostream &os) const {
-  os << "creg:(";
+  os << "Simulator:\nState:(";
+  os << m_state;
+  os << ";),\nCREGs states:([\n";
   for (auto &reg: m_circuit.creg) {
     int j = 0;
-    os << reg.name << "=\"";
+    os << " [\t\"" << reg.name << "\": bitstring(";
     for (uint i = 0; i < reg.size; i++) {
       j <<= 1;
       j +=  m_cReg.find(reg.name)->second[i];
       os << m_cReg.find(reg.name)->second[i];
     }
-    os << "\"" << "(" << j << ");";
+    os << "); intvalue(" << j << ");\t],\n";
   }
-  os << ")";
+  os << "];)";
 }
 
 std::ostream& operator<<(std::ostream& os, const Simulator& sim)
