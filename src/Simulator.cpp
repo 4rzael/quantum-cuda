@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-25T11:09:44+01:00
+ * @Last modified time: 2018-06-25T12:26:24+01:00
  * @License: MIT License
  */
 
@@ -41,11 +41,17 @@ Simulator::StepVisitor::StepVisitor(Simulator& simulator) :
 m_simulator(simulator) {}
 
 void Simulator::StepVisitor::operator()(const Circuit::UGate& value) {
+  // Computing the offset of the target qubit
   Circuit::Qubit target = value.target;
   int id = m_simulator.m_qRegOffsets.find(target.registerName)->second;
   id += target.element;
 
-  std::vector<Matrix> gates = std::vector<Matrix>(m_simulator.m_size, MatrixStore::i2);
+  // filling a vector of the simulator size with identity gates.
+  std::vector<Matrix> gates = std::vector<Matrix>(m_simulator.m_size,
+    MatrixStore::i2);
+
+  // Creating a gate according to the phi, theta and lambda parameters and
+  // setting it as the target qubit transformation gate.
   using namespace std::complex_literals;
   gates[id] = Matrix(new Tvcplxd({exp(-1i * (value.phi + value.lambda) / 2.0)
     * cos(value.theta / 2.0),
@@ -54,10 +60,15 @@ void Simulator::StepVisitor::operator()(const Circuit::UGate& value) {
     exp(1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2.0)
   }), 2, 2);
 
-  Matrix op = Matrix::kron(gates);
+  // This state is stored for debug purposes.
   Matrix beforeState = m_simulator.m_state;
+
+  // Computing the new state as the dot product between the kroenecker product
+  // of the transformation gates for each qubits and the actual simulator state.
+  Matrix op = Matrix::kron(gates);
   m_simulator.m_state = op * m_simulator.m_state;
 
+  // Debug logs
   LOG(Logger::DEBUG, "Applying a U Gate:" << "\nU Gate:\n\ttheta: "
     << value.theta << ", phi: " << value.phi << ", lambda: " << value.lambda
     << "\n\ttarget: " << value.target.registerName << "["
@@ -67,23 +78,40 @@ void Simulator::StepVisitor::operator()(const Circuit::UGate& value) {
 }
 
 void Simulator::StepVisitor::operator()(const Circuit::CXGate& value) {
+  // Computing the offset of the control qubit.
   Circuit::Qubit control = value.control;
   int controlId = m_simulator.m_qRegOffsets.find(control.registerName)->second;
   controlId += control.element;
 
-  std::vector<Matrix> lgates = std::vector<Matrix>(m_simulator.m_size, MatrixStore::i2);
-  std::vector<Matrix> rgates = std::vector<Matrix>(m_simulator.m_size, MatrixStore::i2);
+  // Filling two vectors of the simulator size with identity gates.
+  std::vector<Matrix> lgates = std::vector<Matrix>(m_simulator.m_size,
+    MatrixStore::i2);
+  std::vector<Matrix> rgates = std::vector<Matrix>(m_simulator.m_size,
+    MatrixStore::i2);
+
+  // We set the transformation gate of the control qubit to the projector of the
+  // |0> (the |0><0| outer product) in the first vector.
   lgates[controlId] = MatrixStore::pk0;
+  // We set the transformation gate of the control qubit to the projector of the
+  // |1> (the |1><1| outer product) in the second vector.
   rgates[controlId] = MatrixStore::pk1;
 
+  // Computing the offset of the target qubit.
   Circuit::Qubit target = value.target;
   int targetId = m_simulator.m_qRegOffsets.find(target.registerName)->second;
   targetId += target.element;
 
+  // We set the transformation gate of the target qubit to the Pauli-X
+  // (bit-flip) in the second vector.
   rgates[targetId] = MatrixStore::x;
 
-  Matrix op = Matrix::kron(lgates) + Matrix::kron(rgates);
+  // This state is stored for debug purposes.
   Matrix beforeState = m_simulator.m_state;
+
+  // Computing the new state as the dot product between the summed kroenecker
+  // products of the transformation gates for each qubits from both vectors
+  // and the actual simulator state.
+  Matrix op = Matrix::kron(lgates) + Matrix::kron(rgates);
   m_simulator.m_state = op * m_simulator.m_state;
 
   LOG(Logger::DEBUG, "Applying a CX Gate:" << "\nCX Gate:\n\tcontrol: "
@@ -95,18 +123,39 @@ void Simulator::StepVisitor::operator()(const Circuit::CXGate& value) {
 }
 
 void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
+  // Computing the offset of the qubit to measure.
   int sourceId = m_simulator.m_qRegOffsets.find(value.source.registerName)->second;
   sourceId += value.source.element;
-  // Computing probability p0 to measure 0 at qubits sourceId.
+
+  // Filling a vector of simulator size with identity gates.
   std::vector<Matrix> gates = std::vector<Matrix>(m_simulator.m_size,
     MatrixStore::i2);
+
+  // Setting the transformation gate of the designated qubit to the projector of
+  // |0> (the |0><0| outer product).
   gates[sourceId] = MatrixStore::pk0;
+
+  // Computing the kroenecker product of the transformation gates.
   Matrix op = Matrix::kron(gates);
+
+  // Computing the outer product of the current state and its transpose.
   Matrix x = m_simulator.m_state * m_simulator.m_state.T();
+
+  // Computing the dot product of the kroenecker product of the transformation
+  // gates with the outer product of the current state and its transpose.
   Matrix y = op * x;
+
+  // Computing the probability p0 to measure the designated qubit at 0 as the
+  // trace of the dot product of the kroenecker product of the transformation
+  // gates with the outer product of the current state and its transpose.
   std::complex<double> p0 = y.tr();
 
   // Simulate measurement by randomizing outcome according to p0.
+  // If a random number between 0 and 1 is less than p0 the cregister designated
+  // to store the measurement outcome will be set to 0 (false), otherwise it
+  // will be set to 1 (true) and the transformation gate for the measured qubit
+  // would be set to the projector of |1> (the outer product |1><1|) and the
+  // kroenecker product of the transformation gates recomputed.
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> dis(0.0, 1.0);
@@ -118,10 +167,15 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
     op = Matrix::kron(gates);
   };
 
+  // This state is stored for debug purposes.
   Matrix beforeState = m_simulator.m_state;
+
+  // Computing the new state as the normalized dot product between the kroenecker
+  // product of the transformation gates and the actual simulator state.
   m_simulator.m_state = op * m_simulator.m_state;
   m_simulator.m_state = m_simulator.m_state.normalize();
 
+  // Debug logs
   LOG(Logger::DEBUG, "Performing a measurement:" << "\nMeasurement:\n\tsource: "
     << value.source.registerName << "[" << value.source.element << "]\n\tdest: "
     << value.dest.registerName << "[" << value.dest.element
@@ -134,7 +188,6 @@ void Simulator::simulate() {
   // Looping through each steps of the circuit.
   for (std::vector<Circuit::Step>::iterator it = m_circuit.steps.begin();
     it != m_circuit.steps.end(); ++it) {
-    // Setting default I transformation in the visitor.
     for (auto &substep: *it) {
       // Applying defined tranformations in the visitor.
       boost::apply_visitor(visitor, substep);
