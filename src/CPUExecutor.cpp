@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CPUExecutor.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-23T14:35:13+01:00
+ * @Last modified time: 2018-06-25T11:11:43+01:00
  * @License: MIT License
  */
 
@@ -85,14 +85,14 @@ Tvcplxd* CPUExecutor::normalize(Tvcplxd* a) {
   std::complex<double> sum = 0;
 
   for (uint i = 0; i < a->size(); i++) {
-    sum += pow((*a)[i], 2);
+    sum += (*a)[i] * (*a)[i];
   }
   if (sum == std::complex<double>(0)) {
     sum = 1;
   }
   sum = sqrt(sum);
   for (uint j = 0; j < a->size(); j++) {
-    (*result)[j] = (*a)[j] / sum.real();
+    (*result)[j] = (*a)[j] / sum;
   }
   return result;
 }

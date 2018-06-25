@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-25T10:59:35+01:00
+ * @Last modified time: 2018-06-25T11:09:44+01:00
  * @License: MIT License
  */
 
@@ -120,6 +120,7 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
 
   Matrix beforeState = m_simulator.m_state;
   m_simulator.m_state = op * m_simulator.m_state;
+  m_simulator.m_state = m_simulator.m_state.normalize();
 
   LOG(Logger::DEBUG, "Performing a measurement:" << "\nMeasurement:\n\tsource: "
     << value.source.registerName << "[" << value.source.element << "]\n\tdest: "

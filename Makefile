@@ -9,9 +9,9 @@
 
 CXX=	g++
 
-OPTIFLAGS= -g3
+OPTIFLAGS=	-g3
 
-CXXFLAGS= -Wextra -Wall -std=c++14 $(OPTIFLAGS)
+CXXFLAGS=	-Wextra -Wall -std=c++14 $(OPTIFLAGS)
 
 NVCC=	nvcc
 
@@ -20,45 +20,45 @@ RM=	rm -rf
 NAME=	quSim
 
 # .cpp source files directory
-SDIR= src
+SDIR=	src
 
 # .cu source files firectory
-CUSDIR= cuda_src
+CUSDIR=	cuda_src
 
 # objects from .cpp sources directory
 ODIR=	obj
 
 # objects from .cu sources directory
-CUODIR= cuda_obj
+CUODIR=	cuda_obj
 
 # .cu source files
 CUSRC=
 
 # .cpp sources
-SRC= Parser/float_expr_ast.cpp \
-	 Parser/ASTGenerator.cpp \
-	 Parser/CircuitBuilder/CXBuilder.cpp \
-	 Parser/CircuitBuilder/MeasureBuilder.cpp \
-	 Parser/CircuitBuilder/RegisterDeclarationBuilder.cpp \
-	 Parser/CircuitBuilder/UBuilder.cpp \
-	 Parser/CircuitBuilder/UserDefinedGateBuilder.cpp \
-	 Parser/CircuitBuilder/CircuitBuilder.cpp \
-	 Parser/CircuitBuilder/CircuitBuilderUtils.cpp \
-	 Parser/FloatExpressionEvaluator.cpp \
-	 CircuitPrinter.cpp \
-	 CPUExecutor.cpp \
-	 ExecutorManager.cpp \
-	 Matrix.cpp \
-     Simulator.cpp \
-	 main.cpp
+SRC=	Parser/float_expr_ast.cpp \
+	Parser/ASTGenerator.cpp \
+	Parser/CircuitBuilder/CXBuilder.cpp \
+	Parser/CircuitBuilder/MeasureBuilder.cpp \
+	Parser/CircuitBuilder/RegisterDeclarationBuilder.cpp \
+	Parser/CircuitBuilder/UBuilder.cpp \
+	Parser/CircuitBuilder/UserDefinedGateBuilder.cpp \
+	Parser/CircuitBuilder/CircuitBuilder.cpp \
+	Parser/CircuitBuilder/CircuitBuilderUtils.cpp \
+	Parser/FloatExpressionEvaluator.cpp \
+	CircuitPrinter.cpp \
+	CPUExecutor.cpp \
+	ExecutorManager.cpp \
+	Matrix.cpp \
+	Simulator.cpp \
+	main.cpp
 
 $(ODIR)/Parser/ASTGenerator.o: CXXFLAGS:=$(filter-out $(OPTIFLAGS),$(CXXFLAGS))
 
 # Includes for CXX
-INC= -Iinclude -I/usr/include/boost -Icuda_include
+INC=	-Iinclude -I/usr/include/boost -Icuda_include
 
 # Includes for NVCC
-CUINC= -I $(CUDA_HOME)/samples/common/inc/ -Icuda_include
+CUINC=	-I $(CUDA_HOME)/samples/common/inc/ -Icuda_include
 
 # objects from .cpp source files
 _OBJS=	$(SRC:.cpp=.o)
