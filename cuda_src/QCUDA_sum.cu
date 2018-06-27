@@ -117,10 +117,12 @@ template<typename T> __host__ QCUDA::arrayComplex_t<T>*
 QCUDA::CUDAGPU<T>::convertResToHost(structComplex_t<T>* m) {
   arrayComplex_t<T>*	ptr;
 
-  ptr = new arrayComplex_t<T> [this->hostVecA_.size()];
+  ptr = new arrayComplex_t<T>(this->hostVecA_.size());
   for (unsigned int i = 0;
        i < this->hostVecA_.size();
        i++) {
+    std::cout << "i: " << i << " expected real: " << m[i].getReal() << std::endl;
+    std::cout << "i: " << i << " expected imag: " << m[i].getImag() << std::endl;
     (*ptr)[i].real(m[i].getReal());
     (*ptr)[i].imag(m[i].getImag());
   }
@@ -179,7 +181,7 @@ QCUDA::arrayComplex_t<T>* QCUDA::CUDAGPU<T>::performAddOnGPU() {
 	    << "And its address of address: "
 	    << &resDev << std::endl;
   this->initGridAndBlock();
-  cudaAddition<<<1, 10>>>(m1, m2, resDev);
+  cudaAddition<<<1, this->hostVecA_.size()>>>(m1, m2, resDev);
   this->copyDataFromGPU(resDev, resHost);
   ptr = this->convertResToHost(resHost);
   cudaFree(m1);

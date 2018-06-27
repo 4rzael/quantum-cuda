@@ -4,7 +4,7 @@
 # @Project: CUDA-Based Simulator of Quantum Systems
 # @Filename: Makefile
 # @Last modified by:   vial-d_j
-# @Last modified time: 2018-06-22T09:03:42+01:00
+# @Last modified time: 2018-06-27T14:53:37+01:00
 # @License: MIT License
 
 CXX=	g++
@@ -36,7 +36,13 @@ CUODIR=	cuda_obj
 # .cu source files
 CUSRC=	QCUDA.cu \
 	QCUDA_sum.cu \
+<<<<<<< HEAD
 	GPUExecutor.cu
+=======
+	GPUExecutor.cu \
+	CPUExecutor.cu \
+	ExecutorManager.cu
+>>>>>>> master
 
 # .cpp sources
 SRC=	Parser/float_expr_ast.cpp \
@@ -50,8 +56,6 @@ SRC=	Parser/float_expr_ast.cpp \
 	Parser/CircuitBuilder/CircuitBuilderUtils.cpp \
 	Parser/FloatExpressionEvaluator.cpp \
 	CircuitPrinter.cpp \
-	CPUExecutor.cpp \
-	ExecutorManager.cpp \
 	Matrix.cpp \
 	Simulator.cpp \
 	main.cpp
@@ -84,7 +88,7 @@ $(ODIR):
 
 # create objects from .cpp source files
 $(ODIR)/%.o:	$(SDIR)/%.cpp
-		$(CXX) $(CXXFLAGS) $(INC) -o $@ -c $<
+		$(CXX) $(CXXFLAGS) $(INC) $(CUINC) -o $@ -c $<
 
 # create objects from .cu source files directory
 $(CUODIR):
