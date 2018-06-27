@@ -68,11 +68,11 @@ namespace QGPU {
     this->cgpu_.initThrustHostVec((*m1),
     				  (*m2),
     				  QCUDA::DeviceVectors::DEVICE_VECTORS);
-    // // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-    // // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_B);
-    // this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-    // this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_B);
-    // ptr = this->cgpu_.performAddOnGPU();
+    // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
+    // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_B);
+    this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
+    this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_B);
+    ptr = this->cgpu_.performAddOnGPU();
     std::cout << std::endl << "== OUTPUT 'add' FUNCTION TAIL ==" << std::endl;
     return (ptr);
   };
