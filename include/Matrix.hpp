@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-23T13:40:45+01:00
+ * @Last modified time: 2018-06-25T12:57:29+01:00
  * @License: MIT License
  */
 
@@ -19,7 +19,10 @@
  typedef std::valarray<std::complex<double>> Tvcplxd;
 
  /**
- * Matrix representation class.
+ * @brief Matrix representation class.
+ *
+ * The Matrix representation class containing a matrix content, dimension
+ * information and defining the required linear algebra methods.
  */
 class Matrix {
   private:

@@ -1,11 +1,11 @@
 /**
  * @Author: Julien Vial-Detambel <vial-d_j>
- * @Date:   2018-06-12T11:16:51+01:00
+ * @Date:   2018-06-26T09:43:13+01:00
  * @Email:  julien.vial-detambel@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
- * @Filename: Simulator.h
+ * @Filename: Simulator.hpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-23T15:08:19+01:00
+ * @Last modified time: 2018-06-26T10:54:20+01:00
  * @License: MIT License
  */
 
@@ -19,7 +19,9 @@
 #include "Circuit.hpp"
 
 /**
-* Quantum circuit representation class.
+* @brief Quantum circuit Simulator class.
+*
+* The Simulator class allow for the simulation of a defined circuit.
 */
 class Simulator
 {
@@ -58,15 +60,15 @@ class Simulator
         void operator()(const Circuit::Measurement& value);
     };
     /**
-    * The circuit layout object;
+    * The circuit layout object.
     */
     Circuit& m_circuit;
     /**
-    * The c registers;
+    * The c registers.
     */
     std::map<std::string, bool(*)> m_cReg;
     /**
-    * The qbit registers offsets;
+    * The qbit registers offsets.
     */
     std::map<std::string, int> m_qRegOffsets;
     /**
@@ -83,10 +85,6 @@ class Simulator
      * @param layout The circuit layout.
      */
     Simulator(Circuit& circuit);
-    /**
-    * Draw state util function
-    */
-    void drawState();
     /**
      * Run the circuit
      */

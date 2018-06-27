@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CPUExecutor.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-23T13:40:53+01:00
+ * @Last modified time: 2018-06-25T13:02:20+01:00
  * @License: MIT License
  */
 
@@ -15,7 +15,10 @@
  typedef std::valarray<std::complex<double>> Tvcplxd;
 
  /**
- * Matrix linear algebra executor on CPU class.
+ * @brief Matrix linear algebra executor on CPU class.
+ *
+ * The CPUExecutor class holds implementations of the Executors needed linear
+ * algebra methods directly executed on CPU.
  */
  class CPUExecutor : public Executor
  {
@@ -29,7 +32,7 @@
    */
    ~CPUExecutor(){}
    /**
-   * Performs addition between std::valarray<std::complex<double>> a and b.
+   * Performs an addition between std::valarray<std::complex<double>> a and b.
    * @param a A matrix content.
    * @param b B matrix content.
    * @return The addition between matrices a and b.

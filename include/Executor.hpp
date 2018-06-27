@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Executor.h
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-23T13:40:48+01:00
+ * @Last modified time: 2018-06-25T13:02:31+01:00
  * @License: MIT License
  */
 
@@ -18,7 +18,10 @@
 typedef std::valarray<std::complex<double>> Tvcplxd;
 
 /**
-* Matrix linear algebra executors interface.
+* @brief Matrix linear algebra executors interface.
+*
+* The Executor interface contains signatures of linear algebra methods to be
+* implemented by concrete executors.
 */
 class Executor
 {
@@ -32,7 +35,7 @@ class Executor
     */
     virtual ~Executor(){}
     /**
-    * Performs addition between std::valarray<std::complex<double>> a and b.
+    * Performs an addition between std::valarray<std::complex<double>> a and b.
     * @param a A matrix content.
     * @param b B matrix content.
     * @return The addition between matrices a and b.
