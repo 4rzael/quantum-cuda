@@ -117,7 +117,7 @@ template<typename T> __host__ QCUDA::arrayComplex_t<T>*
 QCUDA::CUDAGPU<T>::convertResToHost(structComplex_t<T>* m) {
   arrayComplex_t<T>*	ptr;
 
-  ptr = new arrayComplex_t<T>(this->hostVecA_.size());
+  ptr = new arrayComplex_t<T> [this->hostVecA_.size()];
   for (unsigned int i = 0;
        i < this->hostVecA_.size();
        i++) {
