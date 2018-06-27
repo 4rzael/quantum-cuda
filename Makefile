@@ -15,6 +15,8 @@ CXXFLAGS=	-Wextra -Wall -std=c++14 $(OPTIFLAGS)
 
 NVCC=	nvcc
 
+NVCCGLAGS= -std=c++14 -arch=sm_61
+
 RM=	rm -rf
 
 NAME=	quSim
@@ -32,7 +34,9 @@ ODIR=	obj
 CUODIR=	cuda_obj
 
 # .cu source files
-CUSRC=
+CUSRC=	QCUDA.cu \
+	QCUDA_sum.cu \
+	GPUExecutor.cu
 
 # .cpp sources
 SRC=	Parser/float_expr_ast.cpp \
@@ -58,7 +62,7 @@ $(ODIR)/Parser/ASTGenerator.o: CXXFLAGS:=$(filter-out $(OPTIFLAGS),$(CXXFLAGS))
 INC=	-Iinclude -I/usr/include/boost -Icuda_include
 
 # Includes for NVCC
-CUINC=	-I $(CUDA_HOME)/samples/common/inc/ -Icuda_include
+CUINC=	-I$(CUDA_HOME)/samples/common/inc/ -Icuda_include -Iinclude
 
 # objects from .cpp source files
 _OBJS=	$(SRC:.cpp=.o)
@@ -88,7 +92,7 @@ $(CUODIR):
 
 # create objects from .cu source files
 $(CUODIR)/%.o:	$(CUSDIR)/%.cu
-		$(NVCC) $(CUINC) -o $@ -c $<
+		$(NVCC) $(CUINC) $(NVCCFLAGS) -o $@ -c $<
 
 $(NAME):	$(OBJS) $(CUOBJS)
 		$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS) $(CUOBJS) $(LDIR)
