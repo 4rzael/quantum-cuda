@@ -4,7 +4,7 @@
 # @Project: CUDA-Based Simulator of Quantum Systems
 # @Filename: Makefile
 # @Last modified by:   vial-d_j
-# @Last modified time: 2018-06-22T09:03:42+01:00
+# @Last modified time: 2018-06-27T14:53:37+01:00
 # @License: MIT License
 
 CXX=	g++
@@ -84,7 +84,7 @@ $(ODIR):
 
 # create objects from .cpp source files
 $(ODIR)/%.o:	$(SDIR)/%.cpp
-		$(CXX) $(CXXFLAGS) $(INC) -o $@ -c $<
+		$(CXX) $(CXXFLAGS) $(INC) $(CUINC) -o $@ -c $<
 
 # create objects from .cu source files directory
 $(CUODIR):
