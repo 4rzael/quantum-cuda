@@ -1,6 +1,6 @@
 #pragma once
 
-# include "Executor.hpp"
+# include "Executor.cuh"
 # include "QCUDA.cuh"
 
 /**

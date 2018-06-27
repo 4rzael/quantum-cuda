@@ -9,7 +9,7 @@
  * @License: MIT License
  */
 
-#include "Executor.hpp"
+#include "Executor.cuh"
 
 /** A convenient typedef for std::valarray<std::complex<double>> */
  typedef std::valarray<std::complex<double>> Tvcplxd;

@@ -36,7 +36,9 @@ CUODIR=	cuda_obj
 # .cu source files
 CUSRC=	QCUDA.cu \
 	QCUDA_sum.cu \
-	GPUExecutor.cu
+	GPUExecutor.cu \
+	CPUExecutor.cu \
+	ExecutorManager.cu
 
 # .cpp sources
 SRC=	Parser/float_expr_ast.cpp \
@@ -50,8 +52,6 @@ SRC=	Parser/float_expr_ast.cpp \
 	Parser/CircuitBuilder/CircuitBuilderUtils.cpp \
 	Parser/FloatExpressionEvaluator.cpp \
 	CircuitPrinter.cpp \
-	CPUExecutor.cpp \
-	ExecutorManager.cpp \
 	Matrix.cpp \
 	Simulator.cpp \
 	main.cpp
