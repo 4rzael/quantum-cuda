@@ -35,7 +35,7 @@ CUODIR=	cuda_obj
 
 # .cu source files
 CUSRC=	QCUDA.cu \
-	QCUDA_sum.cu \
+	QCUDA_operations.cu \
 	GPUExecutor.cu \
 	CPUExecutor.cu \
 	ExecutorManager.cu
