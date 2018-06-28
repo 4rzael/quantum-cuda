@@ -35,14 +35,10 @@ CUODIR=	cuda_obj
 
 # .cu source files
 CUSRC=	QCUDA.cu \
-	QCUDA_sum.cu \
-<<<<<<< HEAD
-	GPUExecutor.cu
-=======
+	QCUDA_operations.cu \
 	GPUExecutor.cu \
 	CPUExecutor.cu \
 	ExecutorManager.cu
->>>>>>> master
 
 # .cpp sources
 SRC=	Parser/float_expr_ast.cpp \
