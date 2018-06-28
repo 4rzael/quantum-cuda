@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: include
  * @Filename: Circuit.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Sat Jun 23 2018, 11:24:56
+ * @Last modified by:   l3ninj
+ * @Last modified time: 2018-06-28T22:39:43+01:00
  * @License: MIT License
  */
 

@@ -1,10 +1,10 @@
-# @Author: Julien Vial-Detambel <vial-d_j>
+# @Author: Julien Vial-Detambel <l3ninj>
 # @Date:   2018-06-12T11:58:18+01:00
 # @Email:  julien.vial-detambel@epitech.eu
 # @Project: CUDA-Based Simulator of Quantum Systems
 # @Filename: Makefile
-# @Last modified by:   vial-d_j
-# @Last modified time: 2018-06-27T14:53:37+01:00
+# @Last modified by:   l3ninj
+# @Last modified time: 2018-06-28T22:43:12+01:00
 # @License: MIT License
 
 CXX=	g++

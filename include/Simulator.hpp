@@ -1,11 +1,11 @@
 /**
- * @Author: Julien Vial-Detambel <vial-d_j>
+ * @Author: Julien Vial-Detambel <l3ninj>
  * @Date:   2018-06-26T09:43:13+01:00
  * @Email:  julien.vial-detambel@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.hpp
- * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-26T10:54:20+01:00
+ * @Last modified by:   l3ninj
+ * @Last modified time: 2018-06-28T22:40:54+01:00
  * @License: MIT License
  */
 
