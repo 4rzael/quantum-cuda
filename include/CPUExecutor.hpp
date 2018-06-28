@@ -3,9 +3,9 @@
  * @Date:   2018-06-16T09:36:50+01:00
  * @Email:  julien.vial-detambel@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
- * @Filename: CPUExecutor.h
+ * @Filename: CPUExecutor.hpp
  * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-25T13:02:20+01:00
+ * @Last modified time: 2018-06-28T10:14:53+01:00
  * @License: MIT License
  */
 
