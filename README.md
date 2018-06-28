@@ -25,5 +25,6 @@ To be able to compile the project on a given computer GCC should be installed as
 well as CUDA and Boost libraries.
 Fulfilling compilation requirements could be cumbersome at this stage and
 proper environment deployment instructions should be defined in the future.
-Running the produced binary would require a compatible GPU to run linear algebra
-computations on.
+At the moment running the produced binary would require a compatible GPU to run
+linear algebra computations on. It will soon be possible to automatically detect
+the absence of compatible GPU and compute all linear algebra on the CPU.
