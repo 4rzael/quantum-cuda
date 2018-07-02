@@ -7,7 +7,7 @@
 # @Last modified time: 2018-06-28T22:43:12+01:00
 # @License: MIT License
 
-CXX=	g++
+CXX?=	g++
 
 OPTIFLAGS=	-g3
 
