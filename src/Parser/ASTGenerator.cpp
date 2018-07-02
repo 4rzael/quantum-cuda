@@ -17,6 +17,7 @@
 #include "Parser/AST.hpp"
 #include "Parser/ASTGenerator.hpp"
 #include "Logger.hpp"
+#include "Errors.hpp"
 
 using namespace boost::spirit::x3;
 using namespace Parser;
@@ -178,7 +179,10 @@ namespace Parser {
 
 t_openQASM ASTGenerator::operator()(std::string const &filename) {
     /* Reads the file */
-    std::ifstream file(filename);
+    std::ifstream file;
+    file.exceptions (std::ios::failbit);
+    file.open(filename);
+
     std::stringstream ss;
     ss << file.rdbuf();
     std::string str = ss.str();
@@ -197,25 +201,8 @@ t_openQASM ASTGenerator::operator()(std::string const &filename) {
         std::getline(errorStream, line);
 
         LOG(Logger::ERROR, "Parsing failed at character: " << line);
-    } else if (m_log) {
-        m_outputStream << res;
+        throw OpenQASMError();
     }
 
     return res;
 }
-
-ASTGenerator::ASTGenerator(std::string const &log_folder, std::string const &log_file)
-: m_log(true) {
-    auto fullName = log_folder + (log_folder.back() == '/' ? "" : "/") + log_file;
-
-    if (m_log) {
-        m_outputStream = std::ofstream(fullName);
-    }
-}
-
-ASTGenerator::ASTGenerator(std::string const &log_folder) {
-    auto filename = "AST.log." + std::to_string(std::time(nullptr)) + ".xml";
-    ASTGenerator(log_folder, filename);
-}
-
-ASTGenerator::ASTGenerator() : m_log(false) {}

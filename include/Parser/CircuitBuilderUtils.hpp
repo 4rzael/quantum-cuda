@@ -12,10 +12,10 @@
 #pragma once
 
 #include <boost/assert.hpp>
-#include <exception>
 
 #include "Circuit.hpp"
 #include "Parser/AST.hpp"
+#include "Errors.hpp"
 
 /* TODO: Put into a namespace ? */
 
@@ -50,12 +50,3 @@ std::string getRegisterName(const Parser::AST::t_variable &var);
  * @return uint The size of the register
  */
 uint getRegisterSize(const Circuit &circuit, const Parser::AST::t_variable &var);
-
-/**
- * @brief The generic error used when the openQASM code is incorrect
- */
-class OpenQASMError: public std::logic_error {
-public:
-    OpenQASMError(std::string const &message="")
-    : std::logic_error(message) {}
-};

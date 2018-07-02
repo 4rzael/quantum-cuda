@@ -12,20 +12,41 @@
 #include <iostream>
 #include <cmath>
 
+#include "Errors.hpp"
+#include "Logger.hpp"
+
 #include "Parser/ASTGenerator.hpp"
 #include "Circuit.hpp"
 #include "Parser/CircuitBuilder.hpp"
-#include "Logger.hpp"
 #include "Simulator.hpp"
 
 int main(int ac, char **av) {
   if (ac <2) {
-      std::cout << "Need an argument" << std::endl;
+    std::cout << "Need an argument" << std::endl;
   }
 
-  auto ast = Parser::ASTGenerator()(av[1]);
-  Circuit circuit = CircuitBuilder()(ast);
-  LOG(Logger::DEBUG, "Generated circuit:" << std::endl << circuit);
+  Parser::AST::t_AST ast;
+  /* Reads the file and generate an AST */
+  try {
+    ast = Parser::ASTGenerator()(av[1]);
+  } catch (const std::ios_base::failure &e) {
+    LOG(Logger::ERROR, "Cannot open/parse file " << av[1]);
+    return EXIT_FAILURE;
+  } catch (const OpenQASMError &e) {
+    LOG(Logger::ERROR, "The AST Generator encountered ill-formated OpenQASM");
+    return EXIT_FAILURE;
+  }
+
+  Circuit circuit;
+  /* Reads the AST and generate a Circuit */
+  try {
+    circuit = CircuitBuilder()(ast);
+    LOG(Logger::DEBUG, "Generated circuit:" << std::endl << circuit);
+  } catch (const OpenQASMError& e) {
+    LOG(Logger::ERROR, "Error while generating the circuit: " << e.what());
+    return EXIT_FAILURE;
+  }
+
   Simulator simulator = Simulator(circuit);
   simulator.simulate();
   LOG(Logger::INFO, "Simulator in final state:" << std::endl << simulator);
