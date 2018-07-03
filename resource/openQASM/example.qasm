@@ -11,6 +11,8 @@ measure ninja -> bla;
 barrier ninja, bla;
 if (bla == 5) creg pizza[1];
 
+reset ninja;
+
 gate mygate1(a) qa, qb {
     CX qa, qb;
     U(0,pi/4, ((a/4)*(pi/2))) qa;

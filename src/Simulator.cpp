@@ -183,6 +183,10 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
     << op << ";),\nState after operation:(" << m_simulator.m_state << std::endl);
 }
 
+void Simulator::StepVisitor::operator()(const Circuit::Reset& __attribute__((unused)) value) {
+  LOG(Logger::ERROR, "Reset statements not implemented in the simulator");
+}
+
 void Simulator::simulate() {
   auto visitor = StepVisitor(*this);
   // Looping through each steps of the circuit.

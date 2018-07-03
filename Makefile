@@ -49,6 +49,7 @@ SRC=	Parser/float_expr_ast.cpp \
 	Parser/CircuitBuilder/UBuilder.cpp \
 	Parser/CircuitBuilder/UserDefinedGateBuilder.cpp \
 	Parser/CircuitBuilder/IncludeBuilder.cpp \
+	Parser/CircuitBuilder/ResetBuilder.cpp \
 	Parser/CircuitBuilder/CircuitBuilder.cpp \
 	Parser/CircuitBuilder/CircuitBuilderUtils.cpp \
 	Parser/FloatExpressionEvaluator.cpp \

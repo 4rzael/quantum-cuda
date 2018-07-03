@@ -67,6 +67,3 @@ void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const 
 void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_barrier_statement &statement) const {
     LOG(Logger::WARNING, "barrier statements not implemented yet");
 }
-void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_reset_statement &statement) const {
-    LOG(Logger::WARNING, "reset statements not implemented yet");
-}
