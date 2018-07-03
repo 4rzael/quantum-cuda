@@ -48,6 +48,7 @@ SRC=	Parser/float_expr_ast.cpp \
 	Parser/CircuitBuilder/RegisterDeclarationBuilder.cpp \
 	Parser/CircuitBuilder/UBuilder.cpp \
 	Parser/CircuitBuilder/UserDefinedGateBuilder.cpp \
+	Parser/CircuitBuilder/IncludeBuilder.cpp \
 	Parser/CircuitBuilder/CircuitBuilder.cpp \
 	Parser/CircuitBuilder/CircuitBuilderUtils.cpp \
 	Parser/FloatExpressionEvaluator.cpp \
@@ -72,7 +73,7 @@ OBJS=	$(patsubst %,$(ODIR)/%,$(_OBJS))
 _CUOBJS=	$(CUSRC:.cu=.o)
 CUOBJS=	$(patsubst %,$(CUODIR)/%,$(_CUOBJS))
 
-LDIR=	-L$(CUDA_HOME)/lib64 -lcuda -lcudart
+LDIR=	-L$(CUDA_HOME)/lib64 -lcuda -lcudart -lboost_system -lboost_filesystem
 
 all:	$(ODIR) $(CUODIR) $(NAME)
 

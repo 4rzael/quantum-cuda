@@ -9,14 +9,11 @@
  * @License: MIT License
  */
 
-#include <algorithm>
-
 #include "Logger.hpp"
 #include "Parser/CircuitBuilderUtils.hpp"
 #include "Parser/CircuitBuilder.hpp"
 #include "Circuit.hpp"
 #include "Parser/AST.hpp"
-#include "Parser/FloatExpressionEvaluator.hpp"
 
 using namespace Parser::AST;
 

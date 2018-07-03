@@ -11,12 +11,10 @@
 
 #include <algorithm>
 
-#include "Logger.hpp"
 #include "Parser/CircuitBuilder.hpp"
 #include "Parser/CircuitBuilderUtils.hpp"
 #include "Circuit.hpp"
 #include "Parser/AST.hpp"
-#include "Parser/FloatExpressionEvaluator.hpp"
 
 using namespace Parser::AST;
 

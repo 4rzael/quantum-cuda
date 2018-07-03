@@ -27,12 +27,30 @@ t_float_expression const &defaultParamSubstituter(std::string s) {
     throw OpenQASMError();
 }
 
+/* Constructors */
+CircuitBuilder::CircuitBuilder(std::string const &filename)
+: m_filename(filename),
+  m_circuit(std::make_shared<Circuit>()),
+  m_definedGates(std::make_shared<std::vector<Parser::AST::t_gate_declaration>>()) {
+}
+
+CircuitBuilder::CircuitBuilder(CircuitBuilder &parent, std::string const &filename)
+: m_filename(filename) {
+    // We take the circuit and defined gates of the parent in order to write in it.
+    m_circuit = parent.m_circuit;
+    m_definedGates = parent.m_definedGates;
+}
+
 /* Builds the circuit */
 Circuit CircuitBuilder::operator()(const Parser::AST::t_openQASM &ast) {
     for (const auto &node : ast) {
-        ::boost::apply_visitor(CircuitBuilder::OpenQASMInstructionVisitor(*this, m_circuit), node);
+        /*
+        Call the instruction visitor.
+        We dereference the m_circuit pointer here, and then only work with references to it.
+        */
+        ::boost::apply_visitor(CircuitBuilder::OpenQASMInstructionVisitor(*this, *m_circuit), node);
     }
-    return m_circuit;
+    return *m_circuit;
 }
 
 /* Instruction Visitor */
@@ -45,9 +63,6 @@ void CircuitBuilder::OpenQASMInstructionVisitor::operator()(__attribute__((unuse
 
 /* Statement Visitor */
 void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_invalid_statement &statement) const {
-}
-void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_include_statement &statement) const {
-    m_circuitBuilder(Parser::ASTGenerator()(statement.filename));
 }
 void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_barrier_statement &statement) const {
     LOG(Logger::WARNING, "barrier statements not implemented yet");

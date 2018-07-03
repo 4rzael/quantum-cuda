@@ -40,7 +40,7 @@ int main(int ac, char **av) {
   Circuit circuit;
   /* Reads the AST and generate a Circuit */
   try {
-    circuit = CircuitBuilder()(ast);
+    circuit = CircuitBuilder(av[1])(ast);
     LOG(Logger::DEBUG, "Generated circuit:" << std::endl << circuit);
   } catch (const OpenQASMError& e) {
     LOG(Logger::ERROR, "Error while generating the circuit: " << e.what());

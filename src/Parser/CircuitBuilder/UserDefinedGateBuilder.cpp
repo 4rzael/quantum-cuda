@@ -25,7 +25,7 @@ using namespace Parser::AST;
  */
 void CircuitBuilder::OpenQASMInstructionVisitor::operator()(const Parser::AST::t_gate_declaration &d) const {
     /* TODO: Check that all arguments are unique */
-    m_circuitBuilder.m_definedGates.push_back(d);
+    (*m_circuitBuilder.m_definedGates).push_back(d);
 }
 
 /**
@@ -34,11 +34,11 @@ void CircuitBuilder::OpenQASMInstructionVisitor::operator()(const Parser::AST::t
 void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_gate_call_statement &statement) const {
     using namespace Parser::AST;
 
-    const auto &gateIterator = std::find_if(m_circuitBuilder.m_definedGates.begin(), m_circuitBuilder.m_definedGates.end(),
+    const auto &gateIterator = std::find_if((*m_circuitBuilder.m_definedGates).begin(), (*m_circuitBuilder.m_definedGates).end(),
                  [&statement](t_gate_declaration const &gate) { return statement.name == gate.name; });
 
     /* Check that the gate has been defined */
-    if (gateIterator == m_circuitBuilder.m_definedGates.end()) {
+    if (gateIterator == (*m_circuitBuilder.m_definedGates).end()) {
         LOG(Logger::ERROR, "User-defined gate \"" << statement.name << "\" does not exist");
         throw OpenQASMError();
     }
