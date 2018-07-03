@@ -1,5 +1,5 @@
 OPENQASM 2.0;
-include "coucou.g";
+include "resource/openQASM/qelib1.inc";
 qreg ninja[2]; // bla
 creg bla[2];
 U(pi/2, 0, pi) ninja[0];

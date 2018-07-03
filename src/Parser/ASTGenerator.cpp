@@ -58,7 +58,7 @@ namespace Parser {
         const auto ID = rule<class ID, std::string>()
                 = !RESERVED_ID >> ID_BASE;
 
-        const auto FILENAME = +(alnum | char_('.') | char_('_') | char_('-'));
+        const auto FILENAME = +(alnum | char_('.') | char_('_') | char_('-') | char_('/') | char_('\\'));
         const auto FLOAT = rule<class FLOAT, t_float>()
                         = (double_ | ID);
         const auto UINT = uint_;
@@ -200,7 +200,9 @@ t_openQASM ASTGenerator::operator()(std::string const &filename) {
         std::string line;
         std::getline(errorStream, line);
 
-        LOG(Logger::ERROR, "Parsing failed at character: " << line);
+        const auto lineNb = std::count(str.begin(), iter, '\n') + 1;
+
+        LOG(Logger::ERROR, "Parsing failed at line " << lineNb << ": " << line);
         throw OpenQASMError();
     }
 

@@ -13,6 +13,7 @@
 #include "Parser/CircuitBuilderUtils.hpp"
 #include "Parser/CircuitBuilder.hpp"
 #include "Circuit.hpp"
+#include "Parser/ASTGenerator.hpp"
 #include "Parser/AST.hpp"
 
 using namespace Parser::AST;
@@ -46,7 +47,7 @@ void CircuitBuilder::OpenQASMInstructionVisitor::operator()(__attribute__((unuse
 void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_invalid_statement &statement) const {
 }
 void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_include_statement &statement) const {
-    LOG(Logger::WARNING, "include statements not implemented yet");
+    m_circuitBuilder(Parser::ASTGenerator()(statement.filename));
 }
 void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_barrier_statement &statement) const {
     LOG(Logger::WARNING, "barrier statements not implemented yet");
