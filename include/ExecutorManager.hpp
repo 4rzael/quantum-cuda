@@ -4,12 +4,12 @@
  * @Email:  julien.vial-detambel@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: ExecutorManager.hpp
- * @Last modified by:   l3ninj
- * @Last modified time: 2018-06-28T22:48:23+01:00
+ * @Last modified by:   vial-d_j
+ * @Last modified time: 2018-07-04T17:15:48+01:00
  * @License: MIT License
  */
 
-#include "Executor.cuh"
+#include "IExecutor.cuh"
 
 /**
 * Matrix linear algebra executors singleton manager.
@@ -31,7 +31,7 @@ class ExecutorManager
     * ExecutorManager instantiated executor getter.
     * @return The ExecutorManager instanciated executor.
     */
-    Executor *getExecutor();
+    IExecutor *getExecutor();
 
   private:
     /**
@@ -41,5 +41,5 @@ class ExecutorManager
     /**
     * The ExecutorManager executor object.
     */
-    Executor *m_executor;
+    IExecutor *m_executor;
 };

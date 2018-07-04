@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-06-28T22:40:32+01:00
+ * @Last modified time: 2018-07-04T17:53:25+01:00
  * @License: MIT License
  */
 
@@ -76,11 +76,11 @@ class Matrix {
     /**
     * Matrix transpose
     */
-    Matrix T() const;
+    Matrix transpose() const;
     /**
     * Matrix trace
     */
-    std::complex<double> tr() const;
+    std::complex<double> trace() const;
 };
 
 /**

@@ -5,11 +5,11 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CPUExecutor.hpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-06-28T22:40:00+01:00
+ * @Last modified time: 2018-07-04T17:52:50+01:00
  * @License: MIT License
  */
 
-#include "Executor.cuh"
+#include "IExecutor.cuh"
 
 /** A convenient typedef for std::valarray<std::complex<double>> */
  typedef std::valarray<std::complex<double>> Tvcplxd;
@@ -20,7 +20,7 @@
  * The CPUExecutor class holds implementations of the Executors needed linear
  * algebra methods directly executed on CPU.
  */
- class CPUExecutor : public Executor
+ class CPUExecutor : public IExecutor
  {
  public:
    /**
@@ -38,13 +38,6 @@
    * @return The addition between matrices a and b.
    */
    Tvcplxd* add(Tvcplxd* a, Tvcplxd* b);
-   /**
-   * Performs a multiplication of the matrix by a scalar.
-   * @param a A matrix content.
-   * @param s A complex scalar.
-   * @return The multiplication result as a std::valarray<std::complex<double>>.
-   */
-   Tvcplxd* mult_scalar(Tvcplxd* a, std::complex<double> s);
    /**
    * Performs a dot product between std::valarray<std::complex<double>> a and b.
    * @param a A matrix content.
@@ -71,7 +64,7 @@
    * @param m A matrix m dimension.
    * @return The trace as a std::complex<double>.
    */
-   std::complex<double> tr(Tvcplxd* a, int m);
+   std::complex<double> trace(Tvcplxd* a, int m);
    /**
    * Compute the transpose of a std::valarray<std::complex<double>>.
    * @param a A matrix content.
@@ -79,7 +72,7 @@
    * @param n A matrix n dimension.
    * @return The transpose as a std::valarray<std::complex<double>>.
    */
-   Tvcplxd* T(Tvcplxd* a, int m, int n);
+   Tvcplxd* transpose(Tvcplxd* a, int m, int n);
    /**
    * Compute the normalized std::valarray<std::complex<double>>.
    * @param a A matrix content.

@@ -4,14 +4,14 @@
  * @Email:  nicolas.jankovic@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: GPUExecutor.cuh
- * @Last modified by:   nj203
- * @Last modified time: 2018-06-27T14:51:52+01:00
+ * @Last modified by:   l3ninj
+ * @Last modified time: 2018-07-04T17:49:18+01:00
  * @License: MIT License
  */
 
 #pragma once
 
-# include "Executor.cuh"
+# include "IExecutor.cuh"
 # include "QCUDA.cuh"
 
 /**
@@ -20,7 +20,7 @@
  * The Executor interface contains signatures of linear algebra methods to be
  * implemented by concrete executors.
  */
-class GPUExecutor: public Executor
+class GPUExecutor: public IExecutor
 {
 private:
   /**

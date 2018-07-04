@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.cpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-06-28T22:42:40+01:00
+ * @Last modified time: 2018-07-04T18:00:13+01:00
  * @License: MIT License
  */
 
@@ -139,7 +139,7 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
   Matrix op = Matrix::kron(gates);
 
   // Computing the outer product of the current state and its transpose.
-  Matrix x = m_simulator.m_state * m_simulator.m_state.T();
+  Matrix x = m_simulator.m_state * m_simulator.m_state.transpose();
 
   // Computing the dot product of the kroenecker product of the transformation
   // gates with the outer product of the current state and its transpose.
@@ -148,7 +148,7 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
   // Computing the probability p0 to measure the designated qubit at 0 as the
   // trace of the dot product of the kroenecker product of the transformation
   // gates with the outer product of the current state and its transpose.
-  std::complex<double> p0 = y.tr();
+  std::complex<double> p0 = y.trace();
 
   // Simulate measurement by randomizing outcome according to p0.
   // If a random number between 0 and 1 is less than p0 the cregister designated
@@ -184,6 +184,7 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
 }
 
 void Simulator::StepVisitor::operator()(const Circuit::Reset& __attribute__((unused)) value) {
+  (void)value;
   LOG(Logger::ERROR, "Reset statements not implemented in the simulator");
 }
 
