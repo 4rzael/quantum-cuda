@@ -64,6 +64,3 @@ void CircuitBuilder::OpenQASMInstructionVisitor::operator()(__attribute__((unuse
 /* Statement Visitor */
 void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_invalid_statement &statement) const {
 }
-void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_barrier_statement &statement) const {
-    LOG(Logger::WARNING, "barrier statements not implemented yet");
-}

@@ -44,9 +44,9 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_gate_call
     }
     const auto gate = *gateIterator;
 
-    /* Check parameters */
+    /* Check number of parameters */
     if (gate.params && !statement.params) {
-        LOG(Logger::ERROR, "Gate \"" << statement.name << "\" requires parameters");
+        LOG(Logger::ERROR, "Gate \"" << statement.name << "\" requires" << gate.params.value().size() << "parameters");
         throw OpenQASMError();
     }
     else if (!gate.params && statement.params) {

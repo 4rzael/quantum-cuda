@@ -27,7 +27,7 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_cx_statem
         throw OpenQASMError();
     }
 
-    /* Transform the targets (in case we are in a user-defined gate) */
+    /* Substitute the targets (in case we are in a user-defined gate) */
     std::vector<t_variable> statementTargets;
     std::transform(statement.targets.begin(), statement.targets.end(),
                    std::back_inserter(statementTargets),
@@ -46,8 +46,8 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_cx_statem
     if (statementTargets[0].which() == (int)t_variableType::T_BIT
      && statementTargets[1].which() == (int)t_variableType::T_BIT) {
         Circuit::Step step;
-        auto control = boost::get<t_bit>(statementTargets[0]);
-        auto target = boost::get<t_bit>(statementTargets[1]);
+        const auto control = boost::get<t_bit>(statementTargets[0]);
+        const auto target = boost::get<t_bit>(statementTargets[1]);
 
         step.push_back(Circuit::CXGate(
             Circuit::Qubit(control),
@@ -58,15 +58,13 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_cx_statem
     else if (statementTargets[0].which() == (int)t_variableType::T_BIT
           && statementTargets[1].which() == (int)t_variableType::T_REG) {
         Circuit::Step step;
-        auto control = boost::get<t_bit>(statementTargets[0]);
-        auto targetName = boost::get<t_reg>(statementTargets[1]);
-        auto reg = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
-                                [&targetName](auto r) {return r.name == targetName; });
+        const auto control = boost::get<t_bit>(statementTargets[0]);
+        const auto target = getRegister(m_circuit, statementTargets[1], RegisterType::QREG);
 
-        for (uint i = 0; i < (*reg).size; ++i) {
+        for (uint i = 0; i < target.size; ++i) {
             step.push_back(Circuit::CXGate(
                 Circuit::Qubit(control),
-                Circuit::Qubit(targetName, i)
+                Circuit::Qubit(target.name, i)
             ));
         }
         m_circuit.steps.push_back(step);
@@ -74,35 +72,30 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_cx_statem
     else if (statementTargets[0].which() == (int)t_variableType::T_REG
           && statementTargets[1].which() == (int)t_variableType::T_REG) {
         Circuit::Step step;
-        auto controlName = boost::get<t_reg>(statementTargets[0]);
-        auto targetName = boost::get<t_reg>(statementTargets[1]);
 
-        auto control = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
-                            [&controlName](auto r) {return r.name == controlName; });
-        auto target = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
-                            [&targetName](auto r) {return r.name == targetName; });
-        if ((*control).size != (*target).size) {
-            LOG(Logger::ERROR, "QRegisters " << controlName << " and " << targetName << " sizes differ.");
+        const auto control = getRegister(m_circuit, statementTargets[0], RegisterType::QREG);
+        const auto target = getRegister(m_circuit, statementTargets[1], RegisterType::QREG);
+
+        if (control.size != target.size) {
+            LOG(Logger::ERROR, "QRegisters " << control.name << " and " << target.name << " sizes differ.");
             throw OpenQASMError();
         }
-        for (uint i = 0; i < (*control).size; ++i) {
+        for (uint i = 0; i < control.size; ++i) {
             step.push_back(Circuit::CXGate(
-                Circuit::Qubit(controlName, i),
-                Circuit::Qubit(targetName, i)
+                Circuit::Qubit(control.name, i),
+                Circuit::Qubit(target.name, i)
             ));
         }
         m_circuit.steps.push_back(step);
     } /* If we have one register and one qubit, successionally apply CX(control[i], target). Need many steps*/
     else {
-        auto controlName = boost::get<t_reg>(statementTargets[0]);
-        auto target = boost::get<t_bit>(statementTargets[1]);
-        auto control = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
-                                [&controlName](auto r) {return r.name == controlName; });
+        const auto control = getRegister(m_circuit, statementTargets[0], RegisterType::QREG);
+        const auto target = boost::get<t_bit>(statementTargets[1]);
 
-        for (uint i = 0; i < (*control).size; ++i) {
+        for (uint i = 0; i < control.size; ++i) {
             Circuit::Step step;
             step.push_back(Circuit::CXGate(
-                Circuit::Qubit(controlName, i),
+                Circuit::Qubit(control.name, i),
                 Circuit::Qubit(target)
             ));
             m_circuit.steps.push_back(step);

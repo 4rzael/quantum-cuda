@@ -47,7 +47,8 @@ std::string getRegisterName(const Parser::AST::t_variable &var) {
     return "";
 }
 
-bool containsRegister(const Circuit &circuit, const Parser::AST::t_variable &var, const RegisterType rtype) {
+/* Internal use only: used by containsRegister and getRegister */
+std::vector<Circuit::Register>::const_iterator _getRegisterIterator(const Circuit &circuit, const Parser::AST::t_variable &var, const RegisterType rtype) {
     const std::string name = getRegisterName(var);
     const auto nameEquals = [&name](Circuit::Register r) {
         return name == r.name;
@@ -55,16 +56,39 @@ bool containsRegister(const Circuit &circuit, const Parser::AST::t_variable &var
 
     switch (rtype) {
         case RegisterType::ANY:
-            return (std::find_if(circuit.creg.begin(), circuit.creg.end(), nameEquals) != circuit.creg.end())
-            ||     (std::find_if(circuit.qreg.begin(), circuit.qreg.end(), nameEquals) != circuit.qreg.end());
+        {
+            auto tmp = std::find_if(circuit.creg.begin(), circuit.creg.end(), nameEquals);
+            if (tmp != circuit.creg.end())
+                return tmp;
+            else
+                return std::find_if(circuit.qreg.begin(), circuit.qreg.end(), nameEquals);
+        }
         case RegisterType::CREG:
-            return (std::find_if(circuit.creg.begin(), circuit.creg.end(), nameEquals) != circuit.creg.end());
+            return std::find_if(circuit.creg.begin(), circuit.creg.end(), nameEquals);
         case RegisterType::QREG:
-            return (std::find_if(circuit.qreg.begin(), circuit.qreg.end(), nameEquals) != circuit.qreg.end());
+            return std::find_if(circuit.qreg.begin(), circuit.qreg.end(), nameEquals);
     }
     BOOST_ASSERT(0);
-    return false;
+    throw std::logic_error("Unexpected register type");
+}
+
+bool containsRegister(const Circuit &circuit, const Parser::AST::t_variable &var, const RegisterType rtype) {
+    switch (rtype) {
+        case RegisterType::ANY:
+            return _getRegisterIterator(circuit, var, rtype) != circuit.creg.end()
+                && _getRegisterIterator(circuit, var, rtype) != circuit.qreg.end();
+        case RegisterType::CREG:
+            return _getRegisterIterator(circuit, var, rtype) != circuit.creg.end();
+        case RegisterType::QREG:
+            return _getRegisterIterator(circuit, var, rtype) != circuit.qreg.end();
+    }
+    BOOST_ASSERT(0);
+    throw std::logic_error("Unexpected register type");
 };
+
+Circuit::Register getRegister(const Circuit &circuit, const Parser::AST::t_variable &var, const RegisterType rtype) {
+    return *_getRegisterIterator(circuit, var, rtype);
+}
 
 void checkOutOfBound(const Circuit &circuit, const Parser::AST::t_variable &var) {
     switch (var.which()) {

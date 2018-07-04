@@ -25,6 +25,8 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_measure_s
     auto statementDest = m_substituteTarget(statement.dest);
 
     /* Check that registers exist */
+    checkInexistantRegister(m_circuit, statementSource, RegisterType::QREG);
+    checkInexistantRegister(m_circuit, statementDest, RegisterType::CREG);
 
     /* Check for OOB errors */
     checkOutOfBound(m_circuit, statementSource);
@@ -39,17 +41,19 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_measure_s
     }
     else if (statementSource.which() == (int)t_variableType::T_REG
           && statementDest.which() == (int)t_variableType::T_REG) {
-        if (getRegisterSize(m_circuit, statementSource) != getRegisterSize(m_circuit, statementDest)) {
-            LOG(Logger::ERROR, "QRegisters " << getRegisterName(statementSource)
-                                   << " and " << getRegisterName(statementDest) << " sizes differ.");
+
+        const auto source = getRegister(m_circuit, statementSource, RegisterType::QREG);
+        const auto dest = getRegister(m_circuit, statementDest, RegisterType::CREG);
+
+        if (source.size != dest.size) {
+            LOG(Logger::ERROR, "QRegisters " << source.name << " and " << dest.name << " sizes differ.");
             throw OpenQASMError();
         }
 
-        const uint size = getRegisterSize(m_circuit, statementSource);
-        for (uint i = 0; i < size; ++i) {
+        for (uint i = 0; i < source.size; ++i) {
             step.push_back(Circuit::Measurement(
-                Circuit::Qubit(getRegisterName(statementSource), i),
-                Circuit::Qubit(getRegisterName(statementDest), i)
+                Circuit::Qubit(source.name, i),
+                Circuit::Qubit(dest.name, i)
             ));
         }
     }

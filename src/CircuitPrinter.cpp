@@ -88,6 +88,15 @@ public:
         << "[" << reset.target.element << "]" << std::endl;
         --m_tabs;
     }
+
+    void operator()(const Circuit::Barrier &barrier) const {
+        m_stream << m_tabs << "Barrier:" << std::endl;
+        ++m_tabs;
+        m_stream << m_tabs << "target: "
+        << barrier.target.registerName 
+        << "[" << barrier.target.element << "]" << std::endl;
+        --m_tabs;
+    }
 };
 
 /**

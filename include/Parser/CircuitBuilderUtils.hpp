@@ -33,6 +33,18 @@ enum class RegisterType {ANY, CREG, QREG};
 bool containsRegister(const Circuit &circuit, const Parser::AST::t_variable &var, const RegisterType rtype=RegisterType::ANY);
 
 /**
+ * @brief Returns the register stored in the circuit that corresponds to the t_variable given
+ * 
+ * The register has to exist
+ * 
+ * @param circuit The circuit holding the lists of registers
+ * @param var The register to look for
+ * @param rtype The type of register to look for (CREG/QREG/ANY)
+ * @return The corresponding Circuit::Register
+ */
+Circuit::Register getRegister(const Circuit &circuit, const Parser::AST::t_variable &var, const RegisterType rtype=RegisterType::ANY);
+
+/**
  * @brief Get the name of a register
  * 
  * @param var The variable: either of the form reg, of reg[x]

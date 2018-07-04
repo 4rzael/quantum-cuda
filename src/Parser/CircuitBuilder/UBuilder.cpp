@@ -23,7 +23,7 @@ using namespace Parser::AST;
 void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_u_statement &statement) const {
     auto statementTarget = m_substituteTarget(statement.target);
     checkInexistantRegister(m_circuit, statementTarget, RegisterType::QREG);
-
+    checkOutOfBound(m_circuit, statementTarget);
 
     Circuit::Step step;
     if ((statementTarget.which() == (int)t_variableType::T_BIT)) {
@@ -34,16 +34,14 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_u_stateme
             Circuit::Qubit(boost::get<t_bit>(statementTarget))
         ));
     } else {
-        auto targetName = boost::get<t_reg>(statementTarget);
-        auto target = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
-                        [&targetName](auto r) {return r.name == targetName; });
+        const auto target = getRegister(m_circuit, statementTarget, RegisterType::QREG);
 
-        for (uint i = 0; i < (*target).size; ++i) {
+        for (uint i = 0; i < target.size; ++i) {
             step.push_back(Circuit::UGate(
                 FloatExpressionEvaluator::evaluate(statement.params[0], m_substituteParams),
                 FloatExpressionEvaluator::evaluate(statement.params[1], m_substituteParams),
                 FloatExpressionEvaluator::evaluate(statement.params[2], m_substituteParams),
-                Circuit::Qubit(targetName, i)
+                Circuit::Qubit(target.name, i)
             ));
         }
     }
