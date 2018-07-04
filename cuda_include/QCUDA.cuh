@@ -14,12 +14,14 @@
 # include <cuda_runtime_api.h>
 # include <cuda.h>
 
-# include <thrust/host_vector.h>
-# include <thrust/device_vector.h>
-# include <thrust/complex.h>
+# include "QCUDA_utils.cuh"
 
-# include <valarray>
-# include <complex>
+// # include <thrust/host_vector.h>
+// # include <thrust/device_vector.h>
+// # include <thrust/complex.h>
+
+// # include <valarray>
+// # include <complex>
 
 /**
 * @brief Namespace QCUDA encapsulates all the elements related to the
@@ -29,47 +31,47 @@
 namespace QCUDA {
 
 
-  /**
-   * @brief Enum that contains the available operations that will be executed on the GPU.
-   *
-   * They are mostly used with switch in order to dertermine which kind of
-   * operation we want to perform.
-   */
-  enum class QOperation {
-	 ADDITION,
-	 DOT,
-	 KRONECKER,
-	 TRACE,
-	 TRANSPOSE,
-	 NORMALIZE
-  };
+  // /**
+  //  * @brief Enum that contains the available operations that will be executed on the GPU.
+  //  *
+  //  * They are mostly used with switch in order to dertermine which kind of
+  //  * operation we want to perform.
+  //  */
+  // enum class QOperation {
+  // 	 ADDITION,
+  // 	 DOT,
+  // 	 KRONECKER,
+  // 	 TRACE,
+  // 	 TRANSPOSE,
+  // 	 NORMALIZE
+  // };
 
-  /**
-   * @brief Enum that contains all the available vectors within the class CUDAGPU.
-   *
-   * They are mostly used with switch, in order to inform the methods on
-   * which kind of vector we want to process data.
-   */
-  enum class DeviceVectors {
-	DEVICE_VECTOR_A,
-	DEVICE_VECTOR_B,
-	DEVICE_VECTORS
-  };
-
-
-  //typedef
-  template<typename T>
-  using arrayComplex_t = std::valarray<std::complex<T>>;
+  // /**
+  //  * @brief Enum that contains all the available vectors within the class CUDAGPU.
+  //  *
+  //  * They are mostly used with switch, in order to inform the methods on
+  //  * which kind of vector we want to process data.
+  //  */
+  // enum class DeviceVectors {
+  // 	DEVICE_VECTOR_A,
+  // 	DEVICE_VECTOR_B,
+  // 	DEVICE_VECTORS
+  // };
 
 
-  //typedef
-  template<typename T>
-  using hostVector_t = thrust::host_vector<thrust::complex<T>>;
+  // //typedef
+  // template<typename T>
+  // using arrayComplex_t = std::valarray<std::complex<T>>;
 
 
-  //typedef
-  template<typename T>
-  using deviceVector_t = thrust::device_vector<thrust::complex<T>>;
+  // //typedef
+  // template<typename T>
+  // using hostVector_t = thrust::host_vector<thrust::complex<T>>;
+
+
+  // //typedef
+  // template<typename T>
+  // using deviceVector_t = thrust::device_vector<thrust::complex<T>>;
 
 
   /**
