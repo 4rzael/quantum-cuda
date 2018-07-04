@@ -16,7 +16,6 @@
 #include "Parser/CircuitBuilderUtils.hpp"
 #include "Circuit.hpp"
 #include "Parser/AST.hpp"
-#include "Parser/FloatExpressionEvaluator.hpp"
 
 using namespace Parser::AST;
 
@@ -48,7 +47,8 @@ std::string getRegisterName(const Parser::AST::t_variable &var) {
     return "";
 }
 
-bool containsRegister(const Circuit &circuit, const std::string &name, const RegisterType rtype) {
+bool containsRegister(const Circuit &circuit, const Parser::AST::t_variable &var, const RegisterType rtype) {
+    const std::string name = getRegisterName(var);
     const auto nameEquals = [&name](Circuit::Register r) {
         return name == r.name;
     };
@@ -66,3 +66,41 @@ bool containsRegister(const Circuit &circuit, const std::string &name, const Reg
     return false;
 };
 
+void checkOutOfBound(const Circuit &circuit, const Parser::AST::t_variable &var) {
+    switch (var.which()) {
+    case (int)Parser::AST::t_variableType::T_BIT:
+    {
+        const auto target = boost::get<t_bit>(var);
+        if (target.value >= getRegisterSize(circuit, target)) {
+            LOG(Logger::ERROR, "Out of bound expression on qubit " << target.name
+                                << " (accessed:" << target.value << ", max:" << getRegisterSize(circuit, target) << ")");
+            throw OpenQASMError();
+        }
+        break;
+    }
+    default:
+        return;
+    }
+}
+
+void checkInexistantRegister(const Circuit &circuit, const Parser::AST::t_variable &var, const RegisterType rtype) {
+    auto regName = getRegisterName(var);
+    if (!containsRegister(circuit, var, rtype)) {
+
+        std::string regTypeName;
+        switch (rtype) {
+        case RegisterType::ANY:
+            regTypeName = "REGISTER";
+            break;
+        case RegisterType::CREG:
+            regTypeName = "CREG";
+            break;
+        case RegisterType::QREG:
+            regTypeName = "QREG";
+            break;
+        }
+
+        LOG(Logger::ERROR, regTypeName << " " << regName << " does not exist");
+        throw OpenQASMError();
+    }
+}

@@ -12,25 +12,25 @@
 #pragma once
 
 #include <boost/assert.hpp>
-#include <exception>
 
 #include "Circuit.hpp"
 #include "Parser/AST.hpp"
+#include "Errors.hpp"
 
 /* TODO: Put into a namespace ? */
 
 enum class RegisterType {ANY, CREG, QREG};
 
 /**
- * @brief Checks whether a register exists, and is of the good type (quantum/classical)
+ * @brief Returns whether a register exists, and is of the good type (quantum/classical)
  * 
  * @param circuit The circuit holding the lists of registers
- * @param name The name of the register to look for
+ * @param var The register to look for
  * @param rtype The type of register to look for (CREG/QREG/ANY)
  * @return true if the register is found
  * @return false otherwise
  */
-bool containsRegister(const Circuit &circuit, const std::string &name, const RegisterType rtype=RegisterType::ANY);
+bool containsRegister(const Circuit &circuit, const Parser::AST::t_variable &var, const RegisterType rtype=RegisterType::ANY);
 
 /**
  * @brief Get the name of a register
@@ -52,10 +52,24 @@ std::string getRegisterName(const Parser::AST::t_variable &var);
 uint getRegisterSize(const Circuit &circuit, const Parser::AST::t_variable &var);
 
 /**
- * @brief The generic error used when the openQASM code is incorrect
+ * @brief Checks whether a register access is out of bound and throws if it is.
+ * 
+ * The register has to exist
+ * 
+ * @param circuit The circuit holding the lists of registers
+ * @param var The variable to check: either of the form reg (will never throw in this case), of reg[x]
+ *
+ * @throw OpenQASMError
  */
-class OpenQASMError: public std::logic_error {
-public:
-    OpenQASMError(std::string const &message="")
-    : std::logic_error(message) {}
-};
+void checkOutOfBound(const Circuit &circuit, const Parser::AST::t_variable &var);
+
+/**
+ * @brief Checks whether a register exists and is of the good type, and throw if it is not
+ * 
+ * @param circuit The circuit holding the lists of registers
+ * @param var The register to look for
+ * @param rtype The type of register to look for (CREG/QREG/ANY)
+ * 
+ * @throw OpenQASMError
+ */
+void checkInexistantRegister(const Circuit &circuit, const Parser::AST::t_variable &var, const RegisterType rtype=RegisterType::ANY);

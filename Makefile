@@ -7,8 +7,8 @@
 # @Last modified time: 2018-07-03T23:47:38+01:00
 # @License: MIT License
 
+CXX?=	g++
 # Maccro that defines the c++ compiler we will use.
-CXX=	g++
 
 OPTIFLAGS=	-g3
 
@@ -48,19 +48,21 @@ CUSRC=	QCUDA.cu		\
 
 # Maccro that contains a list of all *.cpp source files that will be compiled
 # with 'CXX' maccro.
-SRC=	Parser/float_expr_ast.cpp				\
-	Parser/ASTGenerator.cpp					\
-	Parser/CircuitBuilder/CXBuilder.cpp			\
-	Parser/CircuitBuilder/MeasureBuilder.cpp		\
-	Parser/CircuitBuilder/RegisterDeclarationBuilder.cpp	\
-	Parser/CircuitBuilder/UBuilder.cpp			\
-	Parser/CircuitBuilder/UserDefinedGateBuilder.cpp	\
-	Parser/CircuitBuilder/CircuitBuilder.cpp		\
-	Parser/CircuitBuilder/CircuitBuilderUtils.cpp		\
-	Parser/FloatExpressionEvaluator.cpp			\
-	CircuitPrinter.cpp					\
-	Matrix.cpp						\
-	Simulator.cpp						\
+SRC=	Parser/float_expr_ast.cpp \
+	Parser/ASTGenerator.cpp \
+	Parser/CircuitBuilder/CXBuilder.cpp \
+	Parser/CircuitBuilder/MeasureBuilder.cpp \
+	Parser/CircuitBuilder/RegisterDeclarationBuilder.cpp \
+	Parser/CircuitBuilder/UBuilder.cpp \
+	Parser/CircuitBuilder/UserDefinedGateBuilder.cpp \
+	Parser/CircuitBuilder/IncludeBuilder.cpp \
+	Parser/CircuitBuilder/ResetBuilder.cpp \
+	Parser/CircuitBuilder/CircuitBuilder.cpp \
+	Parser/CircuitBuilder/CircuitBuilderUtils.cpp \
+	Parser/FloatExpressionEvaluator.cpp \
+	CircuitPrinter.cpp \
+	Matrix.cpp \
+	Simulator.cpp \
 	main.cpp
 
 $(ODIR)/Parser/ASTGenerator.o: CXXFLAGS:=$(filter-out $(OPTIFLAGS),$(CXXFLAGS))
@@ -107,6 +109,7 @@ OBJS=	$(patsubst %,$(ODIR)/%,$(_OBJS))
 _CUOBJS= $(CUSRC:.cu=.o)
 CUOBJS=	$(patsubst %,$(CUODIR)/%,$(_CUOBJS))
 
+LDIR=	-L$(CUDA_HOME)/lib64 -lcuda -lcudart -lboost_system -lboost_filesystem
 # Maccro that contains all the dynamic libraries that will be linked
 # to the created objects in order to get our executable.
 LDIR=	-L$(CUDA_HOME)/lib64 -lcuda -lcudart

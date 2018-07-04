@@ -54,7 +54,13 @@ struct Circuit {
         Qubit dest;
     };
 
-    typedef std::vector<boost::variant<CXGate, UGate, Measurement>> Step;
+    struct Reset {
+        Reset(const Qubit &trgt)
+        : target(trgt) {}
+        Qubit target;
+    };
+
+    typedef std::vector<boost::variant<CXGate, UGate, Measurement, Reset>> Step;
 
     std::vector<Register> creg;
     std::vector<Register> qreg;

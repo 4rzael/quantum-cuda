@@ -21,7 +21,6 @@
 using namespace Parser::AST;
 
 /* TODO: Check that the control and target of CX can't be the same */
-/* TODO: If a param is a T_BIT, then check for out-of-bounds */
 void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_cx_statement &statement) const {
     if (statement.targets.size() != 2) {
         LOG(Logger::ERROR, "CX expected 2 arguments, got " << statement.targets.size());
@@ -36,12 +35,12 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_cx_statem
 
     /* Check the registers exist and are QREGs (Cannot perform CX on CREGs) */
     for (const auto &target: statementTargets) {
-        auto regName = getRegisterName(target);
-        if (!containsRegister(m_circuit, regName, RegisterType::QREG)) {
-            LOG(Logger::ERROR, "QREG " << regName << " does not exist");
-            throw OpenQASMError();
-        }
+        checkInexistantRegister(m_circuit, target, RegisterType::QREG);
     }
+
+    /* Check for OOB errors */
+    checkOutOfBound(m_circuit, statementTargets[0]);
+    checkOutOfBound(m_circuit, statementTargets[1]);
 
     /* If the operands are both qubits, then simply apply a CX */
     if (statementTargets[0].which() == (int)t_variableType::T_BIT
@@ -49,6 +48,7 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_cx_statem
         Circuit::Step step;
         auto control = boost::get<t_bit>(statementTargets[0]);
         auto target = boost::get<t_bit>(statementTargets[1]);
+
         step.push_back(Circuit::CXGate(
             Circuit::Qubit(control),
             Circuit::Qubit(target))
@@ -62,6 +62,7 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_cx_statem
         auto targetName = boost::get<t_reg>(statementTargets[1]);
         auto reg = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
                                 [&targetName](auto r) {return r.name == targetName; });
+
         for (uint i = 0; i < (*reg).size; ++i) {
             step.push_back(Circuit::CXGate(
                 Circuit::Qubit(control),
@@ -97,6 +98,7 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_cx_statem
         auto target = boost::get<t_bit>(statementTargets[1]);
         auto control = std::find_if(m_circuit.qreg.begin(), m_circuit.qreg.end(),
                                 [&controlName](auto r) {return r.name == controlName; });
+
         for (uint i = 0; i < (*control).size; ++i) {
             Circuit::Step step;
             step.push_back(Circuit::CXGate(

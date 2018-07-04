@@ -18,7 +18,7 @@
 using namespace Parser::AST;
 
 void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_creg_statement &statement) const {
-    if (!containsRegister(m_circuit, statement.reg.name)) {
+    if (!containsRegister(m_circuit, statement.reg)) {
         m_circuit.creg.push_back(Circuit::Register(statement.reg.name, statement.reg.value));
     } else {
         LOG(Logger::ERROR, "register " << static_cast<std::string>(statement.reg.name) << " declared twice");
@@ -26,7 +26,7 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_creg_stat
     }
 }
 void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_qreg_statement &statement) const {
-    if (!containsRegister(m_circuit, statement.reg.name)) {
+    if (!containsRegister(m_circuit, statement.reg)) {
         m_circuit.qreg.push_back(Circuit::Register(statement.reg.name, statement.reg.value));
     } else {
         LOG(Logger::ERROR, "register " << static_cast<std::string>(statement.reg.name) << " declared twice");

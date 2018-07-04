@@ -54,10 +54,16 @@ class Simulator
         */
         void operator()(const Circuit::CXGate& value);
         /**
-        * Register the measurment of a qubit. .
+        * Register the measurement of a qubit. .
         * @param value The Measurement to perform..
         */
         void operator()(const Circuit::Measurement& value);
+        /**
+        * Register the reset of a qubit. .
+        * @param value The Reset to perform..
+        */
+        void operator()(const Circuit::Reset& value);
+
     };
     /**
     * The circuit layout object.

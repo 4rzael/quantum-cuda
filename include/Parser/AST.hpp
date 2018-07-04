@@ -324,6 +324,8 @@ namespace Parser {
                 return stream << "</openQASM>";
             }
         };
+
+        typedef t_openQASM t_AST;
     }
 }
 

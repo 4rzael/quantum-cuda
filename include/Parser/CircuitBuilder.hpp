@@ -109,17 +109,46 @@ class CircuitBuilder {
     };
 
     /**
-     * The circuit being built
+     * The file being parsed
      */
-    ::Circuit m_circuit;
+    std::string m_filename;
+
+    /**
+     * The circuit being built
+     * 
+     * This is a pointer as it is necessary to pass it to children circuit builders
+     * when performing an include statement (possible alternative: using C++11 move semantics)
+     */
+    std::shared_ptr<Circuit> m_circuit;
     /**
      * A list of user-defined gates. We simply store their AST,
-     * and then expand it every time the gate is actually called.
+     * and then expand it every time the gate is actually called
+     * 
+     * This is a pointer as it is necessary to pass it to children circuit builders
+     * when performing an include statement (possible alternative: using C++11 move semantics)
      */
-    std::vector<Parser::AST::t_gate_declaration> m_definedGates;
+    std::shared_ptr<std::vector<Parser::AST::t_gate_declaration>> m_definedGates;
 public:
     /**
-     * @brief Generates the circuit from the AST.
+     * @brief Construct a new Circuit Builder object
+     * 
+     * @param filename The file this Circuit Builder will parse
+     */
+    CircuitBuilder(std::string const &filename);
+
+    /**
+     * @brief Construct a new Circuit Builder object
+     * 
+     * Used in case of include statements: the parent builder creates another one
+     * that will parse the given file, and add the results to the current circuit
+     * 
+     * @param parent The parent Circuit Builder creating this one
+     * @param filename The file this Circuit Builder will parse
+     */
+    CircuitBuilder(CircuitBuilder &parent, std::string const &filename);
+
+    /**
+     * @brief Generate the circuit from the AST
      * 
      * @param ast The input AST
      * @return Circuit The generated Circuit
