@@ -2,9 +2,7 @@
 // Description: Simple two qubit implementation of Deutsch algorithm. It shows that, for a given function f, in order to know value of f(0) xor f(1) can be computed using 1 query. If result is 1, f is balanced, otherwise it is constant funcion
 OPENQASM 2.0;
 
-gate cx a, b { CX a, b; }
-gate x a { U(pi,0,pi) a; }
-gate h a { U(pi/2, 0,pi) a; }
+include "qelib1.inc";
 
 qreg q[2];
 creg c[1];

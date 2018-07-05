@@ -1,5 +1,5 @@
 OPENQASM 2.0;
-include "coucou.g";
+include "qelib1.inc";
 qreg ninja[2]; // bla
 creg bla[2];
 U(pi/2, 0, pi) ninja[0];
@@ -10,6 +10,8 @@ measure ninja -> bla;
 
 barrier ninja, bla;
 if (bla == 5) creg pizza[1];
+
+reset ninja;
 
 gate mygate1(a) qa, qb {
     CX qa, qb;

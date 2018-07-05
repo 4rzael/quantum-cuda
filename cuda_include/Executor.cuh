@@ -1,11 +1,11 @@
 /**
- * @Author: Julien Vial-Detambel <vial-d_j>
+ * @Author: Julien Vial-Detambel <l3ninj>
  * @Date:   2018-06-16T09:38:03+01:00
  * @Email:  julien.vial-detambel@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
- * @Filename: Executor.h
- * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-25T13:02:31+01:00
+ * @Filename: Executor.cuh
+ * @Last modified by:   l3ninj
+ * @Last modified time: 2018-06-28T22:50:58+01:00
  * @License: MIT License
  */
 
@@ -26,14 +26,6 @@ typedef std::valarray<std::complex<double>> Tvcplxd;
 class Executor
 {
   public:
-    /**
-    * Executor constructor
-    */
-    Executor(){}
-    /**
-    * Executor constructor
-    */
-    virtual ~Executor(){}
     /**
     * Performs an addition between std::valarray<std::complex<double>> a and b.
     * @param a A matrix content.

@@ -1,11 +1,11 @@
 /**
- * @Author: Julien Vial-Detambel <vial-d_j>
+ * @Author: Julien Vial-Detambel <l3ninj>
  * @Date:   2018-06-12T11:23:27+01:00
  * @Email: julien.vial-detambel@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.cpp
- * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-25T12:26:24+01:00
+ * @Last modified by:   l3ninj
+ * @Last modified time: 2018-06-28T22:42:40+01:00
  * @License: MIT License
  */
 
@@ -181,6 +181,10 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
     << value.dest.registerName << "[" << value.dest.element
     << "]\nState before operation:(" << beforeState << ";),\nApplied operation:("
     << op << ";),\nState after operation:(" << m_simulator.m_state << std::endl);
+}
+
+void Simulator::StepVisitor::operator()(const Circuit::Reset& __attribute__((unused)) value) {
+  LOG(Logger::ERROR, "Reset statements not implemented in the simulator");
 }
 
 void Simulator::simulate() {

@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: include
  * @Filename: Circuit.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Sat Jun 23 2018, 11:24:56
+ * @Last modified by:   l3ninj
+ * @Last modified time: 2018-06-28T22:39:43+01:00
  * @License: MIT License
  */
 
@@ -54,7 +54,13 @@ struct Circuit {
         Qubit dest;
     };
 
-    typedef std::vector<boost::variant<CXGate, UGate, Measurement>> Step;
+    struct Reset {
+        Reset(const Qubit &trgt)
+        : target(trgt) {}
+        Qubit target;
+    };
+
+    typedef std::vector<boost::variant<CXGate, UGate, Measurement, Reset>> Step;
 
     std::vector<Register> creg;
     std::vector<Register> qreg;

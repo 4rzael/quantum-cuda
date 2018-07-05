@@ -23,40 +23,11 @@ namespace Parser {
     class ASTGenerator {
     public:
         /**
-         * @brief Construct a new ASTGenerator object
-         */
-        ASTGenerator();
-
-        /**
-         * @brief Construct a new ASTGenerator object
-         * 
-         * @param log_folder The folder in which AST logs are generated
-         */
-        ASTGenerator(std::string const &log_folder);
-
-        /**
-         * @brief Construct a new ASTGenerator object
-         * 
-         * @param log_folder The folder in which AST logs are generated
-         * @param log_file The AST log filename
-         */
-        ASTGenerator(std::string const &logFolder, std::string const &logFile);
-
-        /**
          * @brief Generates an AST from an openQASM file
          * 
          * @param filename The name of the file containing the openQASM code
          * @return Parser::AST::t_openQASM The generated AST
          */
         Parser::AST::t_openQASM operator()(std::string const &filename);
-    private:
-        /**
-         * Whether the logging in a file is activated
-         */
-        bool m_log;
-        /**
-         * The stream used for logging in a file
-         */
-        std::ofstream m_outputStream;
     };
 }

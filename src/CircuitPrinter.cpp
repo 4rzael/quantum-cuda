@@ -79,6 +79,15 @@ public:
         << "[" << measurement.dest.element << "]" << std::endl;
         --m_tabs;
     }
+
+    void operator()(const Circuit::Reset &reset) const {
+        m_stream << m_tabs << "Reset:" << std::endl;
+        ++m_tabs;
+        m_stream << m_tabs << "target: "
+        << reset.target.registerName 
+        << "[" << reset.target.element << "]" << std::endl;
+        --m_tabs;
+    }
 };
 
 /**

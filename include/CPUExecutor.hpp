@@ -1,11 +1,11 @@
 /**
- * @Author: Julien Vial-Detambel <vial-d_j>
+ * @Author: Julien Vial-Detambel <l3ninj>
  * @Date:   2018-06-16T09:36:50+01:00
  * @Email:  julien.vial-detambel@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
- * @Filename: CPUExecutor.h
- * @Last modified by:   vial-d_j
- * @Last modified time: 2018-06-25T13:02:20+01:00
+ * @Filename: CPUExecutor.hpp
+ * @Last modified by:   l3ninj
+ * @Last modified time: 2018-06-28T22:40:00+01:00
  * @License: MIT License
  */
 
