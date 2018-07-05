@@ -8,8 +8,8 @@ CX ninja[0], ninja[1];
 measure ninja -> bla;
 //measure ninja[1] -> bla[2];
 
-barrier ninja, bla;
-if (bla == 5) creg pizza[1];
+barrier ninja;
+if (bla == 5) U(0,0,0) ninja;
 
 reset ninja;
 

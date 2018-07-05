@@ -57,9 +57,6 @@ Circuit CircuitBuilder::operator()(const Parser::AST::t_openQASM &ast) {
 void CircuitBuilder::OpenQASMInstructionVisitor::operator()(const Parser::AST::t_statement &s) const {
     ::boost::apply_visitor(CircuitBuilder::StatementVisitor(m_circuitBuilder, m_circuit), s);
 }
-void CircuitBuilder::OpenQASMInstructionVisitor::operator()(__attribute__((unused)) const Parser::AST::t_conditional_statement &s) const {
-    LOG(Logger::WARNING, "conditional statements not implemented yet");
-}
 
 /* Statement Visitor */
 void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const Parser::AST::t_invalid_statement &statement) const {

@@ -140,15 +140,23 @@ namespace Parser {
                        reset_statement |
                        u_statement |
                        gate_call_statement)
-                    >> ';';
+                    >> *WS >> ';';
 
         /* Operations available inside the body of a gate */
-        const auto gate_ops = rule<class statement, t_statement>()
+        const auto gate_ops = rule<class gate_ops, t_statement>()
                     = (cx_statement |
                        u_statement |
                        barrier_statement |
                        gate_call_statement)
-                    >> ';';
+                    >> *WS >> ';';
+
+        /* Operations available inside a conditional statement */
+        const auto qop = rule<class qop, t_statement>()
+                    = (cx_statement |
+                       u_statement |
+                       gate_call_statement |
+                       measure_statement |
+                       reset_statement) >> *WS >> ';';
 
         const auto comment = omit[lexeme["//" >> *(~char_('\n'))]];
         const auto conditional_statement = rule<class conditional_statement, t_conditional_statement>()
@@ -156,7 +164,7 @@ namespace Parser {
                                           reg >>
                                           *WS >> "==" >> *WS >>
                                           UINT >> NONSPACED_RIGHT_PARENTHESIS >> WS >>
-                                          statement;
+                                          qop;
 
         /* Gate declaration */
         const auto gate_code_block = rule<class gate_code_block, std::vector<t_statement>>()

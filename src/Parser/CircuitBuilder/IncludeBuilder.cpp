@@ -32,6 +32,6 @@ void CircuitBuilder::StatementVisitor::operator()(__attribute__((unused)) const 
 
     // Perform the parsing
     auto subBuilder = CircuitBuilder(m_circuitBuilder, finalPath.generic_string());
-    auto subAST = Parser::ASTGenerator()(finalPath.generic_string());
+    const auto subAST = Parser::ASTGenerator()(finalPath.generic_string());
     subBuilder(subAST);
 }

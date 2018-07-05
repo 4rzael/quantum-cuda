@@ -21,7 +21,7 @@
 using namespace Parser::AST;
 
 void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_reset_statement &statement) const {
-    auto statementTarget = m_substituteTarget(statement.target);
+    const auto statementTarget = m_substituteTarget(statement.target);
     checkInexistantRegister(m_circuit, statementTarget, RegisterType::QREG);
     checkOutOfBound(m_circuit, statementTarget);
 

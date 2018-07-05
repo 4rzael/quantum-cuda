@@ -51,6 +51,7 @@ SRC=	Parser/float_expr_ast.cpp \
 	Parser/CircuitBuilder/IncludeBuilder.cpp \
 	Parser/CircuitBuilder/ResetBuilder.cpp \
 	Parser/CircuitBuilder/BarrierBuilder.cpp \
+	Parser/CircuitBuilder/ConditionalStatementBuilder.cpp \
 	Parser/CircuitBuilder/CircuitBuilder.cpp \
 	Parser/CircuitBuilder/CircuitBuilderUtils.cpp \
 	Parser/FloatExpressionEvaluator.cpp \

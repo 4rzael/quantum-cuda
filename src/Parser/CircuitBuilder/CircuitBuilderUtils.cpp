@@ -57,7 +57,7 @@ std::vector<Circuit::Register>::const_iterator _getRegisterIterator(const Circui
     switch (rtype) {
         case RegisterType::ANY:
         {
-            auto tmp = std::find_if(circuit.creg.begin(), circuit.creg.end(), nameEquals);
+            const auto tmp = std::find_if(circuit.creg.begin(), circuit.creg.end(), nameEquals);
             if (tmp != circuit.creg.end())
                 return tmp;
             else

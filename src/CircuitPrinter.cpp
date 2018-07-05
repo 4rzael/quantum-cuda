@@ -97,6 +97,17 @@ public:
         << "[" << barrier.target.element << "]" << std::endl;
         --m_tabs;
     }
+
+    void operator()(const Circuit::ConditionalGate &condition) const {
+        m_stream << m_tabs << "Conditional Gate:" << std::endl;
+        ++m_tabs;
+        m_stream << m_tabs << "condition: "
+        << condition.testedRegister << " == "
+        << condition.expectedValue << std::endl;
+
+        boost::apply_visitor(*this, condition.gate);
+        --m_tabs;
+    }
 };
 
 /**

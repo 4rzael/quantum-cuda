@@ -59,15 +59,20 @@ class Simulator
         */
         void operator()(const Circuit::Measurement& value);
         /**
+        * Register a barrier (ignores it as barrier don't perform any computations). .
+        * @param value The barrier. Ignored.
+        */
+        void operator()(const Circuit::Barrier& value);
+        /**
         * Register the reset of a qubit. .
         * @param value The Reset to perform.
         */
         void operator()(const Circuit::Reset& value);
         /**
-        * Register a barrier (ignores it as barrier don't perform any computations). .
-        * @param value The barrier. Ignored.
+        * Register a conditional gate. .
+        * @param value The conditional gate to perform.
         */
-        void operator()(const Circuit::Barrier& value);
+        void operator()(const Circuit::ConditionalGate& value);
     };
     /**
     * The circuit layout object.

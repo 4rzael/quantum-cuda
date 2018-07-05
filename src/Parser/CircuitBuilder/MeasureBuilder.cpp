@@ -21,8 +21,8 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_measure_s
     Circuit::Step step;
 
     /* Perform substitutions on targets */
-    auto statementSource = m_substituteTarget(statement.source);
-    auto statementDest = m_substituteTarget(statement.dest);
+    const auto statementSource = m_substituteTarget(statement.source);
+    const auto statementDest = m_substituteTarget(statement.dest);
 
     /* Check that registers exist */
     checkInexistantRegister(m_circuit, statementSource, RegisterType::QREG);

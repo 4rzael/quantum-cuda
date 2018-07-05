@@ -66,7 +66,18 @@ struct Circuit {
         Qubit target;
     };
 
-    typedef std::vector<boost::variant<CXGate, UGate, Measurement, Reset, Barrier>> Step;
+    typedef boost::variant<CXGate, UGate, Measurement, Reset> ConditionalCompatibleGate;
+    struct ConditionalGate {
+        ConditionalGate(const std::string &tested, uint value, ConditionalCompatibleGate const &_gate)
+        : testedRegister(tested), expectedValue(value), gate(_gate) {}
+
+        std::string testedRegister;
+        uint expectedValue;
+        ConditionalCompatibleGate gate;
+    };
+
+    typedef boost::variant<CXGate, UGate, Measurement, Reset, Barrier, ConditionalGate> Gate;
+    typedef std::vector<Gate> Step;
 
     std::vector<Register> creg;
     std::vector<Register> qreg;

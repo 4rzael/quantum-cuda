@@ -183,13 +183,16 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
     << op << ";),\nState after operation:(" << m_simulator.m_state << std::endl);
 }
 
-// TODO: Implement that
+void Simulator::StepVisitor::operator()(const Circuit::Barrier& __attribute__((unused)) value) {
+  // Nothing to be done for a barrier. It is the same as an identity, computation-wise
+}
+
+// TODO: Implement those two
 void Simulator::StepVisitor::operator()(const Circuit::Reset& __attribute__((unused)) value) {
   LOG(Logger::ERROR, "Reset statements not implemented in the simulator");
 }
-
-void Simulator::StepVisitor::operator()(const Circuit::Barrier& __attribute__((unused)) value) {
-  // Nothing to be done for a barrier. It is the same as an identity, computation-wise
+void Simulator::StepVisitor::operator()(const Circuit::ConditionalGate& __attribute__((unused)) value) {
+  LOG(Logger::ERROR, "Conditional statements not implemented in the simulator");
 }
 
 void Simulator::simulate() {
