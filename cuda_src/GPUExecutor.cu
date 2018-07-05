@@ -21,11 +21,11 @@ GPUExecutor::~GPUExecutor() = default;
 Tvcplxd* GPUExecutor::add(Tvcplxd* a, Tvcplxd* b) {
   Tvcplxd* ptr;
 
-  this->cgpu_.initThrustHostVec((*a), (*b), QCUDA::DeviceVectors::DEVICE_VECTORS);
-  // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-  // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_B);
-  this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-  this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_B);
+  this->cgpu_.initThrustHostVec((*a), (*b), QCUDA::Vectors::ALL_VECTORS);
+  // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
+  // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_B);
+  this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
+  this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_B);
   ptr = this->cgpu_.performAddOnGPU();
   return (ptr);
 }
@@ -56,11 +56,11 @@ Tvcplxd* GPUExecutor::dot(Tvcplxd* a, Tvcplxd* b, int ma, int mb, int na, int nb
   return result;
   // Tvcplxd* ptr;
 
-  // this->cgpu_.initThrustHostVec((*a), (*b), QCUDA::DeviceVectors::DEVICE_VECTORS);
-  // // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-  // // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_B);
-  // this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-  // this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_B);
+  // this->cgpu_.initThrustHostVec((*a), (*b), QCUDA::Vectors::ALL_VECTORS);
+  // // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
+  // // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_B);
+  // this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
+  // this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_B);
   // ptr = this->cgpu_.performDotOnGPU(ma, mb, na, nb);
   // return (ptr);
 }
@@ -82,20 +82,20 @@ Tvcplxd* GPUExecutor::kron(Tvcplxd* a, Tvcplxd* b, int ma, int mb) {
   return result;
   // Tvcplxd* ptr;
 
-  // this->cgpu_.initThrustHostVec((*a), (*b), QCUDA::DeviceVectors::DEVICE_VECTORS);
-  // // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-  // // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_B);
-  // this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-  // this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_B);
+  // this->cgpu_.initThrustHostVec((*a), (*b), QCUDA::Vectors::ALL_VECTORS);
+  // // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
+  // // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_B);
+  // this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
+  // this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_B);
   // ptr = this->cgpu_.performKronOnGPU(a->size() / ma, b->size() / mb, ma, mb);
   // return (ptr);
 }
 
 
 std::complex<double> GPUExecutor::tr(Tvcplxd* a, int m) {
-  this->cgpu_.initThrustHostVec((*a), (*a), QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-  // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-  this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
+  this->cgpu_.initThrustHostVec((*a), (*a), QCUDA::Vectors::VECTOR_A);
+  // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
+  this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
   return(this->cgpu_.performTraceOnGPU(m));
 }
 
@@ -112,9 +112,9 @@ Tvcplxd* GPUExecutor::T(Tvcplxd* a, int m, int n) {
   return result;
   // Tvcplxd* ptr;
 
-  // this->cgpu_.initThrustHostVec((*a), (*a), QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-  // // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-  // this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
+  // this->cgpu_.initThrustHostVec((*a), (*a), QCUDA::Vectors::VECTOR_A);
+  // // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
+  // this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
   // ptr = this->cgpu_.performTransposeOnGPU(m, n);
   // return (ptr);
 }
@@ -138,9 +138,9 @@ Tvcplxd* GPUExecutor::normalize(Tvcplxd* a) {
   return result;
   // Tvcplxd* ptr;
 
-  // this->cgpu_.initThrustHostVec((*a), (*a), QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-  // // this->cgpu_.assignHostToDevice(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-  // this->cgpu_.convertDeviceToCUDAType(QCUDA::DeviceVectors::DEVICE_VECTOR_A);
+  // this->cgpu_.initThrustHostVec((*a), (*a), QCUDA::Vectors::VECTOR_A);
+  // // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
+  // this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
   // ptr = this->cgpu_.performNormalizeOnGPU();
   // return (ptr);
 }
