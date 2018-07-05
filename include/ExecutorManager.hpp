@@ -9,7 +9,7 @@
  * @License: MIT License
  */
 
-#include "Executor.cuh"
+#include "Executor.hpp"
 
 /**
 * Matrix linear algebra executors singleton manager.

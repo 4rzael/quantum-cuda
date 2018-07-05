@@ -109,10 +109,9 @@ OBJS=	$(patsubst %,$(ODIR)/%,$(_OBJS))
 _CUOBJS= $(CUSRC:.cu=.o)
 CUOBJS=	$(patsubst %,$(CUODIR)/%,$(_CUOBJS))
 
-LDIR=	-L$(CUDA_HOME)/lib64 -lcuda -lcudart -lboost_system -lboost_filesystem
 # Maccro that contains all the dynamic libraries that will be linked
 # to the created objects in order to get our executable.
-LDIR=	-L$(CUDA_HOME)/lib64 -lcuda -lcudart
+LDIR=	-L$(CUDA_HOME)/lib64 -lcuda -lcudart -lboost_system -lboost_filesystem
 
 # Default rule that will be called when the user types 'make'.
 # Here, it will create 'ODIR' and 'CUODIR' repositories and call the 'NAME' rule.
