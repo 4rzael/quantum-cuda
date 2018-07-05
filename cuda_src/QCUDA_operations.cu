@@ -18,10 +18,20 @@
  * This issue will be reviewed in the future.
  */
 
-
+#include "GPUExecutor.cuh"
 #include "QCUDA.cuh"
 
 #include <iomanip>
+
+template<typename T> __host__ __device__
+QCUDA::s_complex<T>::s_complex()
+  : real_(0), imag_(0)
+{}
+
+template<typename T> __host__ __device__
+QCUDA::s_complex<T>::~s_complex()
+{}
+
 template<typename T> __host__ __device__
 T	QCUDA::s_complex<T>::getReal() {
   return (this->real_);
@@ -196,10 +206,10 @@ QCUDA::CUDAGPU<T>::initGridAndBlock(QCUDA::QOperation&& e,
 
 template<typename T> __host__ void
 QCUDA::CUDAGPU<T>::copyDataToGPU(structComplex_t<T>* m,
-				 const QCUDA::DeviceVectors&& e) {
+				 const QCUDA::Vectors&& e) {
   structComplex_t<T>* tmp;
 
-  tmp = ((e == QCUDA::DeviceVectors::DEVICE_VECTOR_A)
+  tmp = ((e == QCUDA::Vectors::VECTOR_A)
 	 ? this->cudaComplexVecA_
 	 : this->cudaComplexVecB_);
   cudaMemcpy((void*)m,
@@ -270,9 +280,9 @@ QCUDA::arrayComplex_t<T>* QCUDA::CUDAGPU<T>::performAddOnGPU() {
   arrayComplex_t<T>*	ptr;
 
   m1 = this->allocMemoryOnGPU(m1, this->hostVecA_.size());
-  this->copyDataToGPU(m1, QCUDA::DeviceVectors::DEVICE_VECTOR_A);
+  this->copyDataToGPU(m1, QCUDA::Vectors::VECTOR_A);
   m2 = this->allocMemoryOnGPU(m2, this->hostVecA_.size());
-  this->copyDataToGPU(m2, QCUDA::DeviceVectors::DEVICE_VECTOR_B);
+  this->copyDataToGPU(m2, QCUDA::Vectors::VECTOR_B);
   resHost = new structComplex_t<T> [this->hostVecA_.size()];
   resDev = this->allocMemoryOnGPU(resDev, this->hostVecA_.size());
   this->initGridAndBlock(QCUDA::QOperation::ADDITION, 0, 0);
@@ -299,9 +309,9 @@ QCUDA::arrayComplex_t<T>* QCUDA::CUDAGPU<T>::performDotOnGPU(int ma,
   arrayComplex_t<T>*	ptr;
 
   m1 = this->allocMemoryOnGPU(m1, ma * na);
-  this->copyDataToGPU(m1, QCUDA::DeviceVectors::DEVICE_VECTOR_A);
+  this->copyDataToGPU(m1, QCUDA::Vectors::VECTOR_A);
   m2 = this->allocMemoryOnGPU(m2, mb * nb);
-  this->copyDataToGPU(m2, QCUDA::DeviceVectors::DEVICE_VECTOR_B);
+  this->copyDataToGPU(m2, QCUDA::Vectors::VECTOR_B);
   resHost = new structComplex_t<T> [na * mb];
   resDev = this->allocMemoryOnGPU(resDev, na * mb);
   this->initGridAndBlock(QCUDA::QOperation::DOT, na, mb);
@@ -325,9 +335,9 @@ QCUDA::arrayComplex_t<T>* QCUDA::CUDAGPU<T>::performKronOnGPU(int divA,
   arrayComplex_t<T>*	ptr;
 
   m1 = this->allocMemoryOnGPU(m1, this->hostVecA_.size());
-  this->copyDataToGPU(m1, QCUDA::DeviceVectors::DEVICE_VECTOR_A);
+  this->copyDataToGPU(m1, QCUDA::Vectors::VECTOR_A);
   m2 = this->allocMemoryOnGPU(m2, this->hostVecB_.size());
-  this->copyDataToGPU(m2, QCUDA::DeviceVectors::DEVICE_VECTOR_B);
+  this->copyDataToGPU(m2, QCUDA::Vectors::VECTOR_B);
   resHost = new structComplex_t<T> [divA * divB * ma * mb];
   resDev = this->allocMemoryOnGPU(resDev, divA * divB * ma * mb);
   this->initGridAndBlock(QCUDA::QOperation::KRONECKER, ma * mb, divA * divB);
@@ -350,7 +360,7 @@ std::complex<T> QCUDA::CUDAGPU<T>::performTraceOnGPU(int m) {
   std::complex<T>	tmp;
 
   m1 = this->allocMemoryOnGPU(m1, this->hostVecA_.size());
-  this->copyDataToGPU(m1, QCUDA::DeviceVectors::DEVICE_VECTOR_A);
+  this->copyDataToGPU(m1, QCUDA::Vectors::VECTOR_A);
   resHost = new structComplex_t<T>;
   resDev = this->allocMemoryOnGPU(resDev, 1);
   this->initGridAndBlock(QCUDA::QOperation::TRACE, m, 1);
@@ -371,7 +381,7 @@ QCUDA::arrayComplex_t<T>* QCUDA::CUDAGPU<T>::performTransposeOnGPU(int m, int n)
   arrayComplex_t<T>*	ptr;
 
   m1 = this->allocMemoryOnGPU(m1, this->hostVecA_.size());
-  this->copyDataToGPU(m1, QCUDA::DeviceVectors::DEVICE_VECTOR_A);
+  this->copyDataToGPU(m1, QCUDA::Vectors::VECTOR_A);
   resHost = new structComplex_t<T> [m * n];
   resDev = this->allocMemoryOnGPU(resDev, m * n);
   this->initGridAndBlock(QCUDA::QOperation::TRANSPOSE, m, n);
@@ -391,7 +401,7 @@ QCUDA::arrayComplex_t<T>* QCUDA::CUDAGPU<T>::performNormalizeOnGPU() {
   arrayComplex_t<T>*	ptr;
 
   m1 = this->allocMemoryOnGPU(m1, this->hostVecA_.size());
-  this->copyDataToGPU(m1, QCUDA::DeviceVectors::DEVICE_VECTOR_A);
+  this->copyDataToGPU(m1, QCUDA::Vectors::VECTOR_A);
   sum = new structComplex_t<T>;
   cudaMemset(sum, 0, sizeof(structComplex_t<T>) * 1);
   resHost = new structComplex_t<T> [this->hostVecA_.size()];
@@ -480,3 +490,4 @@ template __global__
 void	cudaNormalize(QCUDA::structComplex_t<float>*,
 		      QCUDA::structComplex_t<float>*,
 		      QCUDA::structComplex_t<float>*);
+

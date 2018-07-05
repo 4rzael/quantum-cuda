@@ -11,12 +11,14 @@
 
 #pragma once
 
-// Included to use std::valarray<T>.
 # include <valarray>
-// Included to use std::complex<T>
 # include <complex>
 
-// Included to use QCUDA::CUDAGPU class as an attribute in QGPU::GPU class.
+/**
+ * Included to use QCUDA::CUDAGPU class as an attribute in QGPU::GPU class.
+ * Therefore, this attribute will allow us to communicate with the GPU
+ * through his methods.
+ */
 # include "QCUDA.cuh"
 
 /**

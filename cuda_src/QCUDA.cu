@@ -23,27 +23,27 @@ QCUDA::CUDAGPU<T>::~CUDAGPU() = default;
 
 
 template<typename T> __host__ void
-QCUDA::CUDAGPU<T>::convertDeviceToCUDAType(const QCUDA::DeviceVectors&& e) {
+QCUDA::CUDAGPU<T>::convertDeviceToCUDAType(const QCUDA::Vectors&& e) {
   QCUDA::structComplex_t<T>*	ptr;
   QCUDA::hostVector_t<T>*	tmp;
 
   std::cout << "== output convertDeviceToCUDAType HEAD ==" << std::endl;
   ptr = new QCUDA::structComplex_t<T> [
-	    (e == QCUDA::DeviceVectors::DEVICE_VECTOR_A)
+	    (e == QCUDA::Vectors::VECTOR_A)
 	    ? this->hostVecA_.size() : this->hostVecB_.size()
         ];
-  tmp = (e == QCUDA::DeviceVectors::DEVICE_VECTOR_A)
+  tmp = (e == QCUDA::Vectors::VECTOR_A)
     ? &this->hostVecA_
     : &this->hostVecB_;
   for (unsigned int it = 0;
-       it < ((e == QCUDA::DeviceVectors::DEVICE_VECTOR_A)
+       it < ((e == QCUDA::Vectors::VECTOR_A)
 	     ? this->hostVecA_.size()
 	     : this->hostVecB_.size());
        it++) {
     ptr[it].setReal((*tmp)[it].real());
     ptr[it].setImag((*tmp)[it].imag());
   }
-  if (e == QCUDA::DeviceVectors::DEVICE_VECTOR_A)
+  if (e == QCUDA::Vectors::VECTOR_A)
     this->cudaComplexVecA_ = ptr;
   else
     this->cudaComplexVecB_ = ptr;
@@ -52,37 +52,37 @@ QCUDA::CUDAGPU<T>::convertDeviceToCUDAType(const QCUDA::DeviceVectors&& e) {
 
 
 template<typename T> __host__
-void QCUDA::CUDAGPU<T>::assignHostToDevice(const QCUDA::DeviceVectors&& e) {
+void QCUDA::CUDAGPU<T>::assignHostToDevice(const QCUDA::Vectors&& e) {
   QCUDA::hostVector_t<T> ptr;
 
   std::cout << "== output assignHostToDevice HEAD ==" << std::endl;
   switch (e) {
-  case (QCUDA::DeviceVectors::DEVICE_VECTOR_A):
+  case (QCUDA::Vectors::VECTOR_A):
     this->deviceVecA_ = this->hostVecA_;
     break;
-  case (QCUDA::DeviceVectors::DEVICE_VECTOR_B):
+  case (QCUDA::Vectors::VECTOR_B):
     this->deviceVecB_ = this->hostVecB_;
     break;
-  case (QCUDA::DeviceVectors::DEVICE_VECTORS):
+  case (QCUDA::Vectors::ALL_VECTORS):
     this->deviceVecA_ = this->hostVecA_;
     this->deviceVecB_ = this->hostVecB_;
     break;    
   };
-  ptr = (e == QCUDA::DeviceVectors::DEVICE_VECTOR_A) ? this->deviceVecA_
-						     : this->deviceVecB_;
+  ptr = (e == QCUDA::Vectors::VECTOR_A) ? this->deviceVecA_
+					       : this->deviceVecB_;
   std::cout << "== output assignHostToDevice TAIL ==" << std::endl;
 }
 
 
 template<typename T> __host__
 void QCUDA::CUDAGPU<T>::convertVectorToThrust(const QCUDA::arrayComplex_t<T>& vec,
-					      const QCUDA::DeviceVectors& e) {
+					      const QCUDA::Vectors& e) {
   int			i;
   hostVector_t<T>*	ptr;
 
   std::cout << "== output convertVectorToThrust HEAD ==" << std::endl;
-  ptr = (e == QCUDA::DeviceVectors::DEVICE_VECTOR_A) ? &this->hostVecA_
-						     : &this->hostVecB_;
+  ptr = (e == QCUDA::Vectors::VECTOR_A) ? &this->hostVecA_
+					       : &this->hostVecB_;
 
   ptr->resize(vec.size(), 0);
   i = 0;
@@ -118,21 +118,21 @@ void dumpArrayComplex(const QCUDA::arrayComplex_t<T>& vec) {
 template<typename T> __host__
 void QCUDA::CUDAGPU<T>::initThrustHostVec(const QCUDA::arrayComplex_t<T>& vec1,
 					  const QCUDA::arrayComplex_t<T>& vec2,
-					  const QCUDA::DeviceVectors& e) {
+					  const QCUDA::Vectors& e) {
   std::cout << std::endl << "== OUTPUT 'initThrustHostvec' function HEAD ==" << std::endl;
   dumpArrayComplex<T>(vec1);
   dumpArrayComplex<T>(vec2);
   
   switch (e) {
-  case (QCUDA::DeviceVectors::DEVICE_VECTOR_A):
+  case (QCUDA::Vectors::VECTOR_A):
     this->convertVectorToThrust(vec1, e);
     break;
-  case (QCUDA::DeviceVectors::DEVICE_VECTOR_B):
+  case (QCUDA::Vectors::VECTOR_B):
     this->convertVectorToThrust(vec2, e);
     break;
-  case (QCUDA::DeviceVectors::DEVICE_VECTORS):
-    this->convertVectorToThrust(vec1, QCUDA::DeviceVectors::DEVICE_VECTOR_A);
-    this->convertVectorToThrust(vec2, QCUDA::DeviceVectors::DEVICE_VECTOR_B);
+  case (QCUDA::Vectors::ALL_VECTORS):
+    this->convertVectorToThrust(vec1, QCUDA::Vectors::VECTOR_A);
+    this->convertVectorToThrust(vec2, QCUDA::Vectors::VECTOR_B);
     break;
   };
   std::cout << "== OUTPUT 'initThrustHostvec' functionTAIL ==" << std::endl;

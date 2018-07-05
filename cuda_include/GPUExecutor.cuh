@@ -139,3 +139,5 @@ public:
    */
   virtual Tvcplxd* normalize(Tvcplxd* a);
 };
+
+// extern template class QCUDA::CUDAGPU<double>;

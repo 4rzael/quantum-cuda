@@ -22,10 +22,15 @@
 namespace QCUDA {
 
   /**
-   * @brief Enum that contains the available operations that will be executed on the GPU.
+   * @brief The enum QOperation contains enumerators corresponding to all
+   * the available operations that can be performed on the GPU.
    *
-   * They are mostly used with switch in order to dertermine which kind of
-   * operation we want to perform.
+   * They are mostly used with the 'switch' statement in order to dertermine
+   * which kind of operation we want to perform, and which actions we want to do
+   * on top of the selected operation.
+   * Therefore, this prevent the creation of several methods that might have some
+   * redundancies in their actions, except where a specific case has been found
+   * for an operation.
    */
   enum class QOperation {
 	 ADDITION,
@@ -38,29 +43,47 @@ namespace QCUDA {
 
 
   /**
-   * @brief Enum that contains all the available vectors within the class CUDAGPU.
+   * @brief The enum Vectors contains enumerators corresponding to which vector
+   * in the CUDAGPU class we want to perform internal operations.
    *
-   * They are mostly used with switch, in order to inform the methods on
-   * which kind of vector we want to process data.
+   * In overall, this enum has actually the same behaviour as 'QOperation'.
    */
-  enum class DeviceVectors {
-	DEVICE_VECTOR_A,
-	DEVICE_VECTOR_B,
-	DEVICE_VECTORS
+  enum class Vectors {
+	VECTOR_A,
+	VECTOR_B,
+	ALL_VECTORS
   };
 
 
-  //typedef
+  /**
+   * The next part of the file is about the aliases we use in the GPU part of
+   * the project.
+   * 
+   * Indeed, due to length of some variables' type, and therefore for some
+   * readability, we use those aliases to get a decent length and an easy
+   * distinction between them in order to get a coherency on what they are
+   * without the alias.
+   * On top of that, those aliases are template and follow the same idea
+   * we highlighted in QGPU.cuh file.
+   */
+
+  /**
+   * The alias of 'std::valarray<std::complex<T>>' is 'arrayComplex_t'.
+   */
   template<typename T>
   using arrayComplex_t = std::valarray<std::complex<T>>;
 
 
-  //typedef
+  /**
+   * The alias of 'thrust::host_vector<thrust::complex<T>>' is 'hostVector_t'.
+   */
   template<typename T>
   using hostVector_t = thrust::host_vector<thrust::complex<T>>;
 
 
-  //typedef
+  /**
+   * The alias of 'thrust::device_vector<thrust::complex<T>>' is 'deviceVector_t'.
+   */
   template<typename T>
   using deviceVector_t = thrust::device_vector<thrust::complex<T>>;
 
