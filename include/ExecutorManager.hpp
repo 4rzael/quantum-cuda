@@ -4,12 +4,12 @@
  * @Email:  julien.vial-detambel@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: ExecutorManager.hpp
- * @Last modified by:   vial-d_j
- * @Last modified time: 2018-07-04T17:15:48+01:00
+ * @Last modified by:   l3ninj
+ * @Last modified time: 2018-07-05T14:25:28+01:00
  * @License: MIT License
  */
 
-#include "Executor.hpp"
+#include "IExecutor.hpp"
 
 /**
 * Matrix linear algebra executors singleton manager.

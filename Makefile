@@ -4,7 +4,7 @@
 # @Project: CUDA-Based Simulator of Quantum Systems
 # @Filename: Makefile
 # @Last modified by:   l3ninj
-# @Last modified time: 2018-07-04T17:59:07+01:00
+# @Last modified time: 2018-07-05T14:34:34+01:00
 # @License: MIT License
 
 CXX?=	g++
@@ -43,7 +43,6 @@ CUODIR=	cuda_obj
 CUSRC=	QCUDA.cu		\
 	QCUDA_operations.cu	\
 	GPUExecutor.cu		\
-	CPUExecutor.cu		\
 	ExecutorManager.cu
 
 # Maccro that contains a list of all *.cpp source files that will be compiled
@@ -64,6 +63,7 @@ SRC=	Parser/float_expr_ast.cpp \
 	Parser/FloatExpressionEvaluator.cpp \
 	CircuitPrinter.cpp \
 	Matrix.cpp \
+	CPUExecutor.cpp \
 	Simulator.cpp \
 	main.cpp
 

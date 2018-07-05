@@ -4,8 +4,8 @@
  * @Email:  nicolas.jankovic@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: QGPU.cuh
- * @Last modified by:   nj203
- * @Last modified time: 2018-06-27T14:51:52+01:00
+ * @Last modified by:   l3ninj
+ * @Last modified time: 2018-07-05T14:32:05+01:00
  * @License: MIT License
  */
 
@@ -29,17 +29,6 @@ Tvcplxd* GPUExecutor::add(Tvcplxd* a, Tvcplxd* b) {
   ptr = this->cgpu_.performAddOnGPU();
   return (ptr);
 }
-
-
-Tvcplxd* GPUExecutor::mult_scalar(Tvcplxd* a, std::complex<double> s) {
-  Tvcplxd* result = new Tvcplxd(a->size());
-
-  for (uint i = 0; i < a->size(); i++) {
-    (*result)[i] = (*a)[i] * s;
-  }
-  return result;
-}
-
 
 // Naive CPU implementation, whereas GPU is still in development
 Tvcplxd* GPUExecutor::dot(Tvcplxd* a, Tvcplxd* b, int ma, int mb, int na, int nb) {
@@ -92,7 +81,7 @@ Tvcplxd* GPUExecutor::kron(Tvcplxd* a, Tvcplxd* b, int ma, int mb) {
 }
 
 
-std::complex<double> GPUExecutor::tr(Tvcplxd* a, int m) {
+std::complex<double> GPUExecutor::trace(Tvcplxd* a, int m) {
   this->cgpu_.initThrustHostVec((*a), (*a), QCUDA::Vectors::VECTOR_A);
   // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
   this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
@@ -101,7 +90,7 @@ std::complex<double> GPUExecutor::tr(Tvcplxd* a, int m) {
 
 
 // Naive CPU implementation, whereas GPU is still in development
-Tvcplxd* GPUExecutor::T(Tvcplxd* a, int m, int n) {
+Tvcplxd* GPUExecutor::transpose(Tvcplxd* a, int m, int n) {
   Tvcplxd* result = new Tvcplxd(m * n);
 
   for(int j = 0; j < n; j++) {
@@ -144,4 +133,3 @@ Tvcplxd* GPUExecutor::normalize(Tvcplxd* a) {
   // ptr = this->cgpu_.performNormalizeOnGPU();
   // return (ptr);
 }
-
