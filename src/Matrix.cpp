@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-06-28T22:42:32+01:00
+ * @Last modified time: 2018-07-04T17:59:39+01:00
  * @License: MIT License
  */
 
@@ -30,23 +30,15 @@ std::pair<int, int> Matrix::getDimensions() const {
 }
 
 Matrix Matrix::operator+(const Matrix& other) const {
-  Executor *exec = ExecutorManager::getInstance().getExecutor();
+  IExecutor *exec = ExecutorManager::getInstance().getExecutor();
 
   Matrix result = Matrix(exec->add(m_content, other.getContent()),
     m_dim.first, m_dim.second);
   return result;
 }
 
-Matrix Matrix::operator*(const std::complex<double>& scalar) const {
-  Executor *exec = ExecutorManager::getInstance().getExecutor();
-
-  Matrix result = Matrix(exec->mult_scalar(m_content, scalar),
-    m_dim.first, m_dim.second);
-  return result;
-}
-
 Matrix Matrix::operator*(const Matrix& other) const {
-  Executor *exec = ExecutorManager::getInstance().getExecutor();
+  IExecutor *exec = ExecutorManager::getInstance().getExecutor();
 
   Matrix result = Matrix(exec->dot(m_content, other.getContent(),
     m_dim.first, other.getDimensions().first,
@@ -56,7 +48,7 @@ Matrix Matrix::operator*(const Matrix& other) const {
 }
 
 Matrix Matrix::kron(std::vector<Matrix> m) {
-  Executor *exec = ExecutorManager::getInstance().getExecutor();
+  IExecutor *exec = ExecutorManager::getInstance().getExecutor();
 
   Matrix result = m[0];
   for (uint32_t i = 1; i < m.size(); i++) {
@@ -68,24 +60,24 @@ Matrix Matrix::kron(std::vector<Matrix> m) {
   return result;
 }
 
-Matrix Matrix::T() const {
-  Executor *exec = ExecutorManager::getInstance().getExecutor();
+Matrix Matrix::transpose() const {
+  IExecutor *exec = ExecutorManager::getInstance().getExecutor();
 
-  Matrix result = Matrix(exec->T(m_content, m_dim.first, m_dim.second),
+  Matrix result = Matrix(exec->transpose(m_content, m_dim.first, m_dim.second),
   m_dim.second, m_dim.first);
   return result;
 }
 
 Matrix Matrix::normalize() const {
-  Executor* exec = ExecutorManager::getInstance().getExecutor();
+  IExecutor* exec = ExecutorManager::getInstance().getExecutor();
 
   Matrix result = Matrix(exec->normalize(m_content), m_dim.first, m_dim.second);
   return result;
 }
 
-std::complex<double> Matrix::tr() const {
-  Executor *exec = ExecutorManager::getInstance().getExecutor();
-  return exec->tr(m_content, m_dim.first);
+std::complex<double> Matrix::trace() const {
+  IExecutor *exec = ExecutorManager::getInstance().getExecutor();
+  return exec->trace(m_content, m_dim.first);
 }
 
 std::ostream& operator<<(std::ostream& os, const Matrix& m)

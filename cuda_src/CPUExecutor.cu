@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CPUExecutor.cpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-06-28T22:41:10+01:00
+ * @Last modified time: 2018-07-04T17:50:49+01:00
  * @License: MIT License
  */
 
@@ -18,15 +18,6 @@ Tvcplxd* CPUExecutor::add(Tvcplxd* a, Tvcplxd* b) {
 
   for (uint i = 0; i < a->size(); i++) {
     (*result)[i] = (*a)[i] + (*b)[i];
-  }
-  return result;
-}
-
-Tvcplxd* CPUExecutor::mult_scalar(Tvcplxd* a, std::complex<double> s) {
-  Tvcplxd* result = new Tvcplxd(a->size());
-
-  for (uint i = 0; i < a->size(); i++) {
-    (*result)[i] = (*a)[i] * s;
   }
   return result;
 }
@@ -60,7 +51,7 @@ Tvcplxd* CPUExecutor::kron(Tvcplxd* a, Tvcplxd* b, int ma, int mb) {
   return result;
 }
 
-std::complex<double> CPUExecutor::tr(Tvcplxd* a, int m) {
+std::complex<double> CPUExecutor::trace(Tvcplxd* a, int m) {
   std::complex<double> s = 0;
 
   for(int i = 0; i < m; i++) {
@@ -69,7 +60,7 @@ std::complex<double> CPUExecutor::tr(Tvcplxd* a, int m) {
   return s;
 }
 
-Tvcplxd* CPUExecutor::T(Tvcplxd* a, int m, int n) {
+Tvcplxd* CPUExecutor::transpose(Tvcplxd* a, int m, int n) {
   Tvcplxd* result = new Tvcplxd(m * n);
 
   for(int j = 0; j < n; j++) {
