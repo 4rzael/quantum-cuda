@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CircuitCompressor.cpp
- * @Last modified by:   4rzael
- * @Last modified time: Mon Jul 16 2018, 23:09:25
+ * @Last modified by:   l3ninj
+ * @Last modified time: 2018-07-19T13:52:40+01:00
  * @License: MIT License
  */
 
@@ -40,9 +40,10 @@ void CircuitCompressor::shrinkCircuit() {
                 bool canMove = true;
 
                 for (auto const &qubit : getGateTargets(gate)) {
-                    if ((*std::prev(step)).isQubitUsed(qubit))
+                    if ((*std::prev(step)).isQubitUsed(qubit)) {
                         canMove = false;
                         break;
+                    }
                 }
 
                 if (canMove) {
