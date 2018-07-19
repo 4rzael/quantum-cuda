@@ -19,6 +19,7 @@
 #include "Circuit.hpp"
 #include "Parser/CircuitBuilder.hpp"
 #include "Simulator.hpp"
+#include "CircuitCompressor.hpp"
 
 int main(int ac, char **av) {
   if (ac <2) {
@@ -41,7 +42,8 @@ int main(int ac, char **av) {
   /* Reads the AST and generate a Circuit */
   try {
     circuit = CircuitBuilder(av[1])(ast);
-    LOG(Logger::DEBUG, "Generated circuit:" << std::endl << circuit);
+    circuit = CircuitCompressor(circuit)();
+    LOG(Logger::DEBUG, "Optimized circuit:" << std::endl << circuit);
   } catch (const OpenQASMError& e) {
     LOG(Logger::ERROR, "Error while generating the circuit: " << e.what());
     return EXIT_FAILURE;

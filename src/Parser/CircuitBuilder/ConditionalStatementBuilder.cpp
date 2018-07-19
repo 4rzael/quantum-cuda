@@ -36,8 +36,8 @@ struct GateCasterVisitor : public boost::static_visitor<Circuit::ConditionalComp
 
 void CircuitBuilder::OpenQASMInstructionVisitor::operator()(const Parser::AST::t_conditional_statement &c_statement) const {
     /* A conditional statement cannot be in a User-Defined Gate, so no need to perform substitutions */
-    Parser::AST::t_variable statementCheckedReg = c_statement.variable;
-    checkInexistantRegister(m_circuit, statementCheckedReg, RegisterType::CREG);
+    checkInexistantRegister(m_circuit, c_statement.variable, RegisterType::CREG);
+    const auto cregWithSize = getRegister(m_circuit, c_statement.variable, RegisterType::CREG);
 
     // Cannot use iterators because they will get invalidated by the action of writing in the vector
     const auto oldLastStep = m_circuit.steps.size();
@@ -51,8 +51,8 @@ void CircuitBuilder::OpenQASMInstructionVisitor::operator()(const Parser::AST::t
     /* For every gate added to the new step(s), wrap it in a conditional statement gate instead */
     for (auto stepIdx = oldLastStep; stepIdx != newLastStep; ++stepIdx) {
         std::transform(m_circuit.steps[stepIdx].begin(), m_circuit.steps[stepIdx].end(), m_circuit.steps[stepIdx].begin(),
-            [&c_statement](Circuit::Gate const &gate) -> Circuit::Gate {
-                return Circuit::ConditionalGate(c_statement.variable, c_statement.value,
+            [&c_statement, &cregWithSize](Circuit::Gate const &gate) -> Circuit::Gate {
+                return Circuit::ConditionalGate(cregWithSize, c_statement.value,
                     boost::apply_visitor(GateCasterVisitor(), gate));
             });
     }

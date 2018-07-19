@@ -61,7 +61,9 @@ SRC=	Parser/float_expr_ast.cpp \
 	Parser/CircuitBuilder/CircuitBuilder.cpp \
 	Parser/CircuitBuilder/CircuitBuilderUtils.cpp \
 	Parser/FloatExpressionEvaluator.cpp \
+	Circuit.cpp \
 	CircuitPrinter.cpp \
+	CircuitCompressor.cpp \
 	Matrix.cpp \
 	CPUExecutor.cpp \
 	Simulator.cpp \

@@ -128,3 +128,10 @@ void checkInexistantRegister(const Circuit &circuit, const Parser::AST::t_variab
         throw OpenQASMError();
     }
 }
+
+std::vector<Circuit::Qubit> getGateTargets(const Circuit::Gate &gate) {
+    const auto getTargetsVisitor = make_lambda_visitor<std::vector<Circuit::Qubit>>(
+        [](Circuit::GateInterface const &gi) {return gi.getTargets();}
+    );
+    return gate.apply_visitor(getTargetsVisitor);
+}
