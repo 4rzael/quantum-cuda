@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: MatrixStore.hpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-07-04T17:53:43+01:00
+ * @Last modified time: 2018-07-19T13:28:01+01:00
  * @License: MIT License
  */
 
@@ -20,6 +20,9 @@
 
 //! The MatrixStore holds static instances of frenquently used matrices.
 namespace MatrixStore {
+  //! Null 2 matrix.
+  static Matrix null2 = Matrix(new Tvcplxd({0.0, 0.0, 0.0, 0.0}), 2, 2);
+
   //! Identity 2 matrix.
   static Matrix i2 = Matrix(new Tvcplxd({1.0, 0.0, 0.0, 1.0}), 2, 2);
 

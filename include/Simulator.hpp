@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.hpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-06-28T22:40:54+01:00
+ * @Last modified time: 2018-07-18T14:35:25+01:00
  * @License: MIT License
  */
 
@@ -94,6 +94,16 @@ class Simulator
      * A Matrix object representing the state.
      */
     Matrix m_state;
+    /**
+    * A vector of Matrix representing the gates used to change the state at the
+    * end of each step.
+    */
+    std::vector<Matrix> m_gates;
+    /**
+    * A vector of Matrix representing the gates used only for cx-gates operator
+    * computation.
+    */
+    std::vector<Matrix> m_extraGates;
   public:
     /**
      * Construct a Simulator object from a given layout.
