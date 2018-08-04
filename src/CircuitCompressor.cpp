@@ -40,9 +40,10 @@ void CircuitCompressor::shrinkCircuit() {
                 bool canMove = true;
 
                 for (auto const &qubit : getGateTargets(gate)) {
-                    if ((*std::prev(step)).isQubitUsed(qubit))
+                    if ((*std::prev(step)).isQubitUsed(qubit)) {
                         canMove = false;
                         break;
+                    }
                 }
 
                 if (canMove) {

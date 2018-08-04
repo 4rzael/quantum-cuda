@@ -47,7 +47,7 @@ CUSRC=	QCUDA.cu		\
 
 # Maccro that contains a list of all *.cpp source files that will be compiled
 # with 'CXX' maccro.
-SRC=	Parser/float_expr_ast.cpp \
+SRC=	Parser/FloatExprAst.cpp \
 	Parser/ASTGenerator.cpp \
 	Parser/CircuitBuilder/CXBuilder.cpp \
 	Parser/CircuitBuilder/MeasureBuilder.cpp \
