@@ -3,7 +3,7 @@
  * @Date:   Sat Jun 23 2018
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
- * @Filename: float_expr_ast.hpp
+ * @Filename: FloatExprAst.hpp
  * @Last modified by:   4rzael
  * @Last modified time: Sat Jun 23 2018, 14:30:47
  * @License: MIT License
