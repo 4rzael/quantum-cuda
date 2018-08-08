@@ -32,7 +32,7 @@ void CircuitCompressor::shrinkCircuit() {
     bool over;
     do {
         over = true;
-        // reverse iterate from second step to last
+        // reverse iterate from last to second step
         for (auto step = std::next(m_circuit.steps.begin()); step != m_circuit.steps.end(); ++step)
         {
             for (int i = (*step).size() - 1; i >= 0; --i) {
@@ -53,11 +53,11 @@ void CircuitCompressor::shrinkCircuit() {
                 }
             }
         }
-        // remove empty steps
-        for (int i = m_circuit.steps.size(); i >= 0; --i) {
-            if (m_circuit.steps[i].size() == 0) {
-                m_circuit.steps.erase(m_circuit.steps.begin() + i);
-            }
-        }
     } while (over == false);
+    // remove empty steps
+    for (int i = m_circuit.steps.size() - 1; i >= 0; --i) {
+        if (m_circuit.steps[i].size() == 0) {
+            m_circuit.steps.erase(m_circuit.steps.begin() + i);
+        }
+    }
 }
