@@ -34,7 +34,7 @@ std::vector<Circuit::Qubit> Circuit::Reset::getTargets() const {
 }
 
 std::vector<Circuit::Qubit> Circuit::ConditionalGate::getTargets() const {
-    auto res = getGateTargets(gate);
+    auto res = getGateTargets(gate); // Implicit conversion to Circuit::Gate
     /* We add every bit of the CREG to make sure it won't make reordering on it.
      * Removing that part might/will cause problem for circuits such as the inverse QFT
      * or the quantum teleportation (circuits shown in the "Open Quantum Assembly Language" publication)
@@ -56,5 +56,13 @@ bool Circuit::Step::isQubitUsed(Qubit const &qubit) const {
         const auto targets = getGateTargets(g);
         // ... Having the qubit in its list of targets ?
         return std::find(targets.begin(), targets.end(), qubit) != targets.end();
+    }) != end();
+}
+
+bool Circuit::Step::containsMeasurement() const {
+    // Can we find a gate...
+    return std::find_if(begin(), end(), [](const Circuit::Gate &g) {
+        // Of the type Circuit::Measurement ?
+        return g.type().hash_code() == typeid(Circuit::Measurement).hash_code();
     }) != end();
 }

@@ -16,3 +16,13 @@ template <typename ReturnType, typename... Lambdas>
 lambda_visitor<ReturnType, Lambdas...> make_lambda_visitor(Lambdas... lambdas) {
     return { lambdas... };
 }
+
+template <typename ReturnType, typename... Lambdas>
+struct const_lambda_visitor : public boost::static_visitor<ReturnType>, public Lambdas... {
+    const_lambda_visitor(const Lambdas... lambdas) : Lambdas(lambdas)... {}
+};
+
+template <typename ReturnType, typename... Lambdas>
+lambda_visitor<ReturnType, const Lambdas...> make_const_lambda_visitor(Lambdas... lambdas) {
+    return { lambdas... };
+}

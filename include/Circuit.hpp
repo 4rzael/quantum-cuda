@@ -105,6 +105,14 @@ struct Circuit {
          * @return false otherwise
          */
         bool isQubitUsed(Qubit const &qubit) const;
+
+        /**
+         * @brief Returns whether or not the step contains a measurement gate 
+         * 
+         * @return true if a measurement is present
+         * @return false otherwise
+         */
+        bool containsMeasurement() const;
     };
 
     std::vector<Register> creg;

@@ -18,8 +18,6 @@
 using namespace Parser::AST;
 
 void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_measure_statement &statement) const {
-    Circuit::Step step;
-
     /* Perform substitutions on targets */
     const auto statementSource = m_substituteTarget(statement.source);
     const auto statementDest = m_substituteTarget(statement.dest);
@@ -34,10 +32,12 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_measure_s
 
     if (statementSource.which() == (int)t_variableType::T_BIT
      && statementDest.which() == (int)t_variableType::T_BIT) {
+        Circuit::Step step;
         step.push_back(Circuit::Measurement(
            Circuit::Qubit(boost::get<t_bit>(statementSource)),
            Circuit::Qubit(boost::get<t_bit>(statementDest))
         ));
+        m_circuit.steps.push_back(step);
     }
     else if (statementSource.which() == (int)t_variableType::T_REG
           && statementDest.which() == (int)t_variableType::T_REG) {
@@ -50,11 +50,14 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_measure_s
             throw OpenQASMError();
         }
 
+        /* We can only have 1 measurement per step using our measuring method */
         for (uint i = 0; i < source.size; ++i) {
+            Circuit::Step step;
             step.push_back(Circuit::Measurement(
                 Circuit::Qubit(source.name, i),
                 Circuit::Qubit(dest.name, i)
             ));
+            m_circuit.steps.push_back(step);
         }
     }
     else {
@@ -62,5 +65,4 @@ void CircuitBuilder::StatementVisitor::operator()(const Parser::AST::t_measure_s
         throw OpenQASMError();
     }
 
-    m_circuit.steps.push_back(step);
 }
