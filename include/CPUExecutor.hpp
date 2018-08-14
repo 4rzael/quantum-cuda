@@ -9,6 +9,8 @@
  * @License: MIT License
  */
 
+#pragma once
+
 #include "IExecutor.hpp"
 
 /** A convenient typedef for std::valarray<std::complex<double>> */
@@ -30,14 +32,14 @@
    /**
    * CPUExecutor destructor
    */
-   ~CPUExecutor(){}
+   virtual ~CPUExecutor(){}
    /**
    * Performs an addition between std::valarray<std::complex<double>> a and b.
    * @param a A matrix content.
    * @param b B matrix content.
    * @return The addition between matrices a and b.
    */
-   Tvcplxd* add(Tvcplxd* a, Tvcplxd* b);
+   virtual Tvcplxd* add(Tvcplxd* a, Tvcplxd* b);
    /**
    * Performs a dot product between std::valarray<std::complex<double>> a and b.
    * @param a A matrix content.
@@ -48,7 +50,7 @@
    * @param mb B matrix n dimension.
    * @return The dot product result as a std::valarray<std::complex<double>>.
    */
-   Tvcplxd* dot(Tvcplxd* a, Tvcplxd* b, int ma, int mb, int na, int nb);
+   virtual Tvcplxd* dot(Tvcplxd* a, Tvcplxd* b, int ma, int mb, int na, int nb);
    /**
    * Performs a kroenecker product between std::valarray<std::complex<double>> a and b.
    * @param a A matrix content.
@@ -57,14 +59,14 @@
    * @param mb B matrix m dimension.
    * @return The dot product result as a std::valarray<std::complex<double>>.
    */
-   Tvcplxd* kron(Tvcplxd* a, Tvcplxd* b, int ma, int mb);
+   virtual Tvcplxd* kron(Tvcplxd* a, Tvcplxd* b, int ma, int mb);
    /**
    * Compute the trace of a std::valarray<std::complex<double>>.
    * @param a A matrix content.
    * @param m A matrix m dimension.
    * @return The trace as a std::complex<double>.
    */
-   std::complex<double> trace(Tvcplxd* a, int m);
+   virtual std::complex<double> trace(Tvcplxd* a, int m);
    /**
    * Compute the transpose of a std::valarray<std::complex<double>>.
    * @param a A matrix content.
@@ -72,11 +74,11 @@
    * @param n A matrix n dimension.
    * @return The transpose as a std::valarray<std::complex<double>>.
    */
-   Tvcplxd* transpose(Tvcplxd* a, int m, int n);
+   virtual Tvcplxd* transpose(Tvcplxd* a, int m, int n);
    /**
    * Compute the normalized std::valarray<std::complex<double>>.
    * @param a A matrix content.
    * @return The normalized matrix.
    */
-   Tvcplxd* normalize(Tvcplxd* a);
+   virtual Tvcplxd* normalize(Tvcplxd* a);
  };

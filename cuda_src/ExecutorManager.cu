@@ -15,7 +15,9 @@
 #include "ExecutorManager.hpp"
 
 ExecutorManager::ExecutorManager() {
-  m_executor = new CPUExecutor();
+  m_executor = new GPUExecutor(QCUDA::GPUCriteria::HIGHER_COMPUTE_CAPABILITY);
+  
+  // m_executor = new CPUExecutor();
 }
 
 IExecutor *ExecutorManager::getExecutor() {

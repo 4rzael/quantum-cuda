@@ -3,7 +3,7 @@
  * @Date:   2018-06-16T10:08:10+01:00
  * @Email:  nicolas.jankovic@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
- * @Filename: QGPU.cuh
+ * @Filename: QCUDA_utils.cuh
  * @Last modified by:   nj203
  * @Last modified time: 2018-07-04T14:51:52+01:00
  * @License: MIT License
@@ -20,6 +20,39 @@
 
 
 namespace QCUDA {
+
+  /**
+   * @brief The structure 'struct s_ErrorHandler' will be used in each classe
+   * in order to retrieve the return value of each CUDA function. with 'err'
+   * attribute. Then, thanks to the error code value contained in 'err', we
+   * will be able to format a special string with the right error code and
+   * corresponding string contained in 'str' attribute.
+   */
+  struct		s_errorHandler {
+  public:
+    cudaError_t		errorCode;
+    std::string		outputError;
+  public:
+    __host__		s_errorHandler();
+    __host__		~s_errorHandler();
+    __host__ void	fmtOutputError();
+  };
+
+
+  /**
+   * For a better readability, we created an alias for 'struct s_errorHandler'
+   * as 'errorHandler_t'.
+   */
+  using errorHandler_t = struct s_errorHandler;
+
+
+  /**
+   * LINK: https://docs.nvidia.com/cuda/cuda-c-programming-guide/#compute-capabilities
+   */
+  enum class GPUCriteria {
+	 HIGHER_COMPUTE_CAPABILITY,
+	 DOUBLE_TYPE_COMPLIANT
+  };
 
   /**
    * @brief The enum QOperation contains enumerators corresponding to all
