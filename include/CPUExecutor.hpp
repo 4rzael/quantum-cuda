@@ -79,4 +79,24 @@
    * @return The normalized matrix.
    */
    Tvcplxd* normalize(Tvcplxd* a);
+
+    /**
+     * Compute the probability of ending with value v when measuring qubit number q
+     * 
+     * @param a A normalized Vector content
+     * @param q The qubit's index
+     * @param v The expected outcome
+     * @return double The probability of the outcome v on qubit q
+     */
+    double measureProbability(Tvcplxd *a, int q, bool v);
+
+    /**
+     * @brief Compute the resulting vector state after measuring the value v on qubit q
+     * 
+     * @param a A normalized Vector content
+     * @param q The qubit's index
+     * @param v The expected outcome
+     * @return Tvcplxd* The vector state after measurement outcome v on qubit q
+     */
+    Tvcplxd* measureOutcome(Tvcplxd *a, int q, bool v);
  };
