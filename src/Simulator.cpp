@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.cpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-07-19T13:31:52+01:00
+ * @Last modified time: 2018-08-16T15:33:10+02:00
  * @License: MIT License
  */
 
@@ -153,10 +153,18 @@ void Simulator::StepVisitor::operator()(const Circuit::Barrier& __attribute__((u
 }
 
 // TODO: Implement those two
-void Simulator::StepVisitor::operator()(const Circuit::Reset& __attribute__((unused)) value) {
-  (void)value;
-  LOG(Logger::ERROR, "Reset statements not implemented in the simulator");
+void Simulator::StepVisitor::operator()(const Circuit::Reset& value) {
+  // Computing the offset of the qubit to reset.
+  int targetId_0 = m_simulator.m_qRegOffsets.find(value.target.registerName)->second;
+  targetId_0 += value.target.element;
+  int targetId_1 = targetId_0 + 1;
+
+  m_simulator.m_state[targetId_0] = 0;
+  m_simulator.m_state[targetId_1] = 0;
+
+  std::cout << m_simulator.m_state << std::endl;
 }
+
 void Simulator::StepVisitor::operator()(const Circuit::ConditionalGate& __attribute__((unused)) value) {
   LOG(Logger::ERROR, "Conditional statements not implemented in the simulator");
 }

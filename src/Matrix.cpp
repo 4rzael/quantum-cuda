@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-07-04T17:59:39+01:00
+ * @Last modified time: 2018-08-16T15:32:58+02:00
  * @License: MIT License
  */
 
@@ -86,8 +86,8 @@ std::ostream& operator<<(std::ostream& os, const Matrix& m)
     for (int j = 0; j < m.getDimensions().second; j++) {
       os << " [";
       for (int i = 0; i < m.getDimensions().first; i++) {
-        os << "\t" << std::fixed << std::setprecision(2) << (*m.getContent())[j * m.getDimensions().first + i].real() <<
-        "+" << std::fixed << std::setprecision(2) << (*m.getContent())[j * m.getDimensions().first + i].imag() << "i";
+        os << "\t" << std::fixed << std::setprecision(2) << m[j * m.getDimensions().first + i].real() <<
+        "+" << std::fixed << std::setprecision(2) << m[j * m.getDimensions().first + i].imag() << "i";
       }
       os << "\t]," << std::endl;
     }
