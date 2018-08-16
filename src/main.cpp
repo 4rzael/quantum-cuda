@@ -20,6 +20,7 @@
 #include "Parser/CircuitBuilder.hpp"
 #include "Simulator.hpp"
 #include "CircuitCompressor.hpp"
+#include "TaskScheduling/CircuitToTaskGraphConverter.hpp"
 
 int main(int ac, char **av) {
   if (ac <2) {
@@ -48,6 +49,10 @@ int main(int ac, char **av) {
     LOG(Logger::ERROR, "Error while generating the circuit: " << e.what());
     return EXIT_FAILURE;
   }
+
+  CircuitToTaskGraphConverter converter(circuit);
+  TaskGraph::Graph graph = converter.generateTaskGraph();
+  LOG(Logger::INFO, "Task graph:" << graph);
 
   Simulator simulator = Simulator(circuit);
   simulator.simulate();

@@ -12,7 +12,7 @@ CXX?=	g++
 
 OPTIFLAGS=	-g3
 
-CXXFLAGS=	-Wextra -Wall -std=c++14 $(OPTIFLAGS)
+CXXFLAGS=	-Wextra -Wall -std=c++14 $(OPTIFLAGS) -MD
 
 # Maccro that defines the Nvidia's compiler we will use.
 NVCC=	nvcc
@@ -61,6 +61,10 @@ SRC=	Parser/FloatExprAst.cpp \
 	Parser/CircuitBuilder/CircuitBuilder.cpp \
 	Parser/CircuitBuilder/CircuitBuilderUtils.cpp \
 	Parser/FloatExpressionEvaluator.cpp \
+	TaskScheduling/TaskGraph.cpp \
+	TaskScheduling/BasicStateStore.cpp \
+	TaskScheduling/BasicTaskScheduler.cpp \
+	TaskScheduling/CircuitToTaskGraphConverter.cpp \
 	Circuit.cpp \
 	CircuitPrinter.cpp \
 	CircuitCompressor.cpp \
@@ -126,6 +130,7 @@ $(ODIR):
 	mkdir $(ODIR)
 	mkdir $(ODIR)/Parser
 	mkdir $(ODIR)/Parser/CircuitBuilder
+	mkdir $(ODIR)/TaskScheduling
 
 # Rule that creates for each *.cpp file a *.o file,
 # with the specified compilation line (see line 103).
@@ -160,3 +165,5 @@ re:	fclean all
 
 # Specific rule that checks the Makefile's cycle by testing all the specified rules.
 .PHONY: all clean fclean re
+
+-include $(OBJS:.o=.d)

@@ -9,12 +9,15 @@
  * @License: MIT License
  */
 
+// TODO: Add a .cpp file to make it more readable
+
 #pragma once
 #include <vector>
 #include <exception>
 #include <boost/variant.hpp>
 
 #include "TaskScheduling/IStateStore.hpp"
+#include "Circuit.hpp"
 
 namespace TaskGraph {
     struct ITask;
@@ -22,14 +25,19 @@ namespace TaskGraph {
     typedef StateStore::StateId StateId; // using the same type of IDs than the StateStore for simplicity
     typedef StateStore::StateId TaskId; // also using the same type of IDs for tasks because why not ?
 
+    constexpr StateId STATE_ID_NONE = -1;
+    constexpr TaskId TASK_ID_NONE = -1;
+
     enum class StateStatus {AWAITING, AVAILABLE, IN_USE, CONSUMED};
     struct State {
-        State(StateStore::StateId _id): id(_id) {}
+        State(StateStore::StateId _id): id(_id), from(TASK_ID_NONE), to(TASK_ID_NONE) {}
 
         StateStore::StateId id;
         TaskId              from;
         TaskId              to;
         StateStatus         status;
+
+        friend std::ostream& operator<< (std::ostream& stream, const State& s);
     };
 
     enum class TaskStatus {AWAITING, PROCESSING, DONE};
@@ -42,26 +50,42 @@ namespace TaskGraph {
         TaskStatus           status;
 
         virtual ~ITask() {}
+
+        virtual std::ostream &write(std::ostream &stream) const;
+
+        friend std::ostream& operator<< (std::ostream& stream, const ITask& t);
     };
 
     struct SimulateCircuitTask: public ITask {
         SimulateCircuitTask(TaskId  id,
                             StateId input,
-                            StateId output): ITask(id) {
+                            StateId output,
+                            Circuit const &circuit)
+        : ITask(id), circuit(circuit) {
             inputStates.push_back(input);
             outputStates.push_back(output);
         }
+
+        Circuit circuit;
+
+        virtual std::ostream &write(std::ostream &stream) const;
     };
 
     struct DuplicateAndMeasureTask: public ITask {
         DuplicateAndMeasureTask(TaskId  id,
                                 StateId input,
                                 StateId output0,
-                                StateId output1): ITask(id) {
+                                StateId output1,
+                                Circuit::Measurement const &measurement)
+        : ITask(id), measurement(measurement) {
             inputStates.push_back(input);
             outputStates.push_back(output0);
             outputStates.push_back(output1);
         }
+
+        Circuit::Measurement measurement;
+
+        virtual std::ostream &write(std::ostream &stream) const;
     };
     
     struct EndTask: public ITask {
@@ -80,23 +104,13 @@ namespace TaskGraph {
         std::map<TaskId, std::shared_ptr<ITask>>  tasks;
 
     public:
-        std::shared_ptr<State> addState(StateId id, bool startState=false) {
-            if (states.find(id) != states.end()) {
-                throw std::logic_error("Adding a state with a duplicate ID");
-            }
+        bool isTaskReady(TaskId id) const;
+        std::vector<StateId> getAvailableStates() const;
 
-            auto state = std::shared_ptr<State>(new State(id));
-            if (startState) {
-                state->status = StateStatus::AVAILABLE;
-            }
-            states[id] = state;
+        std::shared_ptr<State> getState(StateId id) const {return states.at(id);}
+        std::shared_ptr<ITask> getTask(TaskId id) const {return tasks.at(id);}
 
-            if (initialState.expired()) {
-                initialState = state;
-            }
-
-            return state;
-        }
+        std::shared_ptr<State> addState(StateId id, bool startState=false);
 
         template<typename T, typename... Args>
         std::shared_ptr<T> addTask(TaskId id, Args ...args) {
@@ -123,36 +137,8 @@ namespace TaskGraph {
             return task;
         }
 
-
-        std::shared_ptr<State> getState(StateId id) const {
-            return states.at(id);
-        }
-
-        std::shared_ptr<ITask> getTask(TaskId id) const {
-            return tasks.at(id);
-        }
-
-        bool isTaskReady(TaskId id) const {
-            auto task = getTask(id);
-            if (task->status != TaskStatus::AWAITING) {
-                return false;
-            }
-            for (auto sID: task->inputStates) {
-                if (getState(sID)->status != StateStatus::AVAILABLE) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        
-        std::vector<StateId> getAvailableStates() const {
-            std::vector<StateId> res;
-            for (auto it = states.begin(); it != states.end(); ++it) {
-                if (it->second->status == StateStatus::AVAILABLE) {
-                    res.push_back(it->first);
-                }
-            }
-            return res;
-        }
+        friend std::ostream& operator<< (std::ostream& stream, const Graph& g);
     };
+
+
 }

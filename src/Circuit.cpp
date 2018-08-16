@@ -9,6 +9,8 @@
  * @License: MIT License
  */
 
+#include <algorithm>
+
 #include "Circuit.hpp"
 #include "Parser/CircuitBuilderUtils.hpp"
 #include "utils.hpp"
@@ -65,4 +67,24 @@ bool Circuit::Step::containsMeasurement() const {
         // Of the type Circuit::Measurement ?
         return g.type().hash_code() == typeid(Circuit::Measurement).hash_code();
     }) != end();
+}
+
+Circuit::Circuit(Circuit const &other, uint beginStep, uint endStep) {
+    if (endStep == std::numeric_limits<uint>::max() && other.steps.size() > 0) endStep = other.steps.size() - 1;
+    creg = other.creg;
+    qreg = other.qreg;
+    if (other.steps.size() > 0) {
+        std::copy(other.steps.begin() + beginStep,
+                  other.steps.begin() + endStep + 1,
+                  std::back_inserter(steps));
+    }
+}
+
+void Circuit::removeMeasurements() {
+    for (auto &step: steps) {
+        step.erase(
+            std::remove_if(step.begin(), step.end(),
+                [](Circuit::Gate const &g){ return g.type().hash_code() == typeid(Circuit::Measurement).hash_code();}),
+            step.end());
+    }
 }
