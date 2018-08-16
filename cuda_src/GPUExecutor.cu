@@ -3,7 +3,7 @@
  * @Date:   2018-06-16T10:08:10+01:00
  * @Email:  nicolas.jankovic@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
- * @Filename: QGPU.cuh
+ * @Filename: GPUExecutor.cu
  * @Last modified by:   l3ninj
  * @Last modified time: 2018-07-05T14:32:05+01:00
  * @License: MIT License
@@ -11,27 +11,27 @@
 
 #include "GPUExecutor.cuh"
 
-GPUExecutor::GPUExecutor()
-  : cgpu_() {}
+GPUExecutor::GPUExecutor(const QCUDA::GPUCriteria c)
+  : cgpu_(c) {}
 
 
 GPUExecutor::~GPUExecutor() = default;
 
 
-Tvcplxd* GPUExecutor::add(Tvcplxd* a, Tvcplxd* b) {
-  Tvcplxd* ptr;
-
-  this->cgpu_.initThrustHostVec((*a), (*b), QCUDA::Vectors::ALL_VECTORS);
-  // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
-  // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_B);
-  this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
-  this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_B);
-  ptr = this->cgpu_.performAddOnGPU();
-  return (ptr);
+Tvcplxd*	GPUExecutor::add(Tvcplxd* a, Tvcplxd* b) {
+  try {
+    this->cgpu_.initComplexVecs(a, b);
+    return (this->cgpu_.additionOnGPU());
+  } catch (const std::exception& err) {
+    std::cerr << err.what() << std::endl;
+    std::cerr << "Couldn't perform the addition on the GPU !" << std::endl;
+    return (nullptr);
+  }
 }
 
-// Naive CPU implementation, whereas GPU is still in development
-Tvcplxd* GPUExecutor::dot(Tvcplxd* a, Tvcplxd* b, int ma, int mb, int na, int nb) {
+
+Tvcplxd*	GPUExecutor::dot(Tvcplxd* a, Tvcplxd* b,
+				 int ma, int mb, int na, int nb) {
   Tvcplxd* result = new Tvcplxd(na * mb);
 
   for (int i = 0; i < na; i++) {
@@ -43,20 +43,18 @@ Tvcplxd* GPUExecutor::dot(Tvcplxd* a, Tvcplxd* b, int ma, int mb, int na, int nb
     }
   }
   return result;
-  // Tvcplxd* ptr;
-
-  // this->cgpu_.initThrustHostVec((*a), (*b), QCUDA::Vectors::ALL_VECTORS);
-  // // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
-  // // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_B);
-  // this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
-  // this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_B);
-  // ptr = this->cgpu_.performDotOnGPU(ma, mb, na, nb);
-  // return (ptr);
+  // try {
+  //   this->cgpu_.initComplexVecs(a, b);
+  //   return (this->cgpu_.dotProductOnGPU(ma, mb, na, nb));
+  // } catch (const std::exception& err) {
+  //   std::cerr << err.what() << std::endl;
+  //   std::cerr << "Couldn't perform the dot product on the GPU !" << std::endl;
+  //   return (nullptr);
+  // }
 }
 
 
-// Naive CPU implementation, whereas GPU is still in development
-Tvcplxd* GPUExecutor::kron(Tvcplxd* a, Tvcplxd* b, int ma, int mb) {
+Tvcplxd*	GPUExecutor::kron(Tvcplxd* a, Tvcplxd* b, int ma, int mb) {
   int na = a->size() / ma;
   int nb = b->size() / mb;
 
@@ -69,28 +67,30 @@ Tvcplxd* GPUExecutor::kron(Tvcplxd* a, Tvcplxd* b, int ma, int mb) {
     }
   }
   return result;
-  // Tvcplxd* ptr;
-
-  // this->cgpu_.initThrustHostVec((*a), (*b), QCUDA::Vectors::ALL_VECTORS);
-  // // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
-  // // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_B);
-  // this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
-  // this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_B);
-  // ptr = this->cgpu_.performKronOnGPU(a->size() / ma, b->size() / mb, ma, mb);
-  // return (ptr);
+  // try {
+  //   this->cgpu_.initComplexVecs(a, b);
+  //   return (this->cgpu_.kroneckerOnGPU(a.size() / ma, b.size() / mb, ma, mb));
+  // } catch (const std::exception& err) {
+  //   std::cerr << err.what() << std::endl;
+  //   std::cerr << "Couldn't perform the kronecker on the GPU !" << std::endl;
+  //   return (nullptr);
+  // }
 }
 
 
-std::complex<double> GPUExecutor::trace(Tvcplxd* a, int m) {
-  this->cgpu_.initThrustHostVec((*a), (*a), QCUDA::Vectors::VECTOR_A);
-  // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
-  this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
-  return(this->cgpu_.performTraceOnGPU(m));
+std::complex<double>	GPUExecutor::trace(Tvcplxd* a, int m) {
+  try {
+    this->cgpu_.initComplexVecs(a, nullptr);
+    return (this->cgpu_.traceOnGPU(m));
+  } catch (const std::exception& err) {
+    std::cerr << err.what() << std::endl;
+    std::cerr << "Couldn't perform the trace on the GPU !" << std::endl;
+    return (std::complex<double>());
+  }
 }
 
 
-// Naive CPU implementation, whereas GPU is still in development
-Tvcplxd* GPUExecutor::transpose(Tvcplxd* a, int m, int n) {
+Tvcplxd*	GPUExecutor::transpose(Tvcplxd* a, int m, int n) {
   Tvcplxd* result = new Tvcplxd(m * n);
 
   for(int j = 0; j < n; j++) {
@@ -99,18 +99,18 @@ Tvcplxd* GPUExecutor::transpose(Tvcplxd* a, int m, int n) {
     }
   }
   return result;
-  // Tvcplxd* ptr;
-
-  // this->cgpu_.initThrustHostVec((*a), (*a), QCUDA::Vectors::VECTOR_A);
-  // // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
-  // this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
-  // ptr = this->cgpu_.performTransposeOnGPU(m, n);
-  // return (ptr);
+  // try {
+  //   this->cgpu_.initComplexVecs(a, nullptr);
+  //   return (this->cgpu_.transposeOnGPU(m, n));
+  // } catch (const std::exception& err) {
+  //   std::cerr << err.what() << std::endl;
+  //   std::cerr << "Couldn't perform the transpose on the GPU !" << std::endl;
+  //   return (nullptr);
+  // }
 }
 
 
-// Naive CPU implementation, whereas GPU is still in development
-Tvcplxd* GPUExecutor::normalize(Tvcplxd* a) {
+Tvcplxd*	GPUExecutor::normalize(Tvcplxd* a) {
   Tvcplxd* result = new Tvcplxd(a->size());
   std::complex<double> sum = 0;
 
@@ -125,11 +125,12 @@ Tvcplxd* GPUExecutor::normalize(Tvcplxd* a) {
     (*result)[j] = (*a)[j] / sum;
   }
   return result;
-  // Tvcplxd* ptr;
-
-  // this->cgpu_.initThrustHostVec((*a), (*a), QCUDA::Vectors::VECTOR_A);
-  // // this->cgpu_.assignHostToDevice(QCUDA::Vectors::VECTOR_A);
-  // this->cgpu_.convertDeviceToCUDAType(QCUDA::Vectors::VECTOR_A);
-  // ptr = this->cgpu_.performNormalizeOnGPU();
-  // return (ptr);
+  // try {
+  //   this->cgpu_.initComplexVecs(a, nullptr);
+  //   return (this->cgpu_.normalizeOnGPU());
+  // } catch (const std::exception& err) {
+  //   std::cerr << err.what() << std::endl;
+  //   std::cerr << "Couldn't perform the transpose on the GPU !" << std::endl;
+  //   return (nullptr);
+  // }
 }

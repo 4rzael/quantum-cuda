@@ -42,8 +42,12 @@ CUODIR=	cuda_obj
 # with 'NVCC' maccro.
 CUSRC=	QCUDA.cu		\
 	QCUDA_operations.cu	\
+	QCUDA_struct.cu		\
+	QCUDA_utils.cu		\
 	GPUExecutor.cu		\
-	ExecutorManager.cu
+	GPUProperties.cu	\
+	ExecutorManager.cu	\
+	CUDADimensions.cu
 
 # Maccro that contains a list of all *.cpp source files that will be compiled
 # with 'CXX' maccro.

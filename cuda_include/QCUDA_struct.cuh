@@ -3,13 +3,15 @@
  * @Date:   2018-06-16T10:08:10+01:00
  * @Email:  nicolas.jankovic@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
- * @Filename: QGPU.cuh
+ * @Filename: QCUDA_struct.cuh
  * @Last modified by:   nj203
  * @Last modified time: 2018-06-27T14:51:52+01:00
  * @License: MIT License
  */
 
 #pragma once
+
+# include <iostream>
 
 namespace QCUDA {
   
@@ -22,23 +24,26 @@ namespace QCUDA {
    * order to satisfy the CUDA requirements.
    * Indeed, since CUDA is not familiar with C++ STL containers, we created and
    * therefore use this struture in order to be compliant with CUDA.
+   * On top of that, in order to use our structure from both sides, i.e.
+   * "host" side -CPU-, and "device" side -GPU-, we have to add the __host__
+   * and the __device__ directives on each method.
    *
    * This structure represents a complex number.
    */
+
   template<typename T>
   struct	s_complex {
-  private:
+  public:
 
     /**
      * Attribute corresponding to the real part.
      */
-    T		real_;
+    T			real_;
 
     /**
      * Attribute corresponding to the imaginary part.
      */
-    T		imag_;
-
+    T			imag_;
   public:
 
     /**
@@ -81,7 +86,13 @@ namespace QCUDA {
      */
     __host__ __device__ void	aggregateImag(const T&);
 
+    __host__ __device__ void			operator+=(const struct s_complex<T>&);
+    __host__ __device__ struct s_complex<T>	operator+(const struct s_complex<T>&);
+
   };
+
+  template<typename T>
+  __host__ std::ostream&	operator<<(std::ostream&, const struct s_complex<T>&);
 
   /**
    * Below we have made an alias of 'struct s_complex<T>' to 'structComplex_t'.
