@@ -10,11 +10,11 @@
  */
 
 #pragma once
-#include <string> // TODO: remove
+#include "Matrix.hpp"
 
 namespace StateStore {
     typedef unsigned int StateId;
-    typedef std::string  StateData; // TODO: change to store matrices
+    typedef Matrix StateData;
 
     class IStateStore { // TODO: store pointers ? IDK
     public:

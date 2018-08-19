@@ -19,7 +19,7 @@
 using namespace MeasurementResultsTree;
 
 BasicMeasurementResultsTree::BasicMeasurementResultsTree(uint samples): greatestId(MEASUREMENT_NODE_NONE) {
-    root = std::make_shared<MeasurementResultsNode>(++greatestId);
+    root = std::make_shared<MeasurementResultsNode>(this, ++greatestId);
     root->samples = samples;
 }
 
@@ -77,13 +77,13 @@ uint BasicMeasurementResultsTree::getCregValueAtNode(std::string cregName, NodeI
 std::vector<std::shared_ptr<MeasurementResultsNode>> BasicMeasurementResultsTree::addMeasurement(NodeId parentId, Circuit::Qubit creg, double zeroProbability) {
     auto parent = getNodeWithId(parentId);
     auto zeroSamples = sampleBinomialDistribution(parent->samples, zeroProbability);
-    parent->results[0].node = std::make_shared<MeasurementResultsNode>(++greatestId);
+    parent->results[0].node = std::make_shared<MeasurementResultsNode>(this, ++greatestId);
     parent->results[0].measuredCBit = creg;
     parent->results[0].value = 0;
     parent->results[0].probability = zeroProbability;
     parent->results[0].node->samples = zeroSamples;
 
-    parent->results[1].node = std::make_shared<MeasurementResultsNode>(++greatestId);
+    parent->results[1].node = std::make_shared<MeasurementResultsNode>(this, ++greatestId);
     parent->results[1].measuredCBit = creg;
     parent->results[1].value = 1;
     parent->results[1].probability = 1 - zeroProbability;

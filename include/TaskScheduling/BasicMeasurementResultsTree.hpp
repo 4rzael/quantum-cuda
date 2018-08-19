@@ -32,6 +32,8 @@ namespace MeasurementResultsTree {
 
         virtual uint getCregValueAtNode(std::string cregName, NodeId id) const;
         virtual std::vector<std::shared_ptr<MeasurementResultsNode>> addMeasurement(NodeId parentId, Circuit::Qubit creg, double zeroProbability);
+
+        virtual ~BasicMeasurementResultsTree() {}
     private:
         std::shared_ptr<MeasurementResultsNode> root;
         NodeId greatestId;

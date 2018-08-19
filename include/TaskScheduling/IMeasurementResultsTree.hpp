@@ -18,6 +18,7 @@ namespace MeasurementResultsTree {
     typedef int NodeId;
     constexpr NodeId MEASUREMENT_NODE_NONE = -1;
     struct MeasurementResultsNode;
+    class IMeasurementResultsTree;
 
     struct MeasurementLink {
         Circuit::Qubit measuredCBit;
@@ -31,15 +32,20 @@ namespace MeasurementResultsTree {
         NodeId id;
         uint samples;
         MeasurementLink results[2];
-        MeasurementResultsNode(NodeId id): id(id) {}
+        IMeasurementResultsTree *tree; // not smart as I couldn't make it work
+
+        MeasurementResultsNode(IMeasurementResultsTree *treePtr, NodeId id)
+        : id(id), tree(treePtr) {}
     };
 
-
     class IMeasurementResultsTree {
+    public:
         virtual std::shared_ptr<MeasurementResultsNode> getRoot() = 0;
         virtual std::shared_ptr<MeasurementResultsNode> getNodeWithId(NodeId id) const = 0;
 
         virtual uint getCregValueAtNode(std::string cregName, NodeId id) const = 0;
         virtual std::vector<std::shared_ptr<MeasurementResultsNode>> addMeasurement(NodeId parentId, Circuit::Qubit creg, double zeroProbability) = 0;
+
+        virtual ~IMeasurementResultsTree() {}
     };
 }
