@@ -21,6 +21,7 @@ BasicTaskScheduler::BasicTaskScheduler(TaskGraph::Graph const &graph)
 
 std::shared_ptr<ITask> BasicTaskScheduler::getNextTask() {
     std::shared_ptr<State> state;
+    // From the end to the begin because the end ones probably have their state cached in memory
     for (auto sID = m_availableStates.rbegin(); sID != m_availableStates.rend(); ++sID) {
         if (m_graph.isTaskReady(m_graph.getState(*sID)->to)) {
             state = m_graph.getState(*sID);

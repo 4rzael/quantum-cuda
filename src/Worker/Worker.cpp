@@ -13,6 +13,7 @@ void Worker::operator()() {
     StateData state;
     do {
         task = m_scheduler.getNextTask();
+        LOG(Logger::DEBUG, "Task found:" << task);
         if (task->id == TASK_ID_NONE) break;
 
         // TODO: Change if/when we will support multiple input states
@@ -28,10 +29,10 @@ void Worker::operator()() {
             m_stateStore.deleteState(task->inputStates[0]);
         }
         else if (auto measureTask = std::dynamic_pointer_cast<DuplicateAndMeasureTask>(task)) {
-
+            LOG(Logger::ERROR, "Measurement not implemented yet");
         }
         else if (auto endTask = std::dynamic_pointer_cast<EndTask>(task)) {
-
+            LOG(Logger::ERROR, "End task not implemented yet");
         }
         else {
             throw std::logic_error("Unknown task type found. Stopping the worker");

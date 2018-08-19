@@ -30,7 +30,7 @@ namespace TaskGraph {
 
     enum class StateStatus {AWAITING, AVAILABLE, IN_USE, CONSUMED};
     struct State {
-        State(StateStore::StateId _id): id(_id), from(TASK_ID_NONE), to(TASK_ID_NONE) {}
+        State(StateStore::StateId _id): id(_id), from(TASK_ID_NONE), to(TASK_ID_NONE), status(StateStatus::AVAILABLE) {}
 
         StateStore::StateId id;
         TaskId              from;
@@ -42,7 +42,7 @@ namespace TaskGraph {
 
     enum class TaskStatus {AWAITING, PROCESSING, DONE};
     struct ITask: public std::enable_shared_from_this<ITask> {
-        ITask(TaskId _id): id(_id) {}
+        ITask(TaskId _id): id(_id), status(TaskStatus::AWAITING) {}
 
         TaskId               id;
         std::vector<StateId> inputStates;
@@ -139,6 +139,4 @@ namespace TaskGraph {
 
         friend std::ostream& operator<< (std::ostream& stream, const Graph& g);
     };
-
-
 }

@@ -10,13 +10,15 @@
  */
 
 #include "TaskScheduling/TaskGraph.hpp"
+#include "Logger.hpp"
 
 using namespace TaskGraph;
 
 /* State */
 
 std::ostream& TaskGraph::operator<< (std::ostream& stream, const State& s) {
-    return stream << "ID: " << s.id << ", FROM: " << s.from << ", TO: " << s.to;
+    const std::string statuses[] = {"AWAITING", "AVAILABLE", "IN_USE", "CONSUMED"};
+    return stream << "ID: " << s.id << ", FROM: " << s.from << ", TO: " << s.to << ", status: " << statuses[(uint)s.status];
 }
 
 /* ITask */
@@ -78,11 +80,12 @@ bool Graph::isTaskReady(TaskId id) const {
         return false;
     }
     for (auto sID: task->inputStates) {
+        if (sID == STATE_ID_NONE) continue;
         if (getState(sID)->status != StateStatus::AVAILABLE) {
             return false;
         }
     }
-    return true;
+   return true;
 }
 
 std::vector<StateId> Graph::getAvailableStates() const {
