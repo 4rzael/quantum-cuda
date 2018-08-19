@@ -20,6 +20,12 @@ Graph CircuitToTaskGraphConverter::generateTaskGraph() {
     TaskId currentTaskId = 0;
     StateId currentStateId = 0;
 
+    // compute the number of qubits in the circuit
+    uint qubitCount = 0;
+    for (auto const &qreg : m_circuit.qreg) {
+        qubitCount += qreg.size;
+    }
+
     const std::function<void(uint, StateId)> recursiveHelper =
     [&](uint beginStepIdx=0, StateId inputStateId=STATE_ID_NONE) {
         // find first step containing measurement
@@ -35,7 +41,7 @@ Graph CircuitToTaskGraphConverter::generateTaskGraph() {
         // if no input state, create it
         if (inputStateId == STATE_ID_NONE) {
             inputStateId = currentStateId++;
-            graph.addState(inputStateId, true);
+            graph.addState(inputStateId, qubitCount, true);
         }
 
         StateId computeOutputStateId;
@@ -47,7 +53,7 @@ Graph CircuitToTaskGraphConverter::generateTaskGraph() {
         if (circuit.steps.size() > 0) {
             computeOutputStateId = currentStateId++;
             const TaskId  computeTaskId = currentTaskId++;
-            graph.addState(computeOutputStateId);
+            graph.addState(computeOutputStateId, qubitCount);
             const auto computeTask = graph.addTask<SimulateCircuitTask>(
                 computeTaskId,
                 inputStateId,
@@ -70,8 +76,8 @@ Graph CircuitToTaskGraphConverter::generateTaskGraph() {
         const TaskId measureTaskId = currentTaskId++;
         const StateId measureOutputState0Id = currentStateId++;
         const StateId measureOutputState1Id = currentStateId++;
-        graph.addState(measureOutputState0Id);
-        graph.addState(measureOutputState1Id);
+        graph.addState(measureOutputState0Id, qubitCount);
+        graph.addState(measureOutputState1Id, qubitCount);
         const auto measureTask = graph.addTask<DuplicateAndMeasureTask>(
             measureTaskId,
             computeOutputStateId,

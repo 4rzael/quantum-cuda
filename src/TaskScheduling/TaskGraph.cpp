@@ -54,12 +54,12 @@ std::ostream &DuplicateAndMeasureTask::write(std::ostream &stream) const {
 }
 
 /* Graph */
-std::shared_ptr<State> Graph::addState(StateId id, bool startState) {
+std::shared_ptr<State> Graph::addState(StateId id, uint qubitCount, bool startState) {
     if (states.find(id) != states.end()) {
         throw std::logic_error("Adding a state with a duplicate ID");
     }
 
-    auto state = std::shared_ptr<State>(new State(id));
+    auto state = std::shared_ptr<State>(new State(id, qubitCount));
     if (startState) {
         state->status = StateStatus::AVAILABLE;
     }
@@ -73,7 +73,7 @@ std::shared_ptr<State> Graph::addState(StateId id, bool startState) {
 }
 
 bool Graph::isTaskReady(TaskId id) const {
-    if (id == TASK_ID_NONE) return true;
+    if (id == TASK_ID_NONE) return false;
 
     auto task = getTask(id);
     if (task->status != TaskStatus::AWAITING) {

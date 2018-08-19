@@ -11,6 +11,12 @@
 
 #pragma once
 #include "TaskScheduling/TaskGraph.hpp"
+#include <exception>
+
+class NoTaskAvailable : public std::logic_error {
+public:
+    NoTaskAvailable(std::string const &msg) :std::logic_error(msg) {}
+};
 
 class ITaskScheduler {
 public:

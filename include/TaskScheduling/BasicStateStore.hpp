@@ -13,10 +13,13 @@
 #include <map>
 
 #include "TaskScheduling/IStateStore.hpp"
+#include "TaskScheduling/TaskGraph.hpp"
 
 namespace StateStore {
     class BasicStateStore: public IStateStore { // TODO: store pointers ? IDK
     public:
+        BasicStateStore(TaskGraph::Graph const &graph);
+
         virtual bool storeState(StateId id, StateData const &state);
         virtual bool deleteState(StateId id);
         virtual StateData const &getStateData(StateId id);

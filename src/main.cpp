@@ -62,7 +62,7 @@ int main(int ac, char **av) {
   LOG(Logger::INFO, "Task graph:" << graph);
 
   std::shared_ptr<ITaskScheduler> scheduler = std::make_shared<BasicTaskScheduler>(graph);
-  std::shared_ptr<IStateStore> stateStore = std::make_shared<BasicStateStore>();
+  std::shared_ptr<IStateStore> stateStore = std::make_shared<BasicStateStore>(graph);
   std::shared_ptr<IMeasurementResultsTree> measurementTree = std::make_shared<BasicMeasurementResultsTree>();
 
   Worker worker = Worker(*scheduler, *stateStore, *measurementTree);

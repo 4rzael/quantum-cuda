@@ -29,7 +29,7 @@ std::shared_ptr<ITask> BasicTaskScheduler::getNextTask() {
         }
     }
     if (!state) {
-        throw std::logic_error("No task available");
+        throw NoTaskAvailable("No task available");
     }
     auto task = m_graph.getTask(state->to);
     auto sID = state->id;

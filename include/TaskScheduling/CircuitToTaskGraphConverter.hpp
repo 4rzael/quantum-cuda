@@ -15,7 +15,8 @@
 
 class CircuitToTaskGraphConverter {
 public:
-    CircuitToTaskGraphConverter(Circuit const &circuit): m_circuit(circuit) {}
+    CircuitToTaskGraphConverter(Circuit const &circuit):
+    m_circuit(circuit) {}
 
     TaskGraph::Graph generateTaskGraph();
 

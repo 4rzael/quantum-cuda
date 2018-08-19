@@ -9,8 +9,6 @@
  * @License: MIT License
  */
 
-// TODO: Add a .cpp file to make it more readable
-
 #pragma once
 #include <vector>
 #include <exception>
@@ -30,9 +28,11 @@ namespace TaskGraph {
 
     enum class StateStatus {AWAITING, AVAILABLE, IN_USE, CONSUMED};
     struct State {
-        State(StateStore::StateId _id): id(_id), from(TASK_ID_NONE), to(TASK_ID_NONE), status(StateStatus::AVAILABLE) {}
+        State(StateStore::StateId _id, uint qubits)
+        : id(_id), qubitCount(qubits), from(TASK_ID_NONE), to(TASK_ID_NONE), status(StateStatus::AVAILABLE) {}
 
         StateStore::StateId id;
+        uint                qubitCount;
         TaskId              from;
         TaskId              to;
         StateStatus         status;
@@ -87,14 +87,6 @@ namespace TaskGraph {
 
         virtual std::ostream &write(std::ostream &stream) const;
     };
-    
-    struct EndTask: public ITask {
-        EndTask(TaskId id, std::vector<StateId> const &inputs): ITask(id) {
-            for (auto const &i: inputs) {
-                inputStates.push_back(i);
-            }
-        }
-    };
 
     class Graph {
         std::weak_ptr<State> initialState;
@@ -110,7 +102,7 @@ namespace TaskGraph {
         std::shared_ptr<State> getState(StateId id) const {return states.at(id);}
         std::shared_ptr<ITask> getTask(TaskId id) const {return tasks.at(id);}
 
-        std::shared_ptr<State> addState(StateId id, bool startState=false);
+        std::shared_ptr<State> addState(StateId id, uint qubitCount, bool startState=false);
 
         template<typename T, typename... Args>
         std::shared_ptr<T> addTask(TaskId id, Args ...args) {

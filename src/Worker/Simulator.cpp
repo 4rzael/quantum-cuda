@@ -115,7 +115,6 @@ void Simulator::StepVisitor::operator()(const Circuit::Barrier& __attribute__((u
   (void)value;
 }
 
-// TODO: Implement those two
 void Simulator::StepVisitor::operator()(const Circuit::Reset& value) {
   m_simulator.m_shouldNormalize = true;
   // Computing the offset of the target qubit
