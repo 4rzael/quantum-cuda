@@ -21,7 +21,8 @@ void Worker::operator()() {
         // Detecting the type of task
         if (auto simulateTask = std::dynamic_pointer_cast<SimulateCircuitTask>(task)) {
             // Actually do the work here
-
+            Simulator simulator(*simulateTask, *(m_measurementResults.getRoot()), state); // TODO: remove the getRoot()
+            state = simulator.simulate();
             // Then register new state and remove old one
             m_stateStore.storeState(task->outputStates[0], state);
             m_stateStore.deleteState(task->inputStates[0]);

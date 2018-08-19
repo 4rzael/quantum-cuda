@@ -112,16 +112,22 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
 
 void Simulator::StepVisitor::operator()(const Circuit::Barrier& __attribute__((unused)) value) {
   // Nothing to be done for a barrier. It is the same as an identity, computationaly-wise
+  (void)value;
 }
 
 // TODO: Implement those two
-void Simulator::StepVisitor::operator()(const Circuit::Reset& __attribute__((unused)) value) {
+void Simulator::StepVisitor::operator()(const Circuit::Reset& value) {
   m_simulator.m_shouldNormalize = true;
-  (void)value;
-  LOG(Logger::ERROR, "Reset statements not implemented in the simulator");
+  // Computing the offset of the target qubit
+  Circuit::Qubit target = value.target;
+  int id = m_simulator.m_qRegOffsets.find(target.registerName)->second;
+  id += target.element;
+
+  m_simulator.m_gates[id] = MatrixStore::pk0;
 }
-void Simulator::StepVisitor::operator()(const Circuit::ConditionalGate& __attribute__((unused)) value) {
-  LOG(Logger::ERROR, "Conditional statements not implemented in the simulator");
+void Simulator::StepVisitor::operator()(const Circuit::ConditionalGate& cGate) {
+  const auto value = m_simulator.m_measurementState.tree->getCregValueAtNode(cGate.testedRegister, m_simulator.m_measurementState.id);
+  if (value == cGate.expectedValue) { cGate.gate.apply_visitor(*this); }
 }
 
 Matrix Simulator::simulate() {
