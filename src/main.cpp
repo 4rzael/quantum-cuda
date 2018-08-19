@@ -21,6 +21,7 @@
 #include "Simulator.hpp"
 #include "CircuitCompressor.hpp"
 #include "TaskScheduling/CircuitToTaskGraphConverter.hpp"
+#include "TaskScheduling/BasicMeasurementResultsTree.hpp"
 
 int main(int ac, char **av) {
   if (ac <2) {

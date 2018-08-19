@@ -6,6 +6,8 @@
  */
 
 #pragma once
+#include <random>
+#include <boost/variant.hpp>
 
 template <typename ReturnType, typename... Lambdas>
 struct lambda_visitor : public boost::static_visitor<ReturnType>, public Lambdas... {
@@ -26,3 +28,5 @@ template <typename ReturnType, typename... Lambdas>
 lambda_visitor<ReturnType, const Lambdas...> make_const_lambda_visitor(Lambdas... lambdas) {
     return { lambdas... };
 }
+
+uint sampleBinomialDistribution(uint samples, double proba);

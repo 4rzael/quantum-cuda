@@ -65,12 +65,14 @@ SRC=	Parser/FloatExprAst.cpp \
 	TaskScheduling/BasicStateStore.cpp \
 	TaskScheduling/BasicTaskScheduler.cpp \
 	TaskScheduling/CircuitToTaskGraphConverter.cpp \
+	TaskScheduling/BasicMeasurementResultsTree.cpp \
 	Circuit.cpp \
 	CircuitPrinter.cpp \
 	CircuitCompressor.cpp \
 	Matrix.cpp \
 	CPUExecutor.cpp \
 	Simulator.cpp \
+	utils.cpp \
 	main.cpp
 
 $(ODIR)/Parser/ASTGenerator.o: CXXFLAGS:=$(filter-out $(OPTIFLAGS),$(CXXFLAGS))
