@@ -52,7 +52,7 @@ Graph CircuitToTaskGraphConverter::generateTaskGraph() {
                 computeTaskId,
                 inputStateId,
                 computeOutputStateId,
-                Circuit(m_circuit, beginStepIdx, endStepIdx));
+                circuit);
         } else {
             // we take the input state as our "output" as nothing happened
             computeOutputStateId = inputStateId;
