@@ -16,7 +16,8 @@
 #include <map>
 
 #include "Matrix.hpp"
-#include "Circuit.hpp"
+#include "TaskScheduling/TaskGraph.hpp"
+#include "TaskScheduling/IMeasurementResultsTree.hpp"
 
 /**
 * @brief Quantum circuit Simulator class.
@@ -74,14 +75,11 @@ class Simulator
         */
         void operator()(const Circuit::ConditionalGate& value);
     };
-    /**
-    * The circuit layout object.
-    */
-    Circuit& m_circuit;
-    /**
-    * The c registers.
-    */
-    std::map<std::string, bool(*)> m_cReg;
+
+    TaskGraph::SimulateCircuitTask                 &m_task;
+    MeasurementResultsTree::MeasurementResultsNode &m_measurementState;
+    bool m_shouldNormalize;
+
     /**
     * The qbit registers offsets.
     */
@@ -109,18 +107,12 @@ class Simulator
      * Construct a Simulator object from a given layout.
      * @param layout The circuit layout.
      */
-    Simulator(Circuit& circuit);
+    Simulator(TaskGraph::SimulateCircuitTask &task,
+              MeasurementResultsTree::MeasurementResultsNode &measurementState,
+              Matrix const &state);
     /**
      * Run the circuit
      */
-    void simulate();
-    /**
-    * Print object to ostream in a readable manner.
-    */
-    void print(std::ostream &os) const;
-};
+    Matrix simulate();
 
-/**
-* Simulator redirection to ostream overload.
-*/
-std::ostream& operator<<(std::ostream& os, const Simulator& sim);
+};

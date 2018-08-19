@@ -16,12 +16,18 @@
 #include "Logger.hpp"
 
 #include "Parser/ASTGenerator.hpp"
-#include "Circuit.hpp"
 #include "Parser/CircuitBuilder.hpp"
-#include "Simulator.hpp"
+#include "Circuit.hpp"
 #include "CircuitCompressor.hpp"
 #include "TaskScheduling/CircuitToTaskGraphConverter.hpp"
+#include "TaskScheduling/BasicTaskScheduler.hpp"
+#include "TaskScheduling/BasicStateStore.hpp"
 #include "TaskScheduling/BasicMeasurementResultsTree.hpp"
+#include "Worker/Simulator.hpp"
+#include "Worker/Worker.hpp"
+
+using namespace StateStore;
+using namespace MeasurementResultsTree;
 
 int main(int ac, char **av) {
   if (ac <2) {
@@ -55,8 +61,12 @@ int main(int ac, char **av) {
   TaskGraph::Graph graph = converter.generateTaskGraph();
   LOG(Logger::INFO, "Task graph:" << graph);
 
-  Simulator simulator = Simulator(circuit);
-  simulator.simulate();
-  LOG(Logger::INFO, "Simulator in final state:" << std::endl << simulator);
+  std::shared_ptr<ITaskScheduler> scheduler = std::make_shared<BasicTaskScheduler>(graph);
+  std::shared_ptr<IStateStore> stateStore = std::make_shared<BasicStateStore>();
+  std::shared_ptr<IMeasurementResultsTree> measurementTree = std::make_shared<BasicMeasurementResultsTree>();
+
+  Worker worker = Worker(*scheduler, *stateStore, *measurementTree);
+  worker();
+
   return EXIT_SUCCESS;
 }

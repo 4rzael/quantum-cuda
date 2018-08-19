@@ -66,12 +66,13 @@ SRC=	Parser/FloatExprAst.cpp \
 	TaskScheduling/BasicTaskScheduler.cpp \
 	TaskScheduling/CircuitToTaskGraphConverter.cpp \
 	TaskScheduling/BasicMeasurementResultsTree.cpp \
+	Worker/Worker.cpp \
+	Worker/Simulator.cpp \
 	Circuit.cpp \
 	CircuitPrinter.cpp \
 	CircuitCompressor.cpp \
 	Matrix.cpp \
 	CPUExecutor.cpp \
-	Simulator.cpp \
 	utils.cpp \
 	main.cpp
 
@@ -131,6 +132,7 @@ all:	$(ODIR) $(CUODIR) $(NAME)
 $(ODIR):
 	mkdir $(ODIR)
 	mkdir $(ODIR)/Parser
+	mkdir $(ODIR)/Worker
 	mkdir $(ODIR)/Parser/CircuitBuilder
 	mkdir $(ODIR)/TaskScheduling
 

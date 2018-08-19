@@ -16,4 +16,6 @@ class ITaskScheduler {
 public:
     virtual std::shared_ptr<TaskGraph::ITask> getNextTask() = 0;
     virtual void            markTaskAsDone(TaskGraph::TaskId) = 0;
+
+    virtual ~ITaskScheduler() {}
 };

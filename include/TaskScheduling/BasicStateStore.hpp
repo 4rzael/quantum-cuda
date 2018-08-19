@@ -19,8 +19,9 @@ namespace StateStore {
     public:
         virtual bool storeState(StateId id, StateData const &state);
         virtual bool deleteState(StateId id);
-        virtual StateData const &getState(StateId id);
+        virtual StateData const &getStateData(StateId id);
 
+        virtual ~BasicStateStore() {}
     private:
         std::map<StateId, StateData> _map;
     };

@@ -23,6 +23,6 @@ bool BasicStateStore::deleteState(StateId id) {
     return true;
 }
 
-StateData const &BasicStateStore::getState(StateId id) {
+StateData const &BasicStateStore::getStateData(StateId id) {
     return _map.at(id);
 }

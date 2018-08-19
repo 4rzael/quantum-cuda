@@ -1,7 +1,8 @@
 #include <memory>
 #include "TaskScheduling/TaskGraph.hpp"
-#include "Worker.hpp"
 #include "Logger.hpp"
+#include "Worker/Worker.hpp"
+#include "Worker/Simulator.hpp"
 
 using namespace MeasurementResultsTree;
 using namespace StateStore;

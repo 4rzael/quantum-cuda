@@ -16,25 +16,26 @@
 #include <boost/foreach.hpp>
 
 #include "MatrixStore.hpp"
-#include "Simulator.hpp"
+#include "Worker/Simulator.hpp"
 #include "Logger.hpp"
 
-Simulator::Simulator(Circuit& circuit) : m_circuit(circuit) {
+using namespace TaskGraph;
+using namespace MeasurementResultsTree;
+
+Simulator::Simulator(SimulateCircuitTask &task, MeasurementResultsNode &measurementState, Matrix const &state)
+: m_task(task), m_measurementState(measurementState), m_state(state) {
   // Allocating the c registers;
-  for (auto &reg: circuit.creg) {
+  for (auto &reg: m_task.circuit.creg) {
     bool* arr = new bool[reg.size];
     std::memset(arr, 0, reg.size);
-    m_cReg.insert(make_pair(reg.name, arr));
   }
   // Computing the offsets for each qregisters,
   // and total qubits number of the system.
   m_size = 0;
-  for (auto &reg: circuit.qreg) {
+  for (auto &reg: m_task.circuit.qreg) {
     m_qRegOffsets.insert(make_pair(reg.name, m_size));
     m_size += reg.size;
   }
-  // Initializing simulator state.with each qubits at |0>.
-  m_state = Matrix::kron(std::vector<Matrix>(m_size, MatrixStore::k0));
 }
 
 Simulator::StepVisitor::StepVisitor(Simulator& simulator) :
@@ -104,56 +105,18 @@ void Simulator::StepVisitor::operator()(const Circuit::CXGate& value) {
 }
 
 void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
-  // Computing the offset of the qubit to measure.
-  int sourceId = m_simulator.m_qRegOffsets.find(value.source.registerName)->second;
-  sourceId += value.source.element;
-
-  // Setting the transformation gate of the designated qubit to the projector of
-  // |0> (the |0><0| outer product).
-  m_simulator.m_gates[sourceId] = MatrixStore::pk0;
-
-  // Computing the kroenecker product of the transformation gates.
-  // Computing the outer product of the current state and its transpose.
-  Matrix x = m_simulator.m_state * m_simulator.m_state.transpose();
-
-  Matrix op = Matrix::kron(m_simulator.m_gates) +
-    Matrix::kron(m_simulator.m_extraGates);
-  // Computing the dot product of the kroenecker product of the transformation
-  // gates with the outer product of the current state and its transpose.
-  Matrix y = op * x;
-
-  // Computing the probability p0 to measure the designated qubit at 0 as the
-  // trace of the dot product of the kroenecker product of the transformation
-  // gates with the outer product of the current state and its transpose.
-  std::complex<double> p0 = y.trace();
-
-  // Simulate measurement by randomizing outcome according to p0.
-  // If a random number between 0 and 1 is less than p0 the cregister designated
-  // to store the measurement outcome will be set to 0 (false), otherwise it
-  // will be set to 1 (true) and the transformation gate for the measured qubit
-  // would be set to the projector of |1> (the outer product |1><1|) and the
-  // kroenecker product of the transformation gates recomputed.
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<> dis(0.0, 1.0);
-  if (dis(gen) < fabs(p0.real())) {
-    m_simulator.m_cReg.find(value.dest.registerName)->second[value.dest.element] = false;
-  } else {
-    m_simulator.m_cReg.find(value.dest.registerName)->second[value.dest.element] = true;
-    m_simulator.m_gates[sourceId] = MatrixStore::pk1;
-  };
-  LOG(Logger::DEBUG, "Performing a measurement:" << "\nMeasurement:\n\tsource: "
-    << value.source.registerName << "[" << value.source.element << "]\n\tdest: "
-    << value.dest.registerName << "[" << value.dest.element
-    << "]\n" << std::endl);
+  (void)(value);
+  LOG(Logger::ERROR, "Measurement should not be present in the circuit anymore");
+  assert(true == false);
 }
 
 void Simulator::StepVisitor::operator()(const Circuit::Barrier& __attribute__((unused)) value) {
-  // Nothing to be done for a barrier. It is the same as an identity, computation-wise
+  // Nothing to be done for a barrier. It is the same as an identity, computationaly-wise
 }
 
 // TODO: Implement those two
 void Simulator::StepVisitor::operator()(const Circuit::Reset& __attribute__((unused)) value) {
+  m_simulator.m_shouldNormalize = true;
   (void)value;
   LOG(Logger::ERROR, "Reset statements not implemented in the simulator");
 }
@@ -161,11 +124,12 @@ void Simulator::StepVisitor::operator()(const Circuit::ConditionalGate& __attrib
   LOG(Logger::ERROR, "Conditional statements not implemented in the simulator");
 }
 
-void Simulator::simulate() {
+Matrix Simulator::simulate() {
   auto visitor = StepVisitor(*this);
   // Looping through each steps of the circuit.
-  for (std::vector<Circuit::Step>::iterator it = m_circuit.steps.begin();
-    it != m_circuit.steps.end(); ++it) {
+  for (std::vector<Circuit::Step>::iterator it = m_task.circuit.steps.begin();
+    it != m_task.circuit.steps.end(); ++it) {
+      m_shouldNormalize = false;
     // Initializing the gate vectors
     m_gates = std::vector<Matrix>(m_size, MatrixStore::i2);
     m_extraGates = std::vector<Matrix>(m_size, MatrixStore::null2);
@@ -177,29 +141,8 @@ void Simulator::simulate() {
     // of the transformation gates for each qubits and the actual simulator state.
     Matrix op = Matrix::kron(m_gates) + Matrix::kron(m_extraGates);
     m_state = op * m_state;
-    m_state = m_state.normalize();
-  }
-}
 
-void Simulator::print(std::ostream &os) const {
-  os << "Simulator:\nState:(";
-  os << m_state;
-  os << ";),\nCREGs states:([\n";
-  for (auto &reg: m_circuit.creg) {
-    int j = 0;
-    os << " [\t\"" << reg.name << "\": bitstring(";
-    for (uint i = 0; i < reg.size; i++) {
-      j <<= 1;
-      j +=  m_cReg.find(reg.name)->second[i];
-      os << m_cReg.find(reg.name)->second[i];
-    }
-    os << "); intvalue(" << j << ");\t],\n";
+    if (m_shouldNormalize) m_state = m_state.normalize();
   }
-  os << "];)";
-}
-
-std::ostream& operator<<(std::ostream& os, const Simulator& sim)
-{
-  sim.print(os);
-  return os;
+  return m_state;
 }

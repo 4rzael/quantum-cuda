@@ -21,5 +21,7 @@ namespace StateStore {
         virtual bool storeState(StateId id, StateData const &state) = 0;
         virtual bool deleteState(StateId id) = 0;
         virtual StateData const &getStateData(StateId id) = 0;
+
+        virtual ~IStateStore() {}
     };
 }

@@ -12,12 +12,14 @@
 #pragma once
 #include "TaskScheduling/ITaskScheduler.hpp"
 
-class BasicTaskScheduler {
+class BasicTaskScheduler: public ITaskScheduler {
 public:
     BasicTaskScheduler(TaskGraph::Graph const &graph);
 
     virtual std::shared_ptr<TaskGraph::ITask> getNextTask();
     virtual void             markTaskAsDone(TaskGraph::TaskId);
+
+    virtual ~BasicTaskScheduler() {}
 
 private:
     TaskGraph::Graph const &m_graph;
