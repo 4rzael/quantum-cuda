@@ -68,6 +68,7 @@ SRC=	Parser/FloatExprAst.cpp \
 	TaskScheduling/BasicMeasurementResultsTree.cpp \
 	Worker/Worker.cpp \
 	Worker/Simulator.cpp \
+	Worker/Measurer.cpp \
 	Circuit.cpp \
 	CircuitPrinter.cpp \
 	CircuitCompressor.cpp \

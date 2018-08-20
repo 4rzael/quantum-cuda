@@ -80,6 +80,16 @@ std::complex<double> Matrix::trace() const {
   return exec->trace(m_content, m_dim.first);
 }
 
+double Matrix::measureStateProbability(int qubitIndex, bool value) const {
+  IExecutor* exec = ExecutorManager::getInstance().getExecutor();
+  return exec->measureProbability(m_content, qubitIndex, value);
+}
+
+Matrix Matrix::measureStateOutcome(int qubitIndex, bool value) const {
+  IExecutor* exec = ExecutorManager::getInstance().getExecutor();
+  return Matrix(exec->measureOutcome(m_content, qubitIndex, value), m_dim.first, m_dim.second);
+}
+
 std::ostream& operator<<(std::ostream& os, const Matrix& m)
 {
     os << "[" << std::endl;

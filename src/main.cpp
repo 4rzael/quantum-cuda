@@ -57,16 +57,19 @@ int main(int ac, char **av) {
     return EXIT_FAILURE;
   }
 
+  std::shared_ptr<IMeasurementResultsTree> measurementTree = std::make_shared<BasicMeasurementResultsTree>();
+
   CircuitToTaskGraphConverter converter(circuit);
-  TaskGraph::Graph graph = converter.generateTaskGraph();
+  TaskGraph::Graph graph = converter.generateTaskGraph(*measurementTree);
   LOG(Logger::INFO, "Task graph:" << graph);
 
   std::shared_ptr<ITaskScheduler> scheduler = std::make_shared<BasicTaskScheduler>(graph);
   std::shared_ptr<IStateStore> stateStore = std::make_shared<BasicStateStore>(graph);
-  std::shared_ptr<IMeasurementResultsTree> measurementTree = std::make_shared<BasicMeasurementResultsTree>();
 
   Worker worker = Worker(*scheduler, *stateStore, *measurementTree);
   worker();
+
+  measurementTree->printResults(circuit.creg);
 
   return EXIT_SUCCESS;
 }

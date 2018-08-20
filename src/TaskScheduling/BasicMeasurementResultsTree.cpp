@@ -15,6 +15,7 @@
 #include <boost/optional.hpp>
 #include "TaskScheduling/BasicMeasurementResultsTree.hpp"
 #include "utils.hpp"
+#include "Logger.hpp"
 
 using namespace MeasurementResultsTree;
 
@@ -23,7 +24,7 @@ BasicMeasurementResultsTree::BasicMeasurementResultsTree(uint samples): greatest
     root->samples = samples;
 }
 
-std::shared_ptr<MeasurementResultsNode> BasicMeasurementResultsTree::getRoot() {
+std::shared_ptr<MeasurementResultsNode> BasicMeasurementResultsTree::getRoot() const {
     return root;
 }
 std::shared_ptr<MeasurementResultsNode> BasicMeasurementResultsTree::getNodeWithId(NodeId id) const {
@@ -74,20 +75,49 @@ uint BasicMeasurementResultsTree::getCregValueAtNode(std::string cregName, NodeI
     return res.value();
 }
 
-std::vector<std::shared_ptr<MeasurementResultsNode>> BasicMeasurementResultsTree::addMeasurement(NodeId parentId, Circuit::Qubit creg, double zeroProbability) {
+
+std::vector<std::shared_ptr<MeasurementResultsNode>> BasicMeasurementResultsTree::makeChildrens(NodeId parentId, Circuit::Qubit creg) {
     auto parent = getNodeWithId(parentId);
-    auto zeroSamples = sampleBinomialDistribution(parent->samples, zeroProbability);
     parent->results[0].node = std::make_shared<MeasurementResultsNode>(this, ++greatestId);
     parent->results[0].measuredCBit = creg;
     parent->results[0].value = 0;
-    parent->results[0].probability = zeroProbability;
-    parent->results[0].node->samples = zeroSamples;
-
+    parent->results[0].probability = 0;
     parent->results[1].node = std::make_shared<MeasurementResultsNode>(this, ++greatestId);
     parent->results[1].measuredCBit = creg;
     parent->results[1].value = 1;
-    parent->results[1].probability = 1 - zeroProbability;
-    parent->results[1].node->samples = parent->samples - zeroSamples;
-
+    parent->results[1].probability = 0;
     return {parent->results[0].node, parent->results[1].node};
+}
+
+std::vector<NodeId> BasicMeasurementResultsTree::addMeasurement(NodeId nodeId, double zeroProbability) {
+    auto node = getNodeWithId(nodeId);
+    auto zeroSamples = sampleBinomialDistribution(node->samples, zeroProbability);
+    node->results[0].probability = zeroProbability;
+    node->results[0].node->samples = zeroSamples;
+
+    node->results[1].probability = 1 - zeroProbability;
+    node->results[1].node->samples = node->samples - zeroSamples;
+
+    return {node->results[0].node->id, node->results[1].node->id};
+}
+
+void BasicMeasurementResultsTree::printResults(std::vector<Circuit::Register> const &cregs) const {
+    LOG(Logger::INFO, "Sampled " << getRoot()->samples << " executions");
+
+    const std::function<void(std::shared_ptr<MeasurementResultsNode> const &)> helper = [&](std::shared_ptr<MeasurementResultsNode> const &node) {
+        // no childrens => we can print the results for this node
+        if (!(node->results[0].node)) {
+            if (node->samples == 0) return;
+            LOG(Logger::INFO, "On " << node->samples << " samples:");
+            for (auto const &reg : cregs) {
+                const auto value = getCregValueAtNode(reg.name, node->id);
+                LOG(Logger::INFO, reg.name << " = " << value);
+            }
+        } else {
+            helper(node->results[0].node);
+            helper(node->results[1].node);
+        }
+    };
+
+    helper(getRoot());
 }

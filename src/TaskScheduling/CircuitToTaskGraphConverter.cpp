@@ -14,8 +14,9 @@
 #include "CircuitCompressor.hpp"
 
 using namespace TaskGraph;
+using namespace MeasurementResultsTree;
 
-Graph CircuitToTaskGraphConverter::generateTaskGraph() {
+Graph CircuitToTaskGraphConverter::generateTaskGraph(IMeasurementResultsTree &measurementTree) {
     Graph graph;
     TaskId currentTaskId = 0;
     StateId currentStateId = 0;
@@ -26,8 +27,8 @@ Graph CircuitToTaskGraphConverter::generateTaskGraph() {
         qubitCount += qreg.size;
     }
 
-    const std::function<void(uint, StateId)> recursiveHelper =
-    [&](uint beginStepIdx=0, StateId inputStateId=STATE_ID_NONE) {
+    const std::function<void(NodeId, uint, StateId)> recursiveHelper =
+    [&](NodeId currentMeasurementNode, uint beginStepIdx=0, StateId inputStateId=STATE_ID_NONE) {
         // find first step containing measurement
         uint endStepIdx = 0;
         for (endStepIdx = beginStepIdx; endStepIdx < m_circuit.steps.size(); ++endStepIdx) {
@@ -59,6 +60,8 @@ Graph CircuitToTaskGraphConverter::generateTaskGraph() {
                 inputStateId,
                 computeOutputStateId,
                 circuit);
+            // save the current measurement node
+            computeTask->measurementNodeId = currentMeasurementNode;
         } else {
             // we take the input state as our "output" as nothing happened
             computeOutputStateId = inputStateId;
@@ -72,6 +75,9 @@ Graph CircuitToTaskGraphConverter::generateTaskGraph() {
             [](const Circuit::Gate &g) {
                 return g.type().hash_code() == typeid(Circuit::Measurement).hash_code();
             }));
+        
+        // No need for the steps in the measurement
+        circuit.steps.clear();
 
         const TaskId measureTaskId = currentTaskId++;
         const StateId measureOutputState0Id = currentStateId++;
@@ -82,13 +88,17 @@ Graph CircuitToTaskGraphConverter::generateTaskGraph() {
             measureTaskId,
             computeOutputStateId,
             measureOutputState0Id, measureOutputState1Id,
-            measurement);
+            measurement,
+            circuit);
+        // store the current measurement node, and create new ones for the measurement outcomes
+        measureTask->measurementNodeId = currentMeasurementNode;
+        const auto childMeasurementNodes = measurementTree.makeChildrens(currentMeasurementNode, measurement.dest);
         
-        recursiveHelper(endStepIdx + 1, measureOutputState0Id);
-        recursiveHelper(endStepIdx + 1, measureOutputState1Id);
+        recursiveHelper(childMeasurementNodes[0]->id, endStepIdx + 1, measureOutputState0Id);
+        recursiveHelper(childMeasurementNodes[1]->id, endStepIdx + 1, measureOutputState1Id);
     };
 
-    recursiveHelper(0, STATE_ID_NONE);
+    recursiveHelper(measurementTree.getRoot()->id, 0, STATE_ID_NONE);
     return graph;
 }
 

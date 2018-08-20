@@ -22,13 +22,8 @@
 using namespace TaskGraph;
 using namespace MeasurementResultsTree;
 
-Simulator::Simulator(SimulateCircuitTask &task, MeasurementResultsNode &measurementState, Matrix const &state)
-: m_task(task), m_measurementState(measurementState), m_state(state) {
-  // Allocating the c registers;
-  for (auto &reg: m_task.circuit.creg) {
-    bool* arr = new bool[reg.size];
-    std::memset(arr, 0, reg.size);
-  }
+Simulator::Simulator(SimulateCircuitTask &task, IMeasurementResultsTree &measurementsTree, Matrix const &state)
+: m_task(task), m_measurementsTree(measurementsTree), m_state(state) {
   // Computing the offsets for each qregisters,
   // and total qubits number of the system.
   m_size = 0;
@@ -125,7 +120,7 @@ void Simulator::StepVisitor::operator()(const Circuit::Reset& value) {
   m_simulator.m_gates[id] = MatrixStore::pk0;
 }
 void Simulator::StepVisitor::operator()(const Circuit::ConditionalGate& cGate) {
-  const auto value = m_simulator.m_measurementState.tree->getCregValueAtNode(cGate.testedRegister, m_simulator.m_measurementState.id);
+  const auto value = m_simulator.m_measurementsTree.getCregValueAtNode(cGate.testedRegister, m_simulator.m_task.measurementNodeId);
   if (value == cGate.expectedValue) { cGate.gate.apply_visitor(*this); }
 }
 

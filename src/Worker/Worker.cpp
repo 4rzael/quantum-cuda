@@ -3,6 +3,7 @@
 #include "Logger.hpp"
 #include "Worker/Worker.hpp"
 #include "Worker/Simulator.hpp"
+#include "Worker/Measurer.hpp"
 
 using namespace MeasurementResultsTree;
 using namespace StateStore;
@@ -23,7 +24,7 @@ void Worker::operator()() {
             // Detecting the type of task
             if (auto simulateTask = std::dynamic_pointer_cast<SimulateCircuitTask>(task)) {
                 // Actually do the work here
-                Simulator simulator(*simulateTask, *(m_measurementResults.getRoot()), state); // TODO: remove the getRoot()
+                Simulator simulator(*simulateTask, m_measurementResults, state);
                 state = simulator.simulate();
                 // Then register new state and remove old one
                 m_stateStore.storeState(task->outputStates[0], state);
@@ -32,15 +33,8 @@ void Worker::operator()() {
                 LOG(Logger::INFO, "State:" << state);
             }
             else if (auto measureTask = std::dynamic_pointer_cast<DuplicateAndMeasureTask>(task)) {
-                LOG(Logger::ERROR, "Measurement not implemented yet");
-                // Move the first state
-                m_stateStore.storeState(task->outputStates[0], state);
-                m_stateStore.deleteState(task->inputStates[0]);
-                // And perform a copy for the second
-                m_stateStore.storeState(task->outputStates[1], 
-                    Matrix(new Tvcplxd(*state.getContent()),
-                        state.getDimensions().first,
-                        state.getDimensions().second));
+                Measurer measurer(*measureTask, m_stateStore, m_measurementResults);
+                measurer();
             }
             else {
                 throw std::logic_error("Unknown task type found. Stopping the worker");

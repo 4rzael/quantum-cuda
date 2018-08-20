@@ -12,15 +12,15 @@
 #pragma once
 #include "Circuit.hpp"
 #include "TaskScheduling/TaskGraph.hpp"
+#include "IMeasurementResultsTree.hpp"
 
 class CircuitToTaskGraphConverter {
 public:
     CircuitToTaskGraphConverter(Circuit const &circuit):
     m_circuit(circuit) {}
 
-    TaskGraph::Graph generateTaskGraph();
+    TaskGraph::Graph generateTaskGraph(MeasurementResultsTree::IMeasurementResultsTree &measurementTree);
 
 private:
-
     Circuit const &m_circuit;
 };

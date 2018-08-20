@@ -77,7 +77,7 @@ class Simulator
     };
 
     TaskGraph::SimulateCircuitTask                 &m_task;
-    MeasurementResultsTree::MeasurementResultsNode &m_measurementState;
+    MeasurementResultsTree::IMeasurementResultsTree &m_measurementsTree;
     bool m_shouldNormalize;
 
     /**
@@ -108,7 +108,7 @@ class Simulator
      * @param layout The circuit layout.
      */
     Simulator(TaskGraph::SimulateCircuitTask &task,
-              MeasurementResultsTree::MeasurementResultsNode &measurementState,
+              MeasurementResultsTree::IMeasurementResultsTree &measurementTree,
               Matrix const &state);
     /**
      * Run the circuit

@@ -15,6 +15,7 @@
 #include <boost/variant.hpp>
 
 #include "TaskScheduling/IStateStore.hpp"
+#include "IMeasurementResultsTree.hpp"
 #include "Circuit.hpp"
 
 namespace TaskGraph {
@@ -36,7 +37,7 @@ namespace TaskGraph {
         TaskId              from;
         TaskId              to;
         StateStatus         status;
-
+    
         friend std::ostream& operator<< (std::ostream& stream, const State& s);
     };
 
@@ -48,6 +49,8 @@ namespace TaskGraph {
         std::vector<StateId> inputStates;
         std::vector<StateId> outputStates;
         TaskStatus           status;
+
+        MeasurementResultsTree::NodeId measurementNodeId;
 
         virtual ~ITask() {}
 
@@ -76,14 +79,16 @@ namespace TaskGraph {
                                 StateId input,
                                 StateId output0,
                                 StateId output1,
-                                Circuit::Measurement const &measurement)
-        : ITask(id), measurement(measurement) {
+                                Circuit::Measurement const &measurement,
+                                Circuit const &circuit)
+        : ITask(id), measurement(measurement), circuit(circuit) {
             inputStates.push_back(input);
             outputStates.push_back(output0);
             outputStates.push_back(output1);
         }
 
         Circuit::Measurement measurement;
+        Circuit circuit; // requires an (empty) circuit to know register offsets
 
         virtual std::ostream &write(std::ostream &stream) const;
     };

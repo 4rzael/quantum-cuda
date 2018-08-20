@@ -28,23 +28,29 @@ namespace MeasurementResultsTree {
         MeasurementLink(): measuredCBit("", 0) {}
     };
 
+    enum class MeasurementResultsNodeStatus {WAITING, COMPLETE};
     struct MeasurementResultsNode {
         NodeId id;
+        MeasurementResultsNodeStatus status;
+
         uint samples;
         MeasurementLink results[2];
         IMeasurementResultsTree *tree; // not smart as I couldn't make it work
 
         MeasurementResultsNode(IMeasurementResultsTree *treePtr, NodeId id)
-        : id(id), tree(treePtr) {}
+        : id(id), status(MeasurementResultsNodeStatus::WAITING), tree(treePtr) {}
     };
 
     class IMeasurementResultsTree {
     public:
-        virtual std::shared_ptr<MeasurementResultsNode> getRoot() = 0;
+        virtual std::shared_ptr<MeasurementResultsNode> getRoot() const = 0;
         virtual std::shared_ptr<MeasurementResultsNode> getNodeWithId(NodeId id) const = 0;
 
         virtual uint getCregValueAtNode(std::string cregName, NodeId id) const = 0;
-        virtual std::vector<std::shared_ptr<MeasurementResultsNode>> addMeasurement(NodeId parentId, Circuit::Qubit creg, double zeroProbability) = 0;
+        virtual std::vector<std::shared_ptr<MeasurementResultsNode>> makeChildrens(NodeId parentId, Circuit::Qubit creg) = 0;
+        virtual std::vector<NodeId> addMeasurement(NodeId nodeId, double zeroProbability) = 0;
+
+        virtual void printResults(std::vector<Circuit::Register> const &cregs) const = 0;
 
         virtual ~IMeasurementResultsTree() {}
     };

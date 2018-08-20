@@ -81,6 +81,10 @@ class Matrix {
     * Matrix trace
     */
     std::complex<double> trace() const;
+
+    double measureStateProbability(int qubitIndex, bool value) const;
+
+    Matrix measureStateOutcome(int qubitIndex, bool value) const;
 };
 
 /**
