@@ -10,6 +10,7 @@
  */
 
 #pragma once
+#include <limits>
 #include <string>
 #include <vector>
 #include <boost/variant/variant.hpp>
@@ -17,6 +18,12 @@
 #include "Parser/AST.hpp"
 
 struct Circuit {
+    // methods
+    Circuit() {}
+    Circuit(Circuit const &other, uint beginStep=0, uint endStep=std::numeric_limits<uint>::max());
+
+    void removeMeasurements();
+
     struct Register {
         Register(const std::string &n, const uint &s) : name(n), size(s) {}
         std::string name;
@@ -57,6 +64,7 @@ struct Circuit {
     };
 
     struct Measurement : public GateInterface {
+        Measurement(Measurement const &other): source(other.source), dest(other.dest) {}
         Measurement(const Qubit &src, const Qubit &dst)
         : source(src), dest(dst) {}
         std::vector<Qubit> getTargets() const;

@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.hpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-08-21T10:39:15+02:00
+ * @Last modified time: 2018-07-18T14:35:25+01:00
  * @License: MIT License
  */
 
@@ -16,7 +16,8 @@
 #include <map>
 
 #include "Matrix.hpp"
-#include "Circuit.hpp"
+#include "TaskScheduling/TaskGraph.hpp"
+#include "TaskScheduling/IMeasurementResultsTree.hpp"
 
 /**
 * @brief Quantum circuit Simulator class.
@@ -27,10 +28,10 @@ class Simulator
 {
   private:
     /**
-    * Gate visitor nested class, used to visit steps and provide tranformation
+    * Step visitor nested class, used to visit steps and provide tranformation
     * operators.
     */
-    class GateVisitor : public boost::static_visitor<>
+    class StepVisitor : public boost::static_visitor<>
     {
       private:
         /**
@@ -42,7 +43,7 @@ class Simulator
         * Construct a visitor object from the parent simulator instance.
         * @param sim The parent simulator instance.
         */
-        GateVisitor(Simulator &simulator);
+        StepVisitor(Simulator &simulator);
         /**
         * Register the transformation of a particular qubit from a UGate. .
         * @param value The UGate.
@@ -59,8 +60,7 @@ class Simulator
         */
         void operator()(const Circuit::Measurement& value);
         /**
-        * Register a barrier (ignores it as barrier don't perform any
-        * computations). .
+        * Register a barrier (ignores it as barrier don't perform any computations). .
         * @param value The barrier. Ignored.
         */
         void operator()(const Circuit::Barrier& value);
@@ -76,14 +76,10 @@ class Simulator
         void operator()(const Circuit::ConditionalGate& value);
     };
 
-    /**
-    * The circuit layout object.
-    */
-    Circuit& m_circuit;
-    /**
-    * The c registers.
-    */
-    std::map<std::string, bool(*)> m_cReg;
+    TaskGraph::SimulateCircuitTask                 &m_task;
+    MeasurementResultsTree::IMeasurementResultsTree &m_measurementsTree;
+    bool m_shouldNormalize;
+
     /**
     * The qbit registers offsets.
     */
@@ -111,18 +107,12 @@ class Simulator
      * Construct a Simulator object from a given layout.
      * @param layout The circuit layout.
      */
-    Simulator(Circuit& circuit);
+    Simulator(TaskGraph::SimulateCircuitTask &task,
+              MeasurementResultsTree::IMeasurementResultsTree &measurementTree,
+              Matrix const &state);
     /**
      * Run the circuit
      */
-    void simulate();
-    /**
-    * Print object to ostream in a readable manner.
-    */
-    void print(std::ostream &os) const;
-};
+    Matrix simulate();
 
-/**
-* Simulator redirection to ostream overload.
-*/
-std::ostream& operator<<(std::ostream& os, const Simulator& sim);
+};
