@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.cpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-08-21T10:35:00+02:00
+ * @Last modified time: 2018-08-21T11:25:26+02:00
  * @License: MIT License
  */
 
@@ -49,8 +49,8 @@ void Simulator::GateVisitor::operator()(const Circuit::UGate& value) {
   // Creating a gate according to the phi, theta and lambda parameters and
   // setting it as the target qubit transformation gate.
   using namespace std::complex_literals;
-  m_simulator.m_gates[id] = Matrix(new Tvcplxd({exp(-1i * (value.phi + value.lambda) / 2.0)
-    * cos(value.theta / 2.0),
+  m_simulator.m_gates[id] = Matrix(new Tvcplxd({exp(-1i * (value.phi +
+    value.lambda) / 2.0) * cos(value.theta / 2.0),
     -exp(-1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2.0),
     exp(1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2.0),
     exp(1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2.0)
@@ -59,8 +59,8 @@ void Simulator::GateVisitor::operator()(const Circuit::UGate& value) {
   // Debug logs
   LOG(Logger::DEBUG, "Applying a U Gate:" << "\nU Gate:\n\ttheta: "
     << value.theta << ", phi: " << value.phi << ", lambda: " << value.lambda
-    << "\n\ttarget: " << value.target.registerName << "[" << value.target.element << "]\n"
-    << std::endl);
+    << "\n\ttarget: " << value.target.registerName << "["
+    << value.target.element << "]\n" << std::endl);
 }
 
 void Simulator::GateVisitor::operator()(const Circuit::CXGate& value) {
@@ -99,8 +99,8 @@ void Simulator::GateVisitor::operator()(const Circuit::CXGate& value) {
 
   LOG(Logger::DEBUG, "Applying a CX Gate:" << "\nCX Gate:\n\tcontrol: "
     << value.control.registerName << "[" << value.control.element
-    << "]\n\ttarget: " << value.target.registerName << "[" << value.target.element << "]\n"
-    << std::endl);
+    << "]\n\ttarget: " << value.target.registerName << "["
+    << value.target.element << "]\n" << std::endl);
 }
 
 void Simulator::GateVisitor::operator()(const Circuit::Measurement& value) {
@@ -155,13 +155,10 @@ void Simulator::GateVisitor::operator()(const Circuit::Barrier& __attribute__((u
 
 // TODO: Implement those two
 void Simulator::GateVisitor::operator()(const Circuit::Reset& value) {
-  // Computing the offset of the qubit to reset.
-  int targetId_0 = m_simulator.m_qRegOffsets.find(value.target.registerName)->second;
-  targetId_0 += value.target.element;
-  int targetId_1 = targetId_0 + 1;
+  int targetId = m_simulator.m_qRegOffsets.find(value.target.registerName)->second;
+  targetId += value.target.element;
 
-  m_simulator.m_state[targetId_0] = 0;
-  m_simulator.m_state[targetId_1] = 0;
+  m_simulator.m_gates[targetId] = MatrixStore::pk0;
 
   LOG(Logger::DEBUG, "Resetting a qubit:" << "\nReset:\n\ttarget: "
     << value.target.registerName << "[" << value.target.element << "]\n"
@@ -177,9 +174,9 @@ void Simulator::GateVisitor::operator()(const Circuit::ConditionalGate& value) {
   }
   // Performing the gate according to the register actual and expected values
   // comparison
-  LOG(Logger::DEBUG, "Applying a Conditional Gate:" << "\nCondition:\n\ttested register: "
-    << value.testedRegister << "\n\texpected value: " << value.expectedValue << "\n"
-    << std::endl);
+  LOG(Logger::DEBUG, "Applying a Conditional Gate:"
+    << "\nCondition:\n\ttested register: " << value.testedRegister
+    << "\n\texpected value: " << value.expectedValue << "\n" << std::endl);
   auto visitor = GateVisitor(m_simulator);
   if (value.expectedValue == j) {
     boost::apply_visitor(visitor, value.gate);
