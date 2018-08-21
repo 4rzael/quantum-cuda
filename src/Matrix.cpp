@@ -47,6 +47,13 @@ Matrix Matrix::operator*(const Matrix& other) const {
   return result;
 }
 
+Matrix Matrix::operator*(const std::complex<double> &scalar) const {
+  IExecutor *exec = ExecutorManager::getInstance().getExecutor();
+
+  Matrix result = Matrix(exec->multiply(m_content, scalar), m_dim.first ,m_dim.second);
+  return result;
+}
+
 Matrix Matrix::kron(std::vector<Matrix> m) {
   IExecutor *exec = ExecutorManager::getInstance().getExecutor();
 

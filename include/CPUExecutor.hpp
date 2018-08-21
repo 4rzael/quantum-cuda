@@ -99,4 +99,6 @@
      * @return Tvcplxd* The vector state after measurement outcome v on qubit q
      */
     Tvcplxd* measureOutcome(Tvcplxd *a, int q, bool v);
+
+    Tvcplxd* multiply(Tvcplxd *a, const std::complex<double> &scalar);
  };

@@ -98,6 +98,7 @@ std::vector<NodeId> BasicMeasurementResultsTree::addMeasurement(NodeId nodeId, d
     node->results[1].probability = 1 - zeroProbability;
     node->results[1].node->samples = node->samples - zeroSamples;
 
+    node->status = MeasurementResultsNodeStatus::COMPLETE;
     return {node->results[0].node->id, node->results[1].node->id};
 }
 

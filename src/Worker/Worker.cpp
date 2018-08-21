@@ -18,11 +18,10 @@ void Worker::operator()() {
             LOG(Logger::DEBUG, "Task found:" << task);
             if (task->id == TASK_ID_NONE) break;
 
-            // TODO: Change if/when we will support multiple input states
-            state = m_stateStore.getStateData(task->inputStates[0]);
-
             // Detecting the type of task
             if (auto simulateTask = std::dynamic_pointer_cast<SimulateCircuitTask>(task)) {
+                // TODO: Change if/when we will support multiple input states
+                state = m_stateStore.getStateData(task->inputStates[0]);
                 // Actually do the work here
                 Simulator simulator(*simulateTask, m_measurementResults, state);
                 state = simulator.simulate();

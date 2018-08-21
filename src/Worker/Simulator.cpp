@@ -60,38 +60,22 @@ void Simulator::StepVisitor::operator()(const Circuit::UGate& value) {
 }
 
 void Simulator::StepVisitor::operator()(const Circuit::CXGate& value) {
+  // Apparently this method requires us to normalize the state afterward
+  m_simulator.m_shouldNormalize = true;
+
   // Computing the offset of the control qubit.
   Circuit::Qubit control = value.control;
   int controlId = m_simulator.m_qRegOffsets.find(control.registerName)->second;
   controlId += control.element;
-
-  // Filling two vectors of the simulator size with identity gates.
-  std::vector<Matrix> lgates = std::vector<Matrix>(m_simulator.m_size,
-    MatrixStore::i2);
-  std::vector<Matrix> rgates = std::vector<Matrix>(m_simulator.m_size,
-    MatrixStore::null2);
-
-  // We set the transformation gate of the control qubit to the projector of the
-  // |0> (the |0><0| outer product) in the first vector.
-  lgates[controlId] = MatrixStore::pk0;
-  // We set the transformation gate of the control qubit to the projector of the
-  // |1> (the |1><1| outer product) in the second vector.
-  rgates[controlId] = MatrixStore::pk1;
 
   // Computing the offset of the target qubit.
   Circuit::Qubit target = value.target;
   int targetId = m_simulator.m_qRegOffsets.find(target.registerName)->second;
   targetId += target.element;
 
-  // We set the transformation gate of the target qubit to the Pauli-X
-  // (bit-flip) in the second vector.
-  rgates[targetId] = MatrixStore::x;
-
-  // Applying proper gates transformations
-  for (int i = 0; i < m_simulator.m_size; i++) {
-    m_simulator.m_gates[i] = lgates[i];
-    m_simulator.m_extraGates[i] = rgates[i];
-  }
+  m_simulator.m_gates[controlId] = MatrixStore::pk0;
+  m_simulator.m_extraGates[controlId] = MatrixStore::pk1;
+  m_simulator.m_extraGates[targetId] = MatrixStore::x;
 
   LOG(Logger::DEBUG, "Applying a CX Gate:" << "\nCX Gate:\n\tcontrol: "
     << value.control.registerName << "[" << value.control.element

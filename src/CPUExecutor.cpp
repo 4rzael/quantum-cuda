@@ -13,6 +13,7 @@
 #include <cmath>
 
 #include "CPUExecutor.hpp"
+#include "Logger.hpp"
 
 Tvcplxd* CPUExecutor::add(Tvcplxd* a, Tvcplxd* b) {
   Tvcplxd* result = new Tvcplxd(a->size());
@@ -99,6 +100,7 @@ double CPUExecutor::measureProbability(Tvcplxd *a, int q, bool v) {
     std::complex<double> squared = (*a)[i] * (*a)[i];
     prob += squared.real() * (int)takeIntoAccount;
   }
+
   return prob;
 }
 
@@ -110,6 +112,14 @@ Tvcplxd* CPUExecutor::measureOutcome(Tvcplxd *a, int q, bool v) {
   for (uint i = 0; i < a->size(); ++i) {
     bool takeIntoAccount = (i / blockSize) % 2 == (int)v;
     (*result)[i] = (*a)[i] * (double)takeIntoAccount;
+  }
+  return normalize(result);
+}
+
+Tvcplxd* CPUExecutor::multiply(Tvcplxd *a, const std::complex<double> &scalar) {
+  Tvcplxd* result = new Tvcplxd(a->size());
+  for (uint i = 0; i < a->size(); ++i) {
+    (*result)[i] = (*a)[i] * scalar;
   }
   return result;
 }

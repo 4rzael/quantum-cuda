@@ -19,7 +19,7 @@ BasicStateStore::BasicStateStore(Graph const &graph) {
     for (auto avail : graph.getAvailableStates()) {
         const size_t size = pow(2, graph.getState(avail)->qubitCount);
         auto mat = Matrix(new Tvcplxd(size), 1, size);
-        mat.getContent()[0] = 1;
+        (*mat.getContent())[0] = 1;
         _map[graph.getState(avail)->id] = mat;
     }
 }
@@ -35,6 +35,5 @@ bool BasicStateStore::deleteState(StateId id) {
 }
 
 StateData const &BasicStateStore::getStateData(StateId id) {
-    LOG(Logger::DEBUG, "Trying to access state " << (int)id);
     return _map.at(id);
 }

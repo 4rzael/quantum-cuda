@@ -94,4 +94,13 @@ class IExecutor
      * @return Tvcplxd* The vector state after measurement outcome v on qubit q
      */
     virtual Tvcplxd* measureOutcome(Tvcplxd *a, int q, bool v) = 0;
+
+    /**
+     * @brief Perform Matrx-scalar multiplication 
+     * 
+     * @param a The matrix content
+     * @param scalar A scalar
+     * @return Tvcplxd* The resulting Matrix
+     */
+    virtual Tvcplxd* multiply(Tvcplxd *a, const std::complex<double> &scalar) = 0;
 };
