@@ -4,14 +4,15 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: TaskGraph.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Sun Aug 12 2018, 20:05:26
+ * @Last modified by:   l3ninj
+ * @Last modified time: 2018-08-21T14:20:45+02:00
  * @License: MIT License
  */
 
 #pragma once
 #include <vector>
 #include <exception>
+#include <map>
 #include <boost/variant.hpp>
 
 #include "TaskScheduling/IStateStore.hpp"
@@ -37,7 +38,7 @@ namespace TaskGraph {
         TaskId              from;
         TaskId              to;
         StateStatus         status;
-    
+
         friend std::ostream& operator<< (std::ostream& stream, const State& s);
     };
 

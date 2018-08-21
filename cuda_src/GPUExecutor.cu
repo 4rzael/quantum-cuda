@@ -4,8 +4,8 @@
  * @Email:  nicolas.jankovic@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: GPUExecutor.cu
- * @Last modified by:   l3ninj
- * @Last modified time: 2018-07-05T14:32:05+01:00
+ * @Last modified by:   Julien Vial-Detambel
+ * @Last modified time: 2018-08-21T14:34:29+02:00
  * @License: MIT License
  */
 
@@ -134,3 +134,32 @@ Tvcplxd*	GPUExecutor::normalize(Tvcplxd* a) {
   //   return (nullptr);
   // }
 }
+
+/**
+ * Compute the probability of ending with value v when measuring qubit number q
+ *
+ * @param a A Vector content
+ * @param q The qubit's index
+ * @param v The expected outcome
+ * @return double The probability of the outcome v on qubit q
+ */
+double GPUExecutor::measureProbability(Tvcplxd *a, int q, bool v) {}
+
+/**
+ * @brief Compute the resulting vector state after measuring the value v on qubit q
+ *
+ * @param a A Vector content
+ * @param q The qubit's index
+ * @param v The expected outcome
+ * @return Tvcplxd* The vector state after measurement outcome v on qubit q
+ */
+Tvcplxd* GPUExecutor::measureOutcome(Tvcplxd *a, int q, bool v) {}
+
+/**
+ * @brief Perform Matrx-scalar multiplication
+ *
+ * @param a The matrix content
+ * @param scalar A scalar
+ * @return Tvcplxd* The resulting Matrix
+ */
+Tvcplxd* GPUExecutor::multiply(Tvcplxd *a, const std::complex<double> &scalar) {}
