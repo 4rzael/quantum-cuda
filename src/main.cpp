@@ -59,16 +59,20 @@ int main(int ac, char **av) {
 
   std::shared_ptr<IMeasurementResultsTree> measurementTree = std::make_shared<BasicMeasurementResultsTree>();
 
+  /* Convert circuit to graph of tasks */
   CircuitToTaskGraphConverter converter(circuit);
   TaskGraph::Graph graph = converter.generateTaskGraph(*measurementTree);
   LOG(Logger::INFO, "Task graph:" << graph);
 
+  /* Creates scheduler and state store*/
   std::shared_ptr<ITaskScheduler> scheduler = std::make_shared<BasicTaskScheduler>(graph);
   std::shared_ptr<IStateStore> stateStore = std::make_shared<BasicStateStore>(graph);
 
+  /* Start a worker */
   Worker worker = Worker(*scheduler, *stateStore, *measurementTree);
   worker();
 
+  /* End of the simulation */
   measurementTree->printResults(circuit.creg);
 
   return EXIT_SUCCESS;

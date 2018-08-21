@@ -14,8 +14,17 @@
 
 
 namespace MeasurementResultsTree {
+    /**
+     * @brief A basic implementation of the IMeasurementResultsTree
+     * This implementation implements it without any concurrency in mind.
+     */
     class BasicMeasurementResultsTree: public IMeasurementResultsTree {
     public:
+        /**
+         * @brief Construct a new Basic Measurement Results Tree object
+         * 
+         * @param samples The number of measurement samples to generate.
+         */
         BasicMeasurementResultsTree(uint samples=1000);
 
         virtual std::shared_ptr<MeasurementResultsNode> getRoot() const;

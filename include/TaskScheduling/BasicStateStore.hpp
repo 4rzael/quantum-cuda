@@ -16,8 +16,17 @@
 #include "TaskScheduling/TaskGraph.hpp"
 
 namespace StateStore {
+    /**
+     * @brief A basic implementation of the IStateStore
+     * This implementation implements it without any concurrency in mind.
+     */
     class BasicStateStore: public IStateStore { // TODO: store pointers ? IDK
     public:
+        /**
+         * @brief Construct a new Basic State Store object
+         * 
+         * @param graph The TaskGraph containing informations about the states
+         */
         BasicStateStore(TaskGraph::Graph const &graph);
 
         virtual bool storeState(StateId id, StateData const &state);

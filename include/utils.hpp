@@ -29,4 +29,11 @@ lambda_visitor<ReturnType, const Lambdas...> make_const_lambda_visitor(Lambdas..
     return { lambdas... };
 }
 
+/**
+ * @brief Performs a sampling on a binomial distribution (binary independent events)
+ * 
+ * @param samples The number of samples to perform
+ * @param proba The probability of an event happening
+ * @return uint The number of samples where the event happened
+ */
 uint sampleBinomialDistribution(uint samples, double proba);

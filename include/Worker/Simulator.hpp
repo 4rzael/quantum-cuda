@@ -55,7 +55,7 @@ class Simulator
         */
         void operator()(const Circuit::CXGate& value);
         /**
-        * Register the measurement of a qubit. .
+        * Register the measurement of a qubit. Doesn't do anything anymore. See Measurer class
         * @param value The Measurement to perform..
         */
         void operator()(const Circuit::Measurement& value);

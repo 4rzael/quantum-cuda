@@ -12,8 +12,17 @@
 #pragma once
 #include "TaskScheduling/ITaskScheduler.hpp"
 
+/**
+ * @brief A basic implementation of the ITaskScheduler
+ * This implementation implements it without any concurrency in mind.
+ */
 class BasicTaskScheduler: public ITaskScheduler {
 public:
+    /**
+     * @brief Construct a new Basic Task Scheduler object
+     * 
+     * @param graph The TaskGraph containing the tasks to execute
+     */
     BasicTaskScheduler(TaskGraph::Graph const &graph);
 
     virtual std::shared_ptr<TaskGraph::ITask> getNextTask();

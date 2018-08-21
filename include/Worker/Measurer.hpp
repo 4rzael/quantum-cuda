@@ -20,11 +20,19 @@
 /**
 * @brief Quantum circuit Measurer class.
 *
-* The Measurer class allow for the simulation of a defined circuit.
+* The Measurer class performs the DuplicateAndMeasureTask: Takes a state,
+* Perform a measurement, and output two states, for each possible outcome
 */
 class Measurer
 {
 public:
+    /**
+     * @brief Construct a new Measurer object
+     * 
+     * @param task The task to execute
+     * @param stateStore The state store
+     * @param measurementTree The tree containing the measurement outcomes
+     */
     Measurer(TaskGraph::DuplicateAndMeasureTask &task,
             StateStore::IStateStore &stateStore,
             MeasurementResultsTree::IMeasurementResultsTree &measurementTree);
@@ -35,8 +43,18 @@ private:
     StateStore::IStateStore &m_stateStore;
     MeasurementResultsTree::IMeasurementResultsTree &m_measurementsTree;
 
+    /**
+     * @brief The current (input) state
+     */
     Matrix m_state;
 
+    /**
+     * @brief The number of qubits in this state
+     */
     size_t m_size;
+    /**
+     * @brief The offsets of each quantum register
+     * 
+     */
     std::map<std::string, size_t> m_qRegOffsets;
 };
