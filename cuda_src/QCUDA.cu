@@ -222,7 +222,9 @@ Tvcplxd*			QCUDA::CUDAGPU<T>::additionOnGPU() {
 
   device = this->allocMemOnGPU(device, this->lenA_);
 
-  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), this->lenA_);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(),
+			      QCUDA::QOperation::ADDITION,
+			      this->lenA_);
   cudaAddition<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, c2, device, this->lenA_);
 
   this->copyGPUDataToHost(device, host, this->lenA_);
@@ -248,6 +250,8 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::dotProductOnGPU(int mA,
   structComplex_t<T>*	device = nullptr;
   Tvcplxd*		ret = nullptr;
 
+  std::cout << "(mA,nA): " << "(" << mA << "," << nA << ")" << std::endl;
+  std::cout << "(mB,nB): " << "(" << mB << "," << nB << ")" << std::endl;
   c1 = this->allocMemOnGPU(c1, mA * nA);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
 
@@ -259,7 +263,7 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::dotProductOnGPU(int mA,
   device = this->allocMemOnGPU(device, nA * mB);
   this->setGPUData(device, (nA * mB), 0);
 
-  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), 1024); //DANGEROUS !!!!!
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::DOT, 1024); //DANGEROUS !!!!!
   cudaDotProduct<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, c2,	device,
 									mA, mB, nA, nB, (nA * mB));
 
@@ -328,7 +332,7 @@ std::complex<T>		QCUDA::CUDAGPU<T>::traceOnGPU(int n) {
   device = this->allocMemOnGPU(device, 1);
   this->setGPUData(device, 1, 0);
 
-  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), n);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::TRACE, n);
   cudaTrace<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, n);
 
   this->copyGPUDataToHost(device, host, 1);
