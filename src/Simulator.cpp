@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.cpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-08-16T15:33:10+02:00
+ * @Last modified time: 2018-08-21T10:35:00+02:00
  * @License: MIT License
  */
 
@@ -37,10 +37,10 @@ Simulator::Simulator(Circuit& circuit) : m_circuit(circuit) {
   m_state = Matrix::kron(std::vector<Matrix>(m_size, MatrixStore::k0));
 }
 
-Simulator::StepVisitor::StepVisitor(Simulator& simulator) :
+Simulator::GateVisitor::GateVisitor(Simulator& simulator) :
 m_simulator(simulator) {}
 
-void Simulator::StepVisitor::operator()(const Circuit::UGate& value) {
+void Simulator::GateVisitor::operator()(const Circuit::UGate& value) {
   // Computing the offset of the target qubit
   Circuit::Qubit target = value.target;
   int id = m_simulator.m_qRegOffsets.find(target.registerName)->second;
@@ -59,11 +59,11 @@ void Simulator::StepVisitor::operator()(const Circuit::UGate& value) {
   // Debug logs
   LOG(Logger::DEBUG, "Applying a U Gate:" << "\nU Gate:\n\ttheta: "
     << value.theta << ", phi: " << value.phi << ", lambda: " << value.lambda
-    << "\n\ttarget: " << value.target.registerName << "["
-    << value.target.element << "]\n" << std::endl);
+    << "\n\ttarget: " << value.target.registerName << "[" << value.target.element << "]\n"
+    << std::endl);
 }
 
-void Simulator::StepVisitor::operator()(const Circuit::CXGate& value) {
+void Simulator::GateVisitor::operator()(const Circuit::CXGate& value) {
   // Computing the offset of the control qubit.
   Circuit::Qubit control = value.control;
   int controlId = m_simulator.m_qRegOffsets.find(control.registerName)->second;
@@ -99,11 +99,11 @@ void Simulator::StepVisitor::operator()(const Circuit::CXGate& value) {
 
   LOG(Logger::DEBUG, "Applying a CX Gate:" << "\nCX Gate:\n\tcontrol: "
     << value.control.registerName << "[" << value.control.element
-    << "]\n\ttarget: " << value.target.registerName << "["
-    << value.target.element << "]\n" << std::endl);
+    << "]\n\ttarget: " << value.target.registerName << "[" << value.target.element << "]\n"
+    << std::endl);
 }
 
-void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
+void Simulator::GateVisitor::operator()(const Circuit::Measurement& value) {
   // Computing the offset of the qubit to measure.
   int sourceId = m_simulator.m_qRegOffsets.find(value.source.registerName)->second;
   sourceId += value.source.element;
@@ -144,16 +144,17 @@ void Simulator::StepVisitor::operator()(const Circuit::Measurement& value) {
   };
   LOG(Logger::DEBUG, "Performing a measurement:" << "\nMeasurement:\n\tsource: "
     << value.source.registerName << "[" << value.source.element << "]\n\tdest: "
-    << value.dest.registerName << "[" << value.dest.element
-    << "]\n" << std::endl);
+    << value.dest.registerName << "[" << value.dest.element << "]\n"
+    << std::endl);
 }
 
-void Simulator::StepVisitor::operator()(const Circuit::Barrier& __attribute__((unused)) value) {
+void Simulator::GateVisitor::operator()(const Circuit::Barrier& __attribute__((unused)) value) {
   // Nothing to be done for a barrier. It is the same as an identity, computation-wise
+  LOG(Logger::DEBUG, "Reached a barrier.");
 }
 
 // TODO: Implement those two
-void Simulator::StepVisitor::operator()(const Circuit::Reset& value) {
+void Simulator::GateVisitor::operator()(const Circuit::Reset& value) {
   // Computing the offset of the qubit to reset.
   int targetId_0 = m_simulator.m_qRegOffsets.find(value.target.registerName)->second;
   targetId_0 += value.target.element;
@@ -162,24 +163,40 @@ void Simulator::StepVisitor::operator()(const Circuit::Reset& value) {
   m_simulator.m_state[targetId_0] = 0;
   m_simulator.m_state[targetId_1] = 0;
 
-  std::cout << m_simulator.m_state << std::endl;
+  LOG(Logger::DEBUG, "Resetting a qubit:" << "\nReset:\n\ttarget: "
+    << value.target.registerName << "[" << value.target.element << "]\n"
+    << std::endl);
 }
 
-void Simulator::StepVisitor::operator()(const Circuit::ConditionalGate& __attribute__((unused)) value) {
-  LOG(Logger::ERROR, "Conditional statements not implemented in the simulator");
+void Simulator::GateVisitor::operator()(const Circuit::ConditionalGate& value) {
+  // Computing the intvalue of the register
+  uint j = 0;
+  for (uint i = 1; i < value.getTargets().size(); i++) {
+    j <<= 1;
+    j += m_simulator.m_cReg.find(value.getTargets()[i].registerName)->second[value.getTargets()[i].element];
+  }
+  // Performing the gate according to the register actual and expected values
+  // comparison
+  LOG(Logger::DEBUG, "Applying a Conditional Gate:" << "\nCondition:\n\ttested register: "
+    << value.testedRegister << "\n\texpected value: " << value.expectedValue << "\n"
+    << std::endl);
+  auto visitor = GateVisitor(m_simulator);
+  if (value.expectedValue == j) {
+    boost::apply_visitor(visitor, value.gate);
+  }
 }
 
 void Simulator::simulate() {
-  auto visitor = StepVisitor(*this);
+  auto visitor = GateVisitor(*this);
   // Looping through each steps of the circuit.
   for (std::vector<Circuit::Step>::iterator it = m_circuit.steps.begin();
     it != m_circuit.steps.end(); ++it) {
     // Initializing the gate vectors
     m_gates = std::vector<Matrix>(m_size, MatrixStore::i2);
     m_extraGates = std::vector<Matrix>(m_size, MatrixStore::null2);
-    for (auto &substep: *it) {
+    for (auto &gate: *it) {
       // Applying defined tranformations in the visitor.
-      boost::apply_visitor(visitor, substep);
+      boost::apply_visitor(visitor, gate);
     }
     // Computing the new state as the dot product between the kroenecker product
     // of the transformation gates for each qubits and the actual simulator state.
@@ -190,9 +207,9 @@ void Simulator::simulate() {
 }
 
 void Simulator::print(std::ostream &os) const {
-  os << "Simulator:\nState:(";
+  os << "Simulator:" << std::endl << "State:(";
   os << m_state;
-  os << ";),\nCREGs states:([\n";
+  os << ";),\nCREGs states:([" << std::endl;
   for (auto &reg: m_circuit.creg) {
     int j = 0;
     os << " [\t\"" << reg.name << "\": bitstring(";
@@ -201,7 +218,7 @@ void Simulator::print(std::ostream &os) const {
       j +=  m_cReg.find(reg.name)->second[i];
       os << m_cReg.find(reg.name)->second[i];
     }
-    os << "); intvalue(" << j << ");\t],\n";
+    os << "); intvalue(" << j << ");\t]," << std::endl;
   }
   os << "];)";
 }

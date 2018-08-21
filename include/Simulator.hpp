@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.hpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-07-18T14:35:25+01:00
+ * @Last modified time: 2018-08-21T10:39:15+02:00
  * @License: MIT License
  */
 
@@ -27,10 +27,10 @@ class Simulator
 {
   private:
     /**
-    * Step visitor nested class, used to visit steps and provide tranformation
+    * Gate visitor nested class, used to visit steps and provide tranformation
     * operators.
     */
-    class StepVisitor : public boost::static_visitor<>
+    class GateVisitor : public boost::static_visitor<>
     {
       private:
         /**
@@ -42,7 +42,7 @@ class Simulator
         * Construct a visitor object from the parent simulator instance.
         * @param sim The parent simulator instance.
         */
-        StepVisitor(Simulator &simulator);
+        GateVisitor(Simulator &simulator);
         /**
         * Register the transformation of a particular qubit from a UGate. .
         * @param value The UGate.
@@ -59,7 +59,8 @@ class Simulator
         */
         void operator()(const Circuit::Measurement& value);
         /**
-        * Register a barrier (ignores it as barrier don't perform any computations). .
+        * Register a barrier (ignores it as barrier don't perform any
+        * computations). .
         * @param value The barrier. Ignored.
         */
         void operator()(const Circuit::Barrier& value);
@@ -74,6 +75,7 @@ class Simulator
         */
         void operator()(const Circuit::ConditionalGate& value);
     };
+
     /**
     * The circuit layout object.
     */
