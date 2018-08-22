@@ -1,5 +1,5 @@
 /**
- * @Author: Nicolas Jankovic <nj203>
+11;rgb:0000/0000/0000* @Author: Nicolas Jankovic <nj203>
  * @Date:   2018-06-16T10:08:10+01:00
  * @Email:  nicolas.jankovic@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
@@ -386,8 +386,10 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::transposeOnGPU(int m, int n) {
 			      QCUDA::QOperation::TRANSPOSE,
 			      m,
 			      n);
-  cudaTranspose<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, m, n, (m * n));
-
+  cudaTranspose<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1,
+								       device,
+								       this->dim_.getTILE(),
+								       this->dim_.getROWS());
   this->copyGPUDataToHost(device, host, m * n);
   dumpStruct(host, m * n);
 
@@ -515,13 +517,13 @@ void	cudaTrace(QCUDA::structComplex_t<float>*,
 extern template __global__
 void	cudaTranspose(QCUDA::structComplex_t<double>*,
 		      QCUDA::structComplex_t<double>*,
-		      int, int, int);
+		      int, int);
 
 
 extern template __global__
 void	cudaTranspose(QCUDA::structComplex_t<float>*,
 		      QCUDA::structComplex_t<float>*,
-		      int, int, int);
+		      int, int);
 
 
 extern template __global__
