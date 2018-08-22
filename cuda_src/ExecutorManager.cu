@@ -6,6 +6,7 @@
  * @Filename: ExecutorManager.cu
  * @Last modified by:   l3ninj
  * @Last modified time: 2018-08-21T22:22:44+02:00
+ * @Last modified time: 2018-08-22T19:30:48+02:00
  * @License: MIT License
  */
 
@@ -15,6 +16,7 @@
 #include "ExecutorManager.hpp"
 #include "Logger.hpp"
 
+extern bool g_cpu_execution;
 ExecutorManager::ExecutorManager() {
   //m_executor = new GPUExecutor(QCUDA::GPUCriteria::HIGHER_COMPUTE_CAPABILITY);
   if (g_cpu_execution == false) {
