@@ -32,25 +32,25 @@ Tvcplxd*	GPUExecutor::add(Tvcplxd* a, Tvcplxd* b) {
 
 Tvcplxd*	GPUExecutor::dot(Tvcplxd* a, Tvcplxd* b,
 				 int ma, int mb, int na, int nb) {
-  Tvcplxd* result = new Tvcplxd(na * mb);
+  // Tvcplxd* result = new Tvcplxd(na * mb);
 
-  for (int i = 0; i < na; i++) {
-    for (int j = 0; j < mb; j++) {
-      (*result)[i * mb + j] = 0;
-      for (int k = 0; k < nb; k++) {
-        (*result)[i * mb + j] += (*a)[i * ma + k] * (*b)[k * mb + j];
-      }
-    }
-  }
-  return result;
-  // try {
-  //   this->cgpu_.initComplexVecs(a, b);
-  //   return (this->cgpu_.dotProductOnGPU(ma, mb, na, nb));
-  // } catch (const std::exception& err) {
-  //   std::cerr << err.what() << std::endl;
-  //   std::cerr << "Couldn't perform the dot product on the GPU !" << std::endl;
-  //   return (nullptr);
+  // for (int i = 0; i < na; i++) {
+  //   for (int j = 0; j < mb; j++) {
+  //     (*result)[i * mb + j] = 0;
+  //     for (int k = 0; k < nb; k++) {
+  //       (*result)[i * mb + j] += (*a)[i * ma + k] * (*b)[k * mb + j];
+  //     }
+  //   }
   // }
+  // return result;
+  try {
+    this->cgpu_.initComplexVecs(a, b);
+    return (this->cgpu_.dotProductOnGPU(ma, mb, na, nb));
+  } catch (const std::exception& err) {
+    std::cerr << err.what() << std::endl;
+    std::cerr << "Couldn't perform the dot product on the GPU !" << std::endl;
+    return (nullptr);
+  }
 }
 
 

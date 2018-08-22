@@ -33,10 +33,10 @@ namespace MatrixStore {
   static Matrix k1 = Matrix(new Tvcplxd({0.0, 1.0}), 1, 2);
 
   //! Projector of |0> matrix.
-  static Matrix pk0 = k0 * k0.transpose();
+  static Matrix pk0 = Matrix(new Tvcplxd({1.0, 0.0, 0.0, 0.0}), 2, 2);
 
   //! Projector of |1> matrix.
-  static Matrix pk1 = k1 * k1.transpose();
+  static Matrix pk1 = Matrix(new Tvcplxd({0.0, 0.0, 0.0, 1.0}), 2, 2);
 
   //! Pauli-X matrix, bit-flip matrix.
   static Matrix x = Matrix(new Tvcplxd({0.0, 1.0, 1.0, 0.0}), 2, 2);
