@@ -138,31 +138,37 @@ Tvcplxd*	GPUExecutor::normalize(Tvcplxd* a) {
   // }
 }
 
-/**
- * Compute the probability of ending with value v when measuring qubit number q
- *
- * @param a A Vector content
- * @param q The qubit's index
- * @param v The expected outcome
- * @return double The probability of the outcome v on qubit q
- */
-double GPUExecutor::measureProbability(Tvcplxd *a, int q, bool v) {}
+double GPUExecutor::measureProbability(Tvcplxd *a, int q, bool v) {
+  int qubitCount = log2(a->size());
+  int blockSize = pow(2, qubitCount - q - 1);
 
-/**
- * @brief Compute the resulting vector state after measuring the value v on qubit q
- *
- * @param a A Vector content
- * @param q The qubit's index
- * @param v The expected outcome
- * @return Tvcplxd* The vector state after measurement outcome v on qubit q
- */
-Tvcplxd* GPUExecutor::measureOutcome(Tvcplxd *a, int q, bool v) {}
+  double prob = 0;
+  for (uint i = 0; i < a->size(); ++i) {
+    bool takeIntoAccount = (i / blockSize) % 2 == (int)v;
+    std::complex<double> squared = (*a)[i] * (*a)[i];
+    prob += squared.real() * (int)takeIntoAccount;
+  }
 
-/**
- * @brief Perform Matrx-scalar multiplication
- *
- * @param a The matrix content
- * @param scalar A scalar
- * @return Tvcplxd* The resulting Matrix
- */
-Tvcplxd* GPUExecutor::multiply(Tvcplxd *a, const std::complex<double> &scalar) {}
+  return prob;
+}
+
+Tvcplxd* GPUExecutor::measureOutcome(Tvcplxd *a, int q, bool v) {
+  int qubitCount = log2(a->size());
+  int blockSize = pow(2, qubitCount - q - 1);
+
+  Tvcplxd* result = new Tvcplxd(a->size());
+  for (uint i = 0; i < a->size(); ++i) {
+    bool takeIntoAccount = (i / blockSize) % 2 == (int)v;
+    (*result)[i] = (*a)[i] * (double)takeIntoAccount;
+  }
+  return normalize(result);
+}
+
+Tvcplxd* GPUExecutor::multiply(Tvcplxd *a, const std::complex<double> &scalar) {
+  Tvcplxd* result = new Tvcplxd(a->size());
+  for (uint i = 0; i < a->size(); ++i) {
+    (*result)[i] = (*a)[i] * scalar;
+  }
+  return result;
+}
+
