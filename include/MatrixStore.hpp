@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: MatrixStore.hpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-07-19T13:28:01+01:00
+ * @Last modified time: 2018-08-22T19:26:00+02:00
  * @License: MIT License
  */
 
@@ -34,9 +34,11 @@ namespace MatrixStore {
 
   //! Projector of |0> matrix.
   static Matrix pk0 = k0 * k0.transpose();
+  static Matrix pk0 = Matrix(new Tvcplxd({1.0, 0.0, 0.0, 0.0}), 2, 2);
 
   //! Projector of |1> matrix.
   static Matrix pk1 = k1 * k1.transpose();
+  static Matrix pk1 = Matrix(new Tvcplxd({0.0, 0.0, 0.0, 1.0}), 2, 2);
 
   //! Pauli-X matrix, bit-flip matrix.
   static Matrix x = Matrix(new Tvcplxd({0.0, 1.0, 1.0, 0.0}), 2, 2);
