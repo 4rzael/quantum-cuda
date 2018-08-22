@@ -48,7 +48,7 @@ void	cudaTrace(QCUDA::structComplex_t<T>*,
 template<typename T> __global__
 void	cudaTranspose(QCUDA::structComplex_t<T>*,
 		      QCUDA::structComplex_t<T>*,
-		      int, int, int);
+		      int, int);
 
 
 template<typename T> __global__
