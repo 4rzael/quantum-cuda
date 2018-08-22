@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-07-04T17:53:25+01:00
+ * @Last modified time: 2018-08-16T15:33:37+02:00
  * @License: MIT License
  */
 
@@ -66,7 +66,12 @@ class Matrix {
     Matrix operator*(const std::complex<double>& scalar) const;
     Matrix operator*(const Matrix& other) const;
     /**
-    * Matrix kron operation
+    * Matrix content accessors
+    */
+    std::complex<double> operator[](int i) const {return (*m_content)[i];}
+    std::complex<double> & operator[](int i) {return (*m_content)[i];}
+    /**
+    * Matrix kron opera.getContent())tion
     */
     static Matrix kron(std::vector<Matrix> m);
     /**
@@ -81,6 +86,10 @@ class Matrix {
     * Matrix trace
     */
     std::complex<double> trace() const;
+
+    double measureStateProbability(int qubitIndex, bool value) const;
+
+    Matrix measureStateOutcome(int qubitIndex, bool value) const;
 };
 
 /**

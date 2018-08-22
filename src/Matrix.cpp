@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-07-04T17:59:39+01:00
+ * @Last modified time: 2018-08-16T15:32:58+02:00
  * @License: MIT License
  */
 
@@ -47,6 +47,13 @@ Matrix Matrix::operator*(const Matrix& other) const {
   return result;
 }
 
+Matrix Matrix::operator*(const std::complex<double> &scalar) const {
+  IExecutor *exec = ExecutorManager::getInstance().getExecutor();
+
+  Matrix result = Matrix(exec->multiply(m_content, scalar), m_dim.first ,m_dim.second);
+  return result;
+}
+
 Matrix Matrix::kron(std::vector<Matrix> m) {
   IExecutor *exec = ExecutorManager::getInstance().getExecutor();
 
@@ -80,14 +87,24 @@ std::complex<double> Matrix::trace() const {
   return exec->trace(m_content, m_dim.first);
 }
 
+double Matrix::measureStateProbability(int qubitIndex, bool value) const {
+  IExecutor* exec = ExecutorManager::getInstance().getExecutor();
+  return exec->measureProbability(m_content, qubitIndex, value);
+}
+
+Matrix Matrix::measureStateOutcome(int qubitIndex, bool value) const {
+  IExecutor* exec = ExecutorManager::getInstance().getExecutor();
+  return Matrix(exec->measureOutcome(m_content, qubitIndex, value), m_dim.first, m_dim.second);
+}
+
 std::ostream& operator<<(std::ostream& os, const Matrix& m)
 {
     os << "[" << std::endl;
     for (int j = 0; j < m.getDimensions().second; j++) {
       os << " [";
       for (int i = 0; i < m.getDimensions().first; i++) {
-        os << "\t" << std::fixed << std::setprecision(2) << (*m.getContent())[j * m.getDimensions().first + i].real() <<
-        "+" << std::fixed << std::setprecision(2) << (*m.getContent())[j * m.getDimensions().first + i].imag() << "i";
+        os << "\t" << std::fixed << std::setprecision(2) << m[j * m.getDimensions().first + i].real() <<
+        "+" << std::fixed << std::setprecision(2) << m[j * m.getDimensions().first + i].imag() << "i";
       }
       os << "\t]," << std::endl;
     }

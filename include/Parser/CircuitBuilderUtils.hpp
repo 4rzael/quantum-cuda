@@ -16,6 +16,7 @@
 #include "Circuit.hpp"
 #include "Parser/AST.hpp"
 #include "Errors.hpp"
+#include "utils.hpp"
 
 /* TODO: Put into a namespace ? */
 
@@ -85,3 +86,11 @@ void checkOutOfBound(const Circuit &circuit, const Parser::AST::t_variable &var)
  * @throw OpenQASMError
  */
 void checkInexistantRegister(const Circuit &circuit, const Parser::AST::t_variable &var, const RegisterType rtype=RegisterType::ANY);
+
+/**
+ * @brief Get the targets of a Gate
+ * 
+ * @param gate the gate
+ * @return The gate's targets
+ */
+std::vector<Circuit::Qubit> getGateTargets(const Circuit::Gate &gate);

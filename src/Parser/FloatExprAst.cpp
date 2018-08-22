@@ -3,13 +3,13 @@
  * @Date:   Sat Jun 23 2018
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
- * @Filename: float_expr_ast.cpp
+ * @Filename: FloatExprAst.cpp
  * @Last modified by:   4rzael
  * @Last modified time: Sat Jun 23 2018, 14:31:23
  * @License: MIT License
  */
 
-#include "Parser/float_expr_ast.hpp"
+#include "Parser/FloatExprAst.hpp"
 
 using namespace boost::spirit;
 using namespace boost::spirit::x3;

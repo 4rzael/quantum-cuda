@@ -16,9 +16,18 @@
 #include "Logger.hpp"
 
 #include "Parser/ASTGenerator.hpp"
-#include "Circuit.hpp"
 #include "Parser/CircuitBuilder.hpp"
-#include "Simulator.hpp"
+#include "Circuit.hpp"
+#include "CircuitCompressor.hpp"
+#include "TaskScheduling/CircuitToTaskGraphConverter.hpp"
+#include "TaskScheduling/BasicTaskScheduler.hpp"
+#include "TaskScheduling/BasicStateStore.hpp"
+#include "TaskScheduling/BasicMeasurementResultsTree.hpp"
+#include "Worker/Simulator.hpp"
+#include "Worker/Worker.hpp"
+
+using namespace StateStore;
+using namespace MeasurementResultsTree;
 
 int main(int ac, char **av) {
   if (ac <2) {
@@ -53,14 +62,30 @@ int main(int ac, char **av) {
   /* Reads the AST and generate a Circuit */
   try {
     circuit = CircuitBuilder(av[1])(ast);
-    LOG(Logger::DEBUG, "Generated circuit:" << std::endl << circuit);
+    circuit = CircuitCompressor(circuit)();
+    LOG(Logger::DEBUG, "Optimized circuit:" << std::endl << circuit);
   } catch (const OpenQASMError& e) {
     LOG(Logger::ERROR, "Error while generating the circuit: " << e.what());
     return EXIT_FAILURE;
   }
 
-  Simulator simulator = Simulator(circuit);
-  simulator.simulate();
-  LOG(Logger::INFO, "Simulator in final state:" << std::endl << simulator);
+  std::shared_ptr<IMeasurementResultsTree> measurementTree = std::make_shared<BasicMeasurementResultsTree>();
+
+  /* Convert circuit to graph of tasks */
+  CircuitToTaskGraphConverter converter(circuit);
+  TaskGraph::Graph graph = converter.generateTaskGraph(*measurementTree);
+  LOG(Logger::INFO, "Task graph:" << graph);
+
+  /* Creates scheduler and state store*/
+  std::shared_ptr<ITaskScheduler> scheduler = std::make_shared<BasicTaskScheduler>(graph);
+  std::shared_ptr<IStateStore> stateStore = std::make_shared<BasicStateStore>(graph);
+
+  /* Start a worker */
+  Worker worker = Worker(*scheduler, *stateStore, *measurementTree);
+  worker();
+
+  /* End of the simulation */
+  measurementTree->printResults(circuit.creg);
+
   return EXIT_SUCCESS;
 }

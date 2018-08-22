@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.hpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-06-28T22:40:54+01:00
+ * @Last modified time: 2018-07-18T14:35:25+01:00
  * @License: MIT License
  */
 
@@ -16,7 +16,8 @@
 #include <map>
 
 #include "Matrix.hpp"
-#include "Circuit.hpp"
+#include "TaskScheduling/TaskGraph.hpp"
+#include "TaskScheduling/IMeasurementResultsTree.hpp"
 
 /**
 * @brief Quantum circuit Simulator class.
@@ -54,7 +55,7 @@ class Simulator
         */
         void operator()(const Circuit::CXGate& value);
         /**
-        * Register the measurement of a qubit. .
+        * Register the measurement of a qubit. Doesn't do anything anymore. See Measurer class
         * @param value The Measurement to perform..
         */
         void operator()(const Circuit::Measurement& value);
@@ -74,14 +75,11 @@ class Simulator
         */
         void operator()(const Circuit::ConditionalGate& value);
     };
-    /**
-    * The circuit layout object.
-    */
-    Circuit& m_circuit;
-    /**
-    * The c registers.
-    */
-    std::map<std::string, bool(*)> m_cReg;
+
+    TaskGraph::SimulateCircuitTask                 &m_task;
+    MeasurementResultsTree::IMeasurementResultsTree &m_measurementsTree;
+    bool m_shouldNormalize;
+
     /**
     * The qbit registers offsets.
     */
@@ -94,23 +92,27 @@ class Simulator
      * A Matrix object representing the state.
      */
     Matrix m_state;
+    /**
+    * A vector of Matrix representing the gates used to change the state at the
+    * end of each step.
+    */
+    std::vector<Matrix> m_gates;
+    /**
+    * A vector of Matrix representing the gates used only for cx-gates operator
+    * computation.
+    */
+    std::vector<Matrix> m_extraGates;
   public:
     /**
      * Construct a Simulator object from a given layout.
      * @param layout The circuit layout.
      */
-    Simulator(Circuit& circuit);
+    Simulator(TaskGraph::SimulateCircuitTask &task,
+              MeasurementResultsTree::IMeasurementResultsTree &measurementTree,
+              Matrix const &state);
     /**
      * Run the circuit
      */
-    void simulate();
-    /**
-    * Print object to ostream in a readable manner.
-    */
-    void print(std::ostream &os) const;
-};
+    Matrix simulate();
 
-/**
-* Simulator redirection to ostream overload.
-*/
-std::ostream& operator<<(std::ostream& os, const Simulator& sim);
+};
