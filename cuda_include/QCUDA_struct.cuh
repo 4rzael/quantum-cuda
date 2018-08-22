@@ -51,6 +51,10 @@ namespace QCUDA {
      */
     __host__ __device__ s_complex();
 
+    __host__ __device__ s_complex(const struct s_complex&);
+
+    __host__ __device__ struct s_complex<T>& operator=(const struct s_complex&);
+  
     /**
      * 'struct s_complex' destructor.
      */
@@ -86,13 +90,14 @@ namespace QCUDA {
      */
     __host__ __device__ void	aggregateImag(const T&);
 
-    __host__ __device__ void			operator+=(const struct s_complex<T>&);
     __host__ __device__ struct s_complex<T>	operator+(const struct s_complex<T>&);
+    __host__ __device__ struct s_complex<T>	operator*(const struct s_complex<T>&);
+    __host__ __device__ struct s_complex<T>&	operator+=(const struct s_complex<T>&);
 
   };
 
-  template<typename T>
-  __host__ std::ostream&	operator<<(std::ostream&, const struct s_complex<T>&);
+  template<typename T> __host__
+  std::ostream&	operator<<(std::ostream&, const struct s_complex<T>&);
 
   /**
    * Below we have made an alias of 'struct s_complex<T>' to 'structComplex_t'.

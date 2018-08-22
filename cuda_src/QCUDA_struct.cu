@@ -27,8 +27,21 @@ QCUDA::s_complex<T>::s_complex()
 
 
 template<typename T> __host__ __device__
-QCUDA::s_complex<T>::~s_complex()
+QCUDA::s_complex<T>::s_complex(const struct s_complex& cpy)
+  : real_(cpy.real_), imag_(cpy.imag_)
 {}
+
+
+template<typename T> __host__ __device__
+QCUDA::s_complex<T>::~s_complex() = default;
+
+
+template<typename T> __host__ __device__
+struct QCUDA::s_complex<T>&	QCUDA::s_complex<T>::operator=(const struct s_complex& cpy) {
+  this->real_ = cpy.real_;
+  this->imag_ = cpy.imag_;
+  return (*this);
+}
 
 
 template<typename T> __host__ __device__
@@ -68,19 +81,29 @@ void	QCUDA::s_complex<T>::aggregateImag(const T& v) {
 
 
 template<typename T> __host__ __device__
-void	QCUDA::s_complex<T>::operator+=(const struct s_complex<T>& c) {
-  this->real_ += c.real_;
-  this->imag_ += c.imag_;
-}
-
-
-template<typename T> __host__ __device__
 struct QCUDA::s_complex<T>	QCUDA::s_complex<T>::operator+(const struct s_complex<T>& c) {
   struct s_complex<T> tmp;
 
   tmp.real_ = this->real_ + c.real_;
   tmp.imag_ = this->imag_ + c.imag_;
   return (tmp);
+}
+
+template<typename T> __host__ __device__
+struct QCUDA::s_complex<T>	QCUDA::s_complex<T>::operator*(const struct s_complex<T>& c) {
+  struct s_complex<T> tmp;
+
+  tmp.real_ = (this->real_ * c.real_) + (this->imag_ * c.imag_ * -1);
+  tmp.imag_ = (this->real_ * c.imag_) + (this->imag_ * c.real_);
+  return (tmp);
+}
+
+
+template<typename T> __host__ __device__
+struct QCUDA::s_complex<T>&	QCUDA::s_complex<T>::operator+=(const struct s_complex<T>& c) {
+  this->real_ += c.real_;
+  this->imag_ += c.imag_;
+  return (*this);
 }
 
 
@@ -90,6 +113,7 @@ std::ostream&	operator<<(std::ostream& os, const struct QCUDA::s_complex<T>& c) 
   os << c.imag_ << std::endl;
   return (os);
 }
+
 
 /**
  * Since templates are defined outside of the header file, due to the fact that

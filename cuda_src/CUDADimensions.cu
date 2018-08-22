@@ -25,6 +25,12 @@ __host__
 QCUDA::CUDADim::~CUDADim() = default;
 
 
+// __host__
+// bool	QCUDA::CUDADim::checkDim(QCUDA::) const noexcept {
+//   switch
+// }
+
+
 __host__
 constexpr void	QCUDA::CUDADim::resetDimensions() noexcept {
   this->gridDim_.x = 1;
@@ -37,8 +43,9 @@ constexpr void	QCUDA::CUDADim::resetDimensions() noexcept {
 }
 
 
+//init as linear
 __host__
-void	QCUDA::CUDADim::naiveInit(const cudaDeviceProp& prop,
+void	QCUDA::CUDADim::naiveInit(const cudaDeviceProp& prop, // CHANGE NAME
 				  int nSteps) {
   this->resetDimensions();
   if ((this->gridDim_.x = ((nSteps + (prop.maxThreadsDim[0] - 1)) / prop.maxThreadsDim[0])) == 0) {
@@ -53,37 +60,49 @@ void	QCUDA::CUDADim::naiveInit(const cudaDeviceProp& prop,
 }
 
 
+//init as plan
 __host__
 void	QCUDA::CUDADim::initForDotProduct(const cudaDeviceProp& prop,
-					  int nSteps) {
+					  int m,
+					  int n) {
   this->resetDimensions();
-  if ((this->gridDim_.x = ((nSteps + (prop.maxThreadsDim[0] - 1)) / prop.maxThreadsDim[0])) == 0) {
+  if ((this->gridDim_.x = ((m + (prop.maxThreadsDim[0] - 1)) / prop.maxThreadsDim[0])) == 0) {
     this->gridDim_.x = 1;
+  }
+  if ((this->gridDim_.y = ((n + (prop.maxThreadsDim[1] - 1)) / prop.maxThreadsDim[1])) == 0) {
+    this->gridDim_.y = 1;
   }
   this->blockDim_.x = prop.maxThreadsDim[0];
   this->blockDim_.y = prop.maxThreadsDim[1];
-  
 }
 
 
 __host__
 void	QCUDA::CUDADim::initGridAndBlock(const cudaDeviceProp& prop,
 					 QCUDA::QOperation&& op,
-					 int nSteps) {
+					 int m,
+					 int n) {
   switch (op) {
   case QCUDA::QOperation::DOT:
-    this->initForDotProduct(prop,nSteps);
+    this->initForDotProduct(prop, m, n);
+    break;
   case QCUDA::QOperation::KRONECKER:
-    this->initForDotProduct(prop,nSteps); // CHANGE
+    this->initForDotProduct(prop, m, n);
+    break;
   case QCUDA::QOperation::TRANSPOSE:
-    this->initForDotProduct(prop,nSteps); // CHANGE
+    this->initForDotProduct(prop, m, n);
+    break;
   case QCUDA::QOperation::NORMALIZE:
-    this->initForDotProduct(prop,nSteps); // CHANGE
+    this->initForDotProduct(prop, m, n);
+    break;
   default:
-    this->naiveInit(prop, nSteps);
+    this->naiveInit(prop, m);
+    break;
   }
-  std::cout << "this->gridDim_.x:" << this->gridDim_.x << std::endl;
-  std::cout << "this->blockDim_.x" << this->blockDim_.x << std::endl;
+  std::cout << "this->gridDim_.x: " << this->gridDim_.x << std::endl;
+  std::cout << "this->gridDim_.y: " << this->gridDim_.y << std::endl;
+  std::cout << "this->blockDim_.x: " << this->blockDim_.x << std::endl;
+  std::cout << "this->blockDim_.y: " << this->blockDim_.y << std::endl;
 }
 
 __host__

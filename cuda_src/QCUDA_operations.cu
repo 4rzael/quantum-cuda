@@ -28,12 +28,10 @@ void	cudaAddition(QCUDA::structComplex_t<T>* c1,
 		     QCUDA::structComplex_t<T>* result,
 		     int n) {
   int	idx;
-
+  
   idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx < n) {
-    result[idx].real_ = c1[idx].real_ + c2[idx].real_;
-    result[idx].imag_ = c1[idx].imag_ + c2[idx].imag_;
-  }
+  if (idx < n)
+    result[idx] = c1[idx] + c2[idx];
 }
 
 
@@ -52,10 +50,9 @@ void	cudaDotProduct(QCUDA::structComplex_t<T>* c1,
   idx = blockIdx.x * blockDim.x + threadIdx.x;
   idy = blockIdx.y * blockDim.y + threadIdx.y;
 
-  if (idx < (na * mb) && idy < (na * mb)) { 
-    for (int k = 0; k < nb; k++) {
-      result[idx * mb + idy].real_ += c1[idx * ma + k].real_ * c2[k * mb + idy].real_;
-      result[idx * mb + idy].imag_ += c1[idx * ma + k].imag_ * c2[k * mb + idy].imag_;
+  if (idx < mb && idy < na) { 
+    for (int k = 0; k < mb; k++) {
+      result[idx * mb + idy] += c1[idx * ma + k] * c2[k * mb + idy];
     }
   }
 }
@@ -89,10 +86,8 @@ void	cudaTrace(QCUDA::structComplex_t<T>* c,
   int idx;
 
   idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx < n) {
-    result->real_ += c[idx * n + idx].real_;
-    result->imag_ += c[idx * n + idx].imag_;
-  }
+  if (idx < n)
+    (*result) += c[idx * n + idx];
 }
 
 
@@ -102,11 +97,16 @@ void	cudaTranspose(QCUDA::structComplex_t<T>* c1,
 		      int m,
 		      int n,
 		      int steps) {
-//   int idx = threadIdx.x;
-//   int idy = threadIdx.y;
+  int	idx;
+  int	idy;
 
-//   res[idx * n + idy].real_ = c1[idy * m + idx].getReal());
-// res[idx * n + idy].imag_ = c1[idy * m + idx].getImag());
+  idx = blockIdx.x * blockDim.x + threadIdx.x;
+  idy = blockIdx.y * blockDim.y + threadIdx.y;
+
+  if (idx < m && idy < n) {
+    result[idx * n + idy].real_ = c1[idy * m + idx].real_;
+    result[idx * n + idy].imag_ = c1[idy * m + idx].imag_;
+  }
 }
 
 

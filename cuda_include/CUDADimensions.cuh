@@ -1,5 +1,5 @@
 /**
-1;5202;0c * @Author: Nicolas Jankovic <nj203>
+ * @Author: Nicolas Jankovic <nj203>
  * @Date:   2018-06-16T10:08:10+01:00
  * @Email:  nicolas.jankovic@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
@@ -27,6 +27,12 @@ namespace QCUDA {
   //! \brief CUDADim  
   //!
   class CUDADim {
+  private:
+    // class enum Limit {
+    //   X,
+    //   Y,
+    // 	Z	
+    // };
   private:
     //! \private
     //! \brief
@@ -59,7 +65,7 @@ namespace QCUDA {
     __host__
     void	initGridAndBlock(const cudaDeviceProp&,
 				 QCUDA::QOperation&&,
-				 int);
+				 int, int);
 
 
     //! \public
@@ -78,6 +84,12 @@ namespace QCUDA {
     //! \private
     //! \brief
     //!
+    // __host__
+    // void	checkDim() const noexcept;
+
+    //! \private
+    //! \brief
+    //!
     __host__
     constexpr void	resetDimensions() noexcept;
 
@@ -92,6 +104,6 @@ namespace QCUDA {
     //! \brief
     //!
     __host__
-    void	initForDotProduct(const cudaDeviceProp&, int);
+    void	initForDotProduct(const cudaDeviceProp&, int, int);
   };
 };

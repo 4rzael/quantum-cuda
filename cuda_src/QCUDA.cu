@@ -88,34 +88,34 @@ void	QCUDA::CUDAGPU<T>::initComplexVecs(Tvcplxd const * const hostA,
       this->cudaComplexVecA_ = new structComplex_t<T>[hostA->size()];
       this->lenA_ = hostA->size();   
       for (int i = 0; i < hostA->size(); ++i) {
-	std::cout << "("
-		  << (*hostA)[i].real()
-		  << ", "
-		  << (*hostA)[i].imag()
-		  << ")"
-		  << std::endl;
+	// std::cout << "("
+	// 	  << (*hostA)[i].real()
+	// 	  << ", "
+	// 	  << (*hostA)[i].imag()
+	// 	  << ")"
+	// 	  << std::endl;
 	this->cudaComplexVecA_[i].real_ = (*hostA)[i].real();
 	this->cudaComplexVecA_[i].imag_ = (*hostA)[i].imag();
       }
     }
-    std::cout << std::endl;
-    dumpStruct(this->cudaComplexVecA_, this->lenA_);
+    // std::cout << std::endl;
+    // dumpStruct(this->cudaComplexVecA_, this->lenA_);
     if (hostB) {
       this->cudaComplexVecB_ = new structComplex_t<T>[hostB->size()];
       this->lenB_ = hostB->size();   
       for (int i = 0; i < hostB->size(); ++i) {
-	std::cout << "("
-		  << (*hostB)[i].real()
-		  << ", "
-		  << (*hostB)[i].imag()
-		  << ")"
-		  << std::endl;	
+	// std::cout << "("
+	// 	  << (*hostB)[i].real()
+	// 	  << ", "
+	// 	  << (*hostB)[i].imag()
+	// 	  << ")"
+	// 	  << std::endl;	
 	this->cudaComplexVecB_[i].real_ = (*hostB)[i].real();
 	this->cudaComplexVecB_[i].imag_ = (*hostB)[i].imag();
       }
     }
-    std::cout << std::endl;
-    dumpStruct(this->cudaComplexVecB_, this->lenB_);
+    // std::cout << std::endl;
+    // dumpStruct(this->cudaComplexVecB_, this->lenB_);
   } catch(const std::bad_alloc& err) {
     std::cerr << err.what() << std::endl;
     throw std::runtime_error("Error while allocating memory with new !");
@@ -210,13 +210,12 @@ Tvcplxd*			QCUDA::CUDAGPU<T>::additionOnGPU() {
   structComplex_t<T>*		device = nullptr;
   Tvcplxd*			ret = nullptr;
 
+  std::cout << "===ADDITION===" << std::endl;
   c1 = this->allocMemOnGPU(c1, this->lenA_);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
-  dumpStruct(this->cudaComplexVecA_, this->lenA_);
 
   c2 = this->allocMemOnGPU(c2, this->lenB_);
   this->copyHostDataToGPU(c2, QCUDA::Vectors::VECTOR_B);
-  dumpStruct(this->cudaComplexVecB_, this->lenB_);
 
   host = new structComplex_t<T> [this->lenA_];
 
@@ -224,10 +223,12 @@ Tvcplxd*			QCUDA::CUDAGPU<T>::additionOnGPU() {
 
   this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(),
 			      QCUDA::QOperation::ADDITION,
-			      this->lenA_);
+			      this->lenA_,
+			      0);
   cudaAddition<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, c2, device, this->lenA_);
 
   this->copyGPUDataToHost(device, host, this->lenA_);
+  std::cout << "Res:" << std::endl;
   dumpStruct(host, this->lenA_);
 
   freeMemOnGPU(c1);
@@ -235,6 +236,7 @@ Tvcplxd*			QCUDA::CUDAGPU<T>::additionOnGPU() {
   freeMemOnGPU(device);
   ret = convertCUDAVecToHostVec(host, this->lenA_);
   delete []host;
+  std::cout << "===ADDITION===" << std::endl;
   return (ret);
 }
 
@@ -250,30 +252,39 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::dotProductOnGPU(int mA,
   structComplex_t<T>*	device = nullptr;
   Tvcplxd*		ret = nullptr;
 
-  std::cout << "(mA,nA): " << "(" << mA << "," << nA << ")" << std::endl;
-  std::cout << "(mB,nB): " << "(" << mB << "," << nB << ")" << std::endl;
+  std::cout << "===DOT PRODUCT===" << std::endl;
+  std::cout << "lenA: " << this->lenA_;
+  std::cout << "(mA,nA): " << "(" << nA << "," << mA << ")" << std::endl;
+  std::cout << "lenB: " << this->lenB_;
+  std::cout << "(mB,nB): " << "(" << nB << "," << mB << ")" << std::endl;
   c1 = this->allocMemOnGPU(c1, mA * nA);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
+  std::cout << "c1:" << std::endl;
+  dumpStruct(this->cudaComplexVecA_, this->lenA_);
 
   c2 = this->allocMemOnGPU(c2, mB * nB);
   this->copyHostDataToGPU(c2, QCUDA::Vectors::VECTOR_B);
+  std::cout << "c2:" << std::endl;
+  dumpStruct(this->cudaComplexVecB_, this->lenB_);
 
   host = new structComplex_t<T> [nA * mB];
 
   device = this->allocMemOnGPU(device, nA * mB);
-  this->setGPUData(device, (nA * mB), 0);
+  // this->setGPUData(device, (nA * mB), 0);
 
-  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::DOT, 1024); //DANGEROUS !!!!!
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::DOT, mB, nA);
   cudaDotProduct<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, c2,	device,
 									mA, mB, nA, nB, (nA * mB));
 
   this->copyGPUDataToHost(device, host, nA * mB);
+  dumpStruct(host, nA * mB);
 
   freeMemOnGPU(c1);
   freeMemOnGPU(c2);
   freeMemOnGPU(device);
   ret = convertCUDAVecToHostVec(host, nA * mB);
   delete []host;
+  std::cout << "===DOT PRODUCT===" << std::endl;
   return (ret);
 }
 
@@ -332,7 +343,7 @@ std::complex<T>		QCUDA::CUDAGPU<T>::traceOnGPU(int n) {
   device = this->allocMemOnGPU(device, 1);
   this->setGPUData(device, 1, 0);
 
-  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::TRACE, n);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::TRACE, n, 0);
   cudaTrace<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, n);
 
   this->copyGPUDataToHost(device, host, 1);
@@ -355,22 +366,36 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::transposeOnGPU(int m, int n) {
   structComplex_t<T>*	device = nullptr;
   Tvcplxd*		ret;
 
+  std::cout << "===TRANSPOSE===" << std::endl;
   c1 = this->allocMemOnGPU(c1, this->lenA_);
+  std::cout << "lenA_: " << this->lenA_ << std::endl;
+  std::cout << "m (column): " << m << std::endl;
+  std::cout << "n (line): " << n << std::endl;
+  std::cout << "a" << std::endl;
+  dumpStruct(this->cudaComplexVecA_, this->lenA_);
+  
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
-
   host = new structComplex_t<T> [m * n];
+  this->copyGPUDataToHost(c1, host, m * n);
+  std::cout << "b" << std::endl;
+  dumpStruct(host, m * n);
 
   device = this->allocMemOnGPU(device, m * n);
- 
-  // this->initGridAndBlock(QCUDA::QOperation::TRANSPOSE, m, n);
-  // cudaTranspose<<<this->dimGrid_, this->dimBlock_>>>(c1, device, m, n);
+  
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(),
+			      QCUDA::QOperation::TRANSPOSE,
+			      m,
+			      n);
+  cudaTranspose<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, m, n, (m * n));
 
   this->copyGPUDataToHost(device, host, m * n);
+  dumpStruct(host, m * n);
 
   freeMemOnGPU(c1);
   freeMemOnGPU(device);
   ret = convertCUDAVecToHostVec(host, m * n);
   delete []host;
+  std::cout << "===TRANSPOSE===" << std::endl;
   return (ret);
 }
 
