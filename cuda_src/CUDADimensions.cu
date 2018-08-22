@@ -67,13 +67,18 @@ void	QCUDA::CUDADim::initForDotProduct(const cudaDeviceProp& prop,
 					  int m,
 					  int n) {
   this->resetDimensions();
-  const int threadPerDim = min((int)sqrt(prop.maxThreadsPerBlock), min(prop.maxThreadsDim[0], prop.maxThreadsDim[1]));
-  this->blockDim_.x = threadPerDim;
-  this->blockDim_.y = threadPerDim;
-  if ((this->gridDim_.x = m / threadPerDim) == 0) {
+  if (m != 1) { // matrix
+    const int threadPerDim = min((int)sqrt(prop.maxThreadsPerBlock), min(prop.maxThreadsDim[0], prop.maxThreadsDim[1]));
+    this->blockDim_.x = threadPerDim;
+    this->blockDim_.y = threadPerDim;
+  } else { // vector
+    this->blockDim_.x = 1;
+    this->blockDim_.y = min(prop.maxThreadsPerBlock, prop.maxThreadsDim[1]);
+  }
+  if ((this->gridDim_.x = m / blockDim_.x) == 0) {
     this->gridDim_.x = 1;
   }
-  if ((this->gridDim_.y = n / threadPerDim) == 0) {
+  if ((this->gridDim_.y = n / blockDim_.y) == 0) {
     this->gridDim_.y = 1;
   }
 }

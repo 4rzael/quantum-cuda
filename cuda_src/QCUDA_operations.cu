@@ -51,8 +51,8 @@ void	cudaDotProduct(QCUDA::structComplex_t<T>* c1,
   idy = blockIdx.y * blockDim.y + threadIdx.y;
 
   if (idx < mb && idy < na) { 
-    for (int k = 0; k < mb; k++) {
-      result[idx * mb + idy] += c1[idx * ma + k] * c2[k * mb + idy];
+    for (int k = 0; k < ma; k++) {
+      result[idy * mb + idx] += c1[idy * ma + k] * c2[k * mb + idx];
     }
   }
 }
