@@ -51,6 +51,8 @@ namespace QCUDA {
      */
     __host__ __device__ s_complex();
 
+    __host__ __device__ s_complex(T r, T i=T());
+
     __host__ __device__ s_complex(const struct s_complex&);
 
     __host__ __device__ struct s_complex<T>& operator=(const struct s_complex&);

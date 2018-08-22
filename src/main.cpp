@@ -1,6 +1,6 @@
 /**
  * @Author: Julien Vial-Detambel <l3ninj>
- * @Date:   2018-06-12T11:57:49+01:00
+ * @Date:   2018-06-12T11:57:649+01:00
  * @Email:  julien.vial-detambel@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: main.cpp
@@ -24,6 +24,14 @@ int main(int ac, char **av) {
   if (ac <2) {
     std::cout << "Need an argument" << std::endl;
   }
+
+  // Matrix m1(new Tvcplxd(64*64, 1.0), 64, 64);
+  // Matrix m2(new Tvcplxd(64*64, 1.0), 64, 64);
+  // Matrix m3(new Tvcplxd(64*64), 64, 64);
+
+  // m3 = m1 * m2;
+  // std::cout << "multiplication" << m3 << std::endl;
+
 
   Parser::AST::t_AST ast;
   /* Reads the file and generate an AST */

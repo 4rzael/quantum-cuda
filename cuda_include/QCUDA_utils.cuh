@@ -15,7 +15,7 @@
 # include <thrust/device_vector.h>
 # include <thrust/complex.h>
 
-# include <valarray>
+# include <vector>
 # include <complex>
 
 
@@ -101,10 +101,10 @@ namespace QCUDA {
    */
 
   /**
-   * The alias of 'std::valarray<std::complex<T>>' is 'arrayComplex_t'.
+   * The alias of 'std::vector<std::complex<T>>' is 'arrayComplex_t'.
    */
   template<typename T>
-  using arrayComplex_t = std::valarray<std::complex<T>>;
+  using arrayComplex_t = std::vector<std::complex<T>>;
 
 
   /**

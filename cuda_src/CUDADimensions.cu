@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <climits>
+#include <cmath>
 
 #include "CUDADimensions.cuh"
 
@@ -66,14 +67,15 @@ void	QCUDA::CUDADim::initForDotProduct(const cudaDeviceProp& prop,
 					  int m,
 					  int n) {
   this->resetDimensions();
-  if ((this->gridDim_.x = ((m + (prop.maxThreadsDim[0] - 1)) / prop.maxThreadsDim[0])) == 0) {
+  const int threadPerDim = min((int)sqrt(prop.maxThreadsPerBlock), min(prop.maxThreadsDim[0], prop.maxThreadsDim[1]));
+  this->blockDim_.x = threadPerDim;
+  this->blockDim_.y = threadPerDim;
+  if ((this->gridDim_.x = m / threadPerDim) == 0) {
     this->gridDim_.x = 1;
   }
-  if ((this->gridDim_.y = ((n + (prop.maxThreadsDim[1] - 1)) / prop.maxThreadsDim[1])) == 0) {
+  if ((this->gridDim_.y = n / threadPerDim) == 0) {
     this->gridDim_.y = 1;
   }
-  this->blockDim_.x = prop.maxThreadsDim[0];
-  this->blockDim_.y = prop.maxThreadsDim[1];
 }
 
 
