@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <valarray>
+#include <vector>
 #include <complex>
 #include <map>
 

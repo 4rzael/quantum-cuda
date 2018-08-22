@@ -140,5 +140,11 @@ namespace QCUDA {
     //!
     __host__
     void	initForDotProduct(const cudaDeviceProp&, int, int);
+
+    //! \private
+    //! \brief
+    //!
+    __host__
+    void	initForTranspose(const cudaDeviceProp&, int, int);
   };
 };

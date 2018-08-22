@@ -25,6 +25,10 @@ QCUDA::s_complex<T>::s_complex()
   : real_(0), imag_(0)
 {}
 
+template<typename T> __host__ __device__
+QCUDA::s_complex<T>::s_complex(T r, T i)
+  : real_(r), imag_(i)
+{}  
 
 template<typename T> __host__ __device__
 QCUDA::s_complex<T>::s_complex(const struct s_complex& cpy)

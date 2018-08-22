@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <climits>
+#include <cmath>
 
 #include "CUDADimensions.cuh"
 
@@ -109,6 +110,28 @@ void	QCUDA::CUDADim::initForDotProduct(const cudaDeviceProp& prop,
 					  int n) {
   this->resetDimensions();
 
+  if (m != 1) { // matrix
+    const int threadPerDim = min((int)sqrt(prop.maxThreadsPerBlock), min(prop.maxThreadsDim[0], prop.maxThreadsDim[1]));
+    this->blockDim_.x = threadPerDim;
+    this->blockDim_.y = threadPerDim;
+  } else { // vector
+    this->blockDim_.x = 1;
+    this->blockDim_.y = min(prop.maxThreadsPerBlock, prop.maxThreadsDim[1]);
+  }
+  if ((this->gridDim_.x = m / blockDim_.x) == 0) {
+    this->gridDim_.x = 1;
+  }
+  if ((this->gridDim_.y = n / blockDim_.y) == 0) {
+    this->gridDim_.y = 1;
+  }
+
+}
+
+__host__
+void	QCUDA::CUDADim::initForTranspose(const cudaDeviceProp& prop,
+					 int m,
+					 int n) {
+  this->resetDimensions();
   if (prop.maxThreadsDim[0] == 1024
       && prop.maxThreadsDim[1] == 1024) {
     this->TILE_DIM = 32;
@@ -127,9 +150,8 @@ void	QCUDA::CUDADim::initForDotProduct(const cudaDeviceProp& prop,
   }
 
   this->blockDim_.x = this->TILE_DIM;
-  this->blockDim_.y = this->BLOCK_ROWS;
+  this->blockDim_.y = this->BLOCK_ROWS;  
 }
-
 
 __host__
 void	QCUDA::CUDADim::initGridAndBlock(const cudaDeviceProp& prop,
@@ -144,7 +166,7 @@ void	QCUDA::CUDADim::initGridAndBlock(const cudaDeviceProp& prop,
     this->initForDotProduct(prop, m, n);
     break;
   case QCUDA::QOperation::TRANSPOSE:
-    this->initForDotProduct(prop, m, n);
+    this->initForTranspose(prop, m, n);
     break;
   case QCUDA::QOperation::NORMALIZE:
     this->initForDotProduct(prop, m, n);
