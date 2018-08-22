@@ -28,11 +28,6 @@ namespace QCUDA {
   //!
   class CUDADim {
   private:
-    // class enum Limit {
-    //   X,
-    //   Y,
-    // 	Z	
-    // };
   private:
     //! \private
     //! \brief
@@ -44,6 +39,12 @@ namespace QCUDA {
     //! \brief
     //!
     dim3 blockDim_;
+
+    //! \private
+    //! \brief
+    int	TILE_DIM;
+    int	BLOCK_ROWS;
+
   public:
     //! \public
     //! \brief Default constructor of the class CUDADim.
@@ -72,21 +73,56 @@ namespace QCUDA {
     //! \brief
     //!
     __host__
-    const dim3&	getGridDim() const;
+    const dim3&	getGridDim() const noexcept;
 
 
     //! \public
     //! \brief
     //!
     __host__
-    const dim3&	getBlockDim() const;
-  private:
-    //! \private
+    unsigned int getGridDimX() const noexcept;
+
+
+    //! \public
     //! \brief
     //!
-    // __host__
-    // void	checkDim() const noexcept;
+    __host__
+    unsigned int getGridDimY() const noexcept;
 
+    //! \public
+    //! \brief
+    //!
+    __host__
+    const dim3&	getBlockDim() const noexcept;
+
+
+    //! \public
+    //! \brief
+    //!
+    __host__
+    unsigned int getBlockDimX() const noexcept;
+
+
+    //! \public
+    //! \brief
+    //!
+    __host__
+    unsigned int	getBlockDimY() const noexcept;
+
+    
+    //! \public
+    //! \brief
+    //!
+    __host__
+    int			getTILE() const noexcept;
+
+
+    //! \public
+    //! \brief
+    //!
+    __host__
+    int			getROWS() const noexcept;
+  private:
     //! \private
     //! \brief
     //!
@@ -98,7 +134,6 @@ namespace QCUDA {
     //!
     __host__
     void	naiveInit(const cudaDeviceProp&, int);
-
 
     //! \private
     //! \brief

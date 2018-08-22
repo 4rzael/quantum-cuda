@@ -25,10 +25,52 @@ __host__
 QCUDA::CUDADim::~CUDADim() = default;
 
 
-// __host__
-// bool	QCUDA::CUDADim::checkDim(QCUDA::) const noexcept {
-//   switch
-// }
+__host__
+const dim3&	QCUDA::CUDADim::getGridDim() const noexcept {
+  return (this->gridDim_);
+}
+
+
+__host__
+unsigned int	QCUDA::CUDADim::getGridDimX() const noexcept {
+  return (this->gridDim_.x);
+}
+
+
+__host__
+unsigned int	QCUDA::CUDADim::getGridDimY() const noexcept {
+  return (this->gridDim_.y);
+}
+
+
+__host__
+const dim3&	QCUDA::CUDADim::getBlockDim() const noexcept {
+  return (this->blockDim_);
+}
+
+
+__host__
+unsigned int	QCUDA::CUDADim::getBlockDimX() const noexcept {
+  return (this->blockDim_.x);
+}
+
+
+__host__
+unsigned int	QCUDA::CUDADim::getBlockDimY() const noexcept {
+  return (this->blockDim_.y);
+}
+
+
+__host__
+ int	QCUDA::CUDADim::getTILE() const noexcept {
+  return (this->TILE_DIM);
+}
+
+
+__host__
+int	QCUDA::CUDADim::getROWS() const noexcept {
+  return (this->BLOCK_ROWS);
+}
 
 
 __host__
@@ -66,14 +108,26 @@ void	QCUDA::CUDADim::initForDotProduct(const cudaDeviceProp& prop,
 					  int m,
 					  int n) {
   this->resetDimensions();
-  if ((this->gridDim_.x = ((m + (prop.maxThreadsDim[0] - 1)) / prop.maxThreadsDim[0])) == 0) {
+
+  if (prop.maxThreadsDim[0] == 1024
+      && prop.maxThreadsDim[1] == 1024) {
+    this->TILE_DIM = 32;
+    this->BLOCK_ROWS = 8;
+  }
+  else {
+    this->TILE_DIM = 16;
+    this->BLOCK_ROWS = 4;
+  }
+
+  if ((this->gridDim_.x = (m / this->TILE_DIM)) == 0) {
     this->gridDim_.x = 1;
   }
-  if ((this->gridDim_.y = ((n + (prop.maxThreadsDim[1] - 1)) / prop.maxThreadsDim[1])) == 0) {
-    this->gridDim_.y = 1;
+  if ((this->gridDim_.y = (n / this->TILE_DIM)) == 0) {
+    this->gridDim_.x = 1;
   }
-  this->blockDim_.x = prop.maxThreadsDim[0];
-  this->blockDim_.y = prop.maxThreadsDim[1];
+
+  this->blockDim_.x = this->TILE_DIM;
+  this->blockDim_.y = this->BLOCK_ROWS;
 }
 
 
@@ -103,14 +157,4 @@ void	QCUDA::CUDADim::initGridAndBlock(const cudaDeviceProp& prop,
   std::cout << "this->gridDim_.y: " << this->gridDim_.y << std::endl;
   std::cout << "this->blockDim_.x: " << this->blockDim_.x << std::endl;
   std::cout << "this->blockDim_.y: " << this->blockDim_.y << std::endl;
-}
-
-__host__
-const dim3&	QCUDA::CUDADim::getGridDim() const {
-  return (this->gridDim_);
-}
-
-__host__
-const dim3&	QCUDA::CUDADim::getBlockDim() const {
-  return (this->blockDim_);
 }
