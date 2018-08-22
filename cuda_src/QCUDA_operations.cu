@@ -94,18 +94,19 @@ void	cudaTrace(QCUDA::structComplex_t<T>* c,
 template<typename T> __global__
 void	cudaTranspose(QCUDA::structComplex_t<T>* c1,
 		      QCUDA::structComplex_t<T>* result,
-		      int m,
-		      int n,
-		      int steps) {
+		      int TILE_DIM,
+		      int BLOCK_ROWS) {
   int	idx;
   int	idy;
+  int	width;
 
-  idx = blockIdx.x * blockDim.x + threadIdx.x;
-  idy = blockIdx.y * blockDim.y + threadIdx.y;
+  idx = blockIdx.x * TILE_DIM + threadIdx.x;
+  idy = blockIdx.y * TILE_DIM + threadIdx.y;
+  width = gridDim.x * TILE_DIM;
 
-  if (idx < m && idy < n) {
-    result[idx * n + idy].real_ = c1[idy * m + idx].real_;
-    result[idx * n + idy].imag_ = c1[idy * m + idx].imag_;
+  for (int j = 0; j < TILE_DIM; j+= BLOCK_ROWS) {
+    result[idx * width + (idy + j)].real_ = c1[(idy + j) * width + idx].real_;
+    result[idx * width + (idy + j)].imag_ = c1[(idy + j) * width + idx].imag_;
   }
 }
 
@@ -199,13 +200,13 @@ void	cudaTrace(QCUDA::structComplex_t<float>*,
 template __global__
 void	cudaTranspose(QCUDA::structComplex_t<double>*,
 		      QCUDA::structComplex_t<double>*,
-		      int, int, int);
+		      int, int);
 
 
 template __global__
 void	cudaTranspose(QCUDA::structComplex_t<float>*,
 		      QCUDA::structComplex_t<float>*,
-		      int, int, int);
+		      int, int);
 
 
 template __global__
