@@ -83,6 +83,16 @@ void	QCUDA::s_complex<T>::aggregateImag(const T& v) {
   this->imag_ += v;
 }
 
+template<typename T> __host__ __device__
+T QCUDA::s_complex<T>::norm() {
+  return real_ * real_ + imag_ * imag_;
+}
+
+template<typename T> __host__ __device__
+QCUDA::s_complex<T> QCUDA::s_complex<T>::operator/(const T &v) {
+  return QCUDA::s_complex<T>(real_ / v, imag_ / v);
+}
+
 
 template<typename T> __host__ __device__
 struct QCUDA::s_complex<T>	QCUDA::s_complex<T>::operator+(const struct s_complex<T>& c) {

@@ -114,24 +114,21 @@ void	cudaTranspose(QCUDA::structComplex_t<T>* c1,
 template<typename T> __global__
 void	cudaNormalize(QCUDA::structComplex_t<T>* a,
 		      QCUDA::structComplex_t<T>* res,
-		      QCUDA::structComplex_t<T>* sum,
+		      T* norm,
 		      int n) {
   int	idx = threadIdx.x;
 
-  sum->aggregateReal(a[idx].getReal() * a[idx].getReal());
-  sum->aggregateImag(a[idx].getImag() * a[idx].getImag());
-  if (sum->getReal() == 0.0
-      && sum->getImag() == 0.0) {
-    sum->setReal(1.0);
-    sum->setImag(1.0);
+  if (idx < n) {
+	*norm += a[idx].norm();
+
+	__syncthreads();
+
+	if (idx == 0 && abs(*norm) < 0.001f) { *norm = 1.0f; }
+
+	__syncthreads();
+
+	res[idx] = a[idx] / sqrt(*norm);
   }
-  sum->setReal(sqrt(sum->getReal()));
-  sum->setImag(sqrt(sum->getImag()));
-
-  __syncthreads();
-
-  res[idx].setReal(a[idx].getReal() / sum->getReal());
-  res[idx].setImag(a[idx].getImag() / sum->getImag());
 }
 
 
@@ -211,14 +208,14 @@ void	cudaTranspose(QCUDA::structComplex_t<float>*,
 
 template __global__
 void	cudaNormalize(QCUDA::structComplex_t<double>*,
-		      QCUDA::structComplex_t<double>*,
-		      QCUDA::structComplex_t<double>*,
+			  QCUDA::structComplex_t<double>*,
+			  double*,
 		      int);
 
 
 template __global__
 void	cudaNormalize(QCUDA::structComplex_t<float>*,
 		      QCUDA::structComplex_t<float>*,
-		      QCUDA::structComplex_t<float>*,
+			  float*,
 		      int);
 
