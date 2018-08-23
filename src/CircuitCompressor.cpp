@@ -14,11 +14,8 @@
 #include "Circuit.hpp"
 #include "Logger.hpp"
 
-/**
- * Disable until we change the way we make CX gates in the simulator, as it brakes it
- */
 Circuit &CircuitCompressor::operator()() {
-    // shrinkCircuit();
+    shrinkCircuit();
     // removeUselessQubits();
     // removeUselessGates();
     // shrinkCircuit();
@@ -30,6 +27,7 @@ void CircuitCompressor::removeUselessQubits() {}
 
 void CircuitCompressor::shrinkCircuit() {
     // Compression is optimal anyway if <= 1
+    /* Disabled until we change the way we make CX gates in the simulator, as it brakes it
     if (m_circuit.steps.size() > 1) {
         bool over;
         do {
@@ -60,6 +58,7 @@ void CircuitCompressor::shrinkCircuit() {
             }
         } while (over == false);
     }
+    */
     // remove empty steps
     for (int i = m_circuit.steps.size() - 1; i >= 0; --i) {
         if (m_circuit.steps[i].size() == 0) {

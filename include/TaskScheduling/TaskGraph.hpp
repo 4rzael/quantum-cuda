@@ -68,16 +68,19 @@ namespace TaskGraph {
     };
 
     enum class TaskStatus {AWAITING, PROCESSING, DONE};
+    enum class TaskType {SIMULATE, MEASURE};
     /**
      * @brief The base class representing a task
      */
     struct ITask: public std::enable_shared_from_this<ITask> {
-        ITask(TaskId _id): id(_id), status(TaskStatus::AWAITING) {}
+        ITask(TaskId _id, TaskType _type): id(_id), type(_type), status(TaskStatus::AWAITING) {}
 
         /**
          * @brief The ID of the task
          */
         TaskId               id;
+
+        TaskType             type;
         /**
          * @brief The list of states this task takes as input.
          * 
@@ -124,7 +127,7 @@ namespace TaskGraph {
                             StateId input,
                             StateId output,
                             Circuit const &circuit)
-        : ITask(id), circuit(circuit) {
+        : ITask(id, TaskType::SIMULATE), circuit(circuit) {
             inputStates.push_back(input);
             outputStates.push_back(output);
         }
@@ -157,7 +160,7 @@ namespace TaskGraph {
                                 StateId output1,
                                 Circuit::Measurement const &measurement,
                                 Circuit const &circuit)
-        : ITask(id), measurement(measurement), circuit(circuit) {
+        : ITask(id, TaskType::MEASURE), measurement(measurement), circuit(circuit) {
             inputStates.push_back(input);
             outputStates.push_back(output0);
             outputStates.push_back(output1);

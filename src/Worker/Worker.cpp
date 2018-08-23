@@ -20,7 +20,8 @@ void Worker::operator()() {
             if (m_measurementResults.getNodeWithId(task->measurementNodeId)->samples > 0) {
                 LOG(Logger::DEBUG, "Executing task:" << task);
                 // Detecting the type of task
-                if (auto simulateTask = std::dynamic_pointer_cast<SimulateCircuitTask>(task)) {
+                if (task->type == TaskType::SIMULATE) {
+                    auto simulateTask = std::dynamic_pointer_cast<SimulateCircuitTask>(task);
                     // TODO: Change if/when we will support multiple input states
                     state = m_stateStore.getStateData(task->inputStates[0]);
                     // Actually do the work here
@@ -29,10 +30,9 @@ void Worker::operator()() {
                     // Then register new state and remove old one
                     m_stateStore.storeState(task->outputStates[0], state);
                     m_stateStore.deleteState(task->inputStates[0]);
-
-                    // LOG(Logger::INFO, "State:" << state);
                 }
-                else if (auto measureTask = std::dynamic_pointer_cast<DuplicateAndMeasureTask>(task)) {
+                else if (task->type == TaskType::MEASURE) {
+                    auto measureTask = std::dynamic_pointer_cast<DuplicateAndMeasureTask>(task);
                     Measurer measurer(*measureTask, m_stateStore, m_measurementResults);
                     measurer();
                 }
