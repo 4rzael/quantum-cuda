@@ -168,6 +168,9 @@ void	QCUDA::CUDADim::initGridAndBlock(const cudaDeviceProp& prop,
   case QCUDA::QOperation::TRANSPOSE:
     this->initForTranspose(prop, m, n);
     break;
+  case QCUDA::QOperation::SUMKERNEL:
+    this->naiveInit(prop, m/2);
+    break;
   default:
     this->naiveInit(prop, m);
     break;

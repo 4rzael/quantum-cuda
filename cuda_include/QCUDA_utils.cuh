@@ -74,7 +74,8 @@ namespace QCUDA {
 	 NORMALIZE,
 	 M_OUTCOME,
 	 M_PROBABILITY,
-	 MULTIPLY
+   MULTIPLY,
+   SUMKERNEL
   };
 
 

@@ -40,8 +40,7 @@ void	cudaKronecker(QCUDA::structComplex_t<T>*,
 
 
 template<typename T>  __global__
-void	cudaTrace(QCUDA::structComplex_t<T>*,
-		  QCUDA::structComplex_t<T>*,
+void	cudaTraceMover(QCUDA::structComplex_t<T>*,
 		  int);
 
 
@@ -67,6 +66,10 @@ void	cudaMeasureOutcome(QCUDA::structComplex_t<T>*,
 template<typename T> __global__
 void	cudaMeasureProbability(QCUDA::structComplex_t<T>*,
 			       T*, int, int, bool);
+
+template<typename T> __global__
+void 	sumKernel(T * input,
+      				  int n);
 
 
 // template<typename T> __global__
