@@ -114,28 +114,28 @@ Tvcplxd*	GPUExecutor::transpose(Tvcplxd* a, int m, int n) {
 
 
 Tvcplxd*	GPUExecutor::normalize(Tvcplxd* a) {
-  Tvcplxd* result = new Tvcplxd(a->size());
-  std::complex<double> sum = 0;
+  // Tvcplxd* result = new Tvcplxd(a->size());
+  // std::complex<double> sum = 0;
 
-  for (uint i = 0; i < a->size(); i++) {
-    sum += (*a)[i] * (*a)[i];
-  }
-  if (sum == std::complex<double>(0)) {
-    sum = 1;
-  }
-  sum = sqrt(sum);
-  for (uint j = 0; j < a->size(); j++) {
-    (*result)[j] = (*a)[j] / sum;
-  }
-  return result;
-  // try {
-  //   this->cgpu_.initComplexVecs(a, nullptr);
-  //   return (this->cgpu_.normalizeOnGPU());
-  // } catch (const std::exception& err) {
-  //   std::cerr << err.what() << std::endl;
-  //   std::cerr << "Couldn't perform the transpose on the GPU !" << std::endl;
-  //   return (nullptr);
+  // for (uint i = 0; i < a->size(); i++) {
+  //   sum += (*a)[i] * (*a)[i];
   // }
+  // if (sum == std::complex<double>(0)) {
+  //   sum = 1;
+  // }
+  // sum = sqrt(sum);
+  // for (uint j = 0; j < a->size(); j++) {
+  //   (*result)[j] = (*a)[j] / sum;
+  // }
+  // return result;
+  try {
+    this->cgpu_.initComplexVecs(a, nullptr);
+    return (this->cgpu_.normalizeOnGPU());
+  } catch (const std::exception& err) {
+    std::cerr << err.what() << std::endl;
+    std::cerr << "Couldn't perform the transpose on the GPU !" << std::endl;
+    return (nullptr);
+  }
 }
 
 double GPUExecutor::measureProbability(Tvcplxd *a, int q, bool v) {

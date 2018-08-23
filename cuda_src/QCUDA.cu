@@ -392,7 +392,8 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::transposeOnGPU(int m, int n) {
 template<typename T> __host__
 Tvcplxd*		QCUDA::CUDAGPU<T>::normalizeOnGPU() {
   structComplex_t<T>*	c1 = nullptr;
-  structComplex_t<T>*	sum = nullptr;
+  T*	sum = nullptr;
+  T*	hostSum = nullptr;
   structComplex_t<T>*	host = nullptr;
   structComplex_t<T>*	device = nullptr;
   Tvcplxd*		ret;
@@ -400,20 +401,26 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::normalizeOnGPU() {
   c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
 
-  sum = (structComplex_t<T>*)this->allocMemOnGPU(sum, sizeof(structComplex_t<T>));
+  sum = (T*)this->allocMemOnGPU(sum, sizeof(T));
   this->setGPUData(sum, sizeof(structComplex_t<T>), 0);
+  // TODO check errors ?
+  // cudaMalloc((void**)&sum, sizeof(T));
+  // cudaMemset(sum, 0, sizeof(T));
 
+  hostSum = new T [1];
   host = new structComplex_t<T> [this->lenA_];
   device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>) * this->lenA_);
 
-  // this->initGridAndBlock(QCUDA::QOperation::NORMALIZE, this->hostVecA_.size(), 1);
-  // cudaNormalize<<<this->dimGrid_, this->dimBlock_>>>(c1, device, sum);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::NORMALIZE, this->lenA_, 0);
+  cudaNormalize<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, sum, this->lenA_);
 
   this->copyGPUDataToHost(device, host, this->lenA_);
   ret = convertCUDAVecToHostVec(host, this->lenA_);
+  // cudaMemcpy((void*)hostSum, (void*)sum, sizeof(T), cudaMemcpyDeviceToHost);
+
+  // std::cout << "Norm before:" << *hostSum << std::endl;
 
   freeMemOnGPU(c1);
-  freeMemOnGPU(sum);
   freeMemOnGPU(device);
   delete []host;
   return (ret);
@@ -591,12 +598,12 @@ void	cudaTranspose(QCUDA::structComplex_t<float>*,
 extern template __global__
 void	cudaNormalize(QCUDA::structComplex_t<double>*,
 		      QCUDA::structComplex_t<double>*,
-		      QCUDA::structComplex_t<double>*,
+          double*,
 		      int);
 extern template __global__
 void	cudaNormalize(QCUDA::structComplex_t<float>*,
 		      QCUDA::structComplex_t<float>*,
-		      QCUDA::structComplex_t<float>*,
+          float*,
 		      int);
 
 

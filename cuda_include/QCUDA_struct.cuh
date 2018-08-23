@@ -92,8 +92,14 @@ namespace QCUDA {
      */
     __host__ __device__ void	aggregateImag(const T&);
 
+    /**
+     * Returns the norm of the number. |a + bi| = a² + b²
+     */
+    __host__ __device__ T norm();
+
     __host__ __device__ struct s_complex<T>	operator+(const struct s_complex<T>&);
     __host__ __device__ struct s_complex<T>	operator*(const struct s_complex<T>&);
+    __host__ __device__ struct s_complex<T>	operator/(const T &);
     __host__ __device__ struct s_complex<T>&	operator+=(const struct s_complex<T>&);
 
   };

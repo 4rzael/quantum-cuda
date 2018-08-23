@@ -54,7 +54,7 @@ void	cudaTranspose(QCUDA::structComplex_t<T>*,
 template<typename T> __global__
 void	cudaNormalize(QCUDA::structComplex_t<T>*,
 		      QCUDA::structComplex_t<T>*,
-		      QCUDA::structComplex_t<T>*,
+		      T*,
 		      int);
 
 
