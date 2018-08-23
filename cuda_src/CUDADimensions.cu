@@ -9,11 +9,11 @@
  * @License: MIT License
  */
 
-#include <iostream>
 #include <climits>
 #include <cmath>
 
 #include "CUDADimensions.cuh"
+
 
 __host__
 QCUDA::CUDADim::CUDADim()
@@ -63,18 +63,6 @@ unsigned int	QCUDA::CUDADim::getBlockDimY() const noexcept {
 
 
 __host__
- int	QCUDA::CUDADim::getTILE() const noexcept {
-  return (this->TILE_DIM);
-}
-
-
-__host__
-int	QCUDA::CUDADim::getROWS() const noexcept {
-  return (this->BLOCK_ROWS);
-}
-
-
-__host__
 constexpr void	QCUDA::CUDADim::resetDimensions() noexcept {
   this->gridDim_.x = 1;
   this->gridDim_.y = 1;
@@ -86,10 +74,9 @@ constexpr void	QCUDA::CUDADim::resetDimensions() noexcept {
 }
 
 
-//init as linear
 __host__
-void	QCUDA::CUDADim::naiveInit(const cudaDeviceProp& prop, // CHANGE NAME
-				  int nSteps) {
+void	QCUDA::CUDADim::linearAllocation(const cudaDeviceProp& prop,
+					 int nSteps) {
   this->resetDimensions();
   if ((this->gridDim_.x = ((nSteps + (prop.maxThreadsDim[0] - 1)) / prop.maxThreadsDim[0])) == 0) {
     this->gridDim_.x = 1;
@@ -103,18 +90,16 @@ void	QCUDA::CUDADim::naiveInit(const cudaDeviceProp& prop, // CHANGE NAME
 }
 
 
-//init as plan
 __host__
-void	QCUDA::CUDADim::initForDotProduct(const cudaDeviceProp& prop,
-					  int m,
-					  int n) {
+void	QCUDA::CUDADim::cartesianAllocation(const cudaDeviceProp& prop,
+					    int m,
+					    int n) {
   this->resetDimensions();
-
-  if (m != 1) { // matrix
+  if (m != 1) {
     const int threadPerDim = min((int)sqrt(prop.maxThreadsPerBlock), min(prop.maxThreadsDim[0], prop.maxThreadsDim[1]));
     this->blockDim_.x = threadPerDim;
     this->blockDim_.y = threadPerDim;
-  } else { // vector
+  } else {
     this->blockDim_.x = 1;
     this->blockDim_.y = min(prop.maxThreadsPerBlock, prop.maxThreadsDim[1]);
   }
@@ -124,34 +109,8 @@ void	QCUDA::CUDADim::initForDotProduct(const cudaDeviceProp& prop,
   if ((this->gridDim_.y = n / blockDim_.y) == 0) {
     this->gridDim_.y = 1;
   }
-
 }
 
-__host__
-void	QCUDA::CUDADim::initForTranspose(const cudaDeviceProp& prop,
-					 int m,
-					 int n) {
-  this->resetDimensions();
-  if (prop.maxThreadsDim[0] == 1024
-      && prop.maxThreadsDim[1] == 1024) {
-    this->TILE_DIM = 32;
-    this->BLOCK_ROWS = 8;
-  }
-  else {
-    this->TILE_DIM = 16;
-    this->BLOCK_ROWS = 4;
-  }
-
-  if ((this->gridDim_.x = (m / this->TILE_DIM)) == 0) {
-    this->gridDim_.x = 1;
-  }
-  if ((this->gridDim_.y = (n / this->TILE_DIM)) == 0) {
-    this->gridDim_.x = 1;
-  }
-
-  this->blockDim_.x = this->TILE_DIM;
-  this->blockDim_.y = this->BLOCK_ROWS;  
-}
 
 __host__
 void	QCUDA::CUDADim::initGridAndBlock(const cudaDeviceProp& prop,
@@ -159,24 +118,22 @@ void	QCUDA::CUDADim::initGridAndBlock(const cudaDeviceProp& prop,
 					 int m,
 					 int n) {
   switch (op) {
+  case QCUDA::QOperation::ADDITION:
+    this->linearAllocation(prop, m);
   case QCUDA::QOperation::DOT:
-    this->initForDotProduct(prop, m, n);
+    this->cartesianAllocation(prop, m, n);
     break;
   case QCUDA::QOperation::KRONECKER:
-    this->initForDotProduct(prop, m, n);
+    this->cartesianAllocation(prop, m, n);
     break;
   case QCUDA::QOperation::TRANSPOSE:
-    this->initForDotProduct(prop, m, n);
+    this->cartesianAllocation(prop, m, n);
     break;
   case QCUDA::QOperation::SUMKERNEL:
-    this->naiveInit(prop, m/2);
+    this->linearAllocation(prop, m/2);
     break;
   default:
-    this->naiveInit(prop, m);
+    this->linearAllocation(prop, m);
     break;
   }
-  // std::cout << "this->gridDim_.x: " << this->gridDim_.x << std::endl;
-  // std::cout << "this->gridDim_.y: " << this->gridDim_.y << std::endl;
-  // std::cout << "this->blockDim_.x: " << this->blockDim_.x << std::endl;
-  // std::cout << "this->blockDim_.y: " << this->blockDim_.y << std::endl;
 }
