@@ -331,27 +331,30 @@ std::complex<T>		QCUDA::CUDAGPU<T>::traceOnGPU(int n) {
 
   structComplex_t<T>*	c1 = nullptr;
   structComplex_t<T>*	host = nullptr;
-  structComplex_t<T>*	device = nullptr;
+  // structComplex_t<T>*	device = nullptr;
   std::complex<T>	ret;
 
   c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
 
   host = new structComplex_t<T>;
-  device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>));
+  // device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>));
 
-  this->setGPUData(device, sizeof(structComplex_t<T>), 0);
+  // this->setGPUData(device, sizeof(structComplex_t<T>), 0);
 
   this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::TRACE, n, 0);
-  cudaTrace<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, n);
+  cudaTraceMover<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, n);
 
-  this->copyGPUDataToHost(device, host, 1);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::SUMKERNEL, n, 0);
+  sumKernel<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, n);
+
+  this->copyGPUDataToHost(c1, host, 1);
 
   ret.real(host->real_);
   ret.imag(host->imag_);
 
   freeMemOnGPU(c1);
-  freeMemOnGPU(device);
+  // freeMemOnGPU(device);
   delete host;
   return (ret);
 }
@@ -392,8 +395,7 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::transposeOnGPU(int m, int n) {
 template<typename T> __host__
 Tvcplxd*		QCUDA::CUDAGPU<T>::normalizeOnGPU() {
   structComplex_t<T>*	c1 = nullptr;
-  T*	sum = nullptr;
-  T*	hostSum = nullptr;
+  T*	sums = nullptr;
   structComplex_t<T>*	host = nullptr;
   structComplex_t<T>*	device = nullptr;
   Tvcplxd*		ret;
@@ -401,24 +403,23 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::normalizeOnGPU() {
   c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
 
-  sum = (T*)this->allocMemOnGPU(sum, sizeof(T));
-  this->setGPUData(sum, sizeof(structComplex_t<T>), 0);
+  sums = (T*)this->allocMemOnGPU(sums, sizeof(T) * this->lenA_ / 2);
+  this->setGPUData(sums, sizeof(T) * this->lenA_ / 2, 0);
   // TODO check errors ?
-  // cudaMalloc((void**)&sum, sizeof(T));
-  // cudaMemset(sum, 0, sizeof(T));
+  // cudaMalloc((void**)&sums, sizeof(T));
+  // cudaMemset(sums, 0, sizeof(T));
 
-  hostSum = new T [1];
   host = new structComplex_t<T> [this->lenA_];
   device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>) * this->lenA_);
 
   this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::NORMALIZE, this->lenA_, 0);
-  cudaNormalize<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, sum, this->lenA_);
+  cudaNormalize<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, sums, this->lenA_);
 
   this->copyGPUDataToHost(device, host, this->lenA_);
   ret = convertCUDAVecToHostVec(host, this->lenA_);
-  // cudaMemcpy((void*)hostSum, (void*)sum, sizeof(T), cudaMemcpyDeviceToHost);
+  // cudaMemcpy((void*)hostSums, (void*)sums, sizeof(T), cudaMemcpyDeviceToHost);
 
-  // std::cout << "Norm before:" << *hostSum << std::endl;
+  // std::cout << "Norm before:" << *hostSums << std::endl;
 
   freeMemOnGPU(c1);
   freeMemOnGPU(device);
@@ -574,12 +575,10 @@ void	cudaKronecker(QCUDA::structComplex_t<float>*,
 
 
 extern template __global__
-void	cudaTrace(QCUDA::structComplex_t<double>*,
-		  QCUDA::structComplex_t<double>*,
+void	cudaTraceMover(QCUDA::structComplex_t<double>*,
 		  int);
 extern template __global__
-void	cudaTrace(QCUDA::structComplex_t<float>*,
-		  QCUDA::structComplex_t<float>*,
+void	cudaTraceMover(QCUDA::structComplex_t<float>*,
 		  int);
 
 
@@ -632,3 +631,17 @@ void	cudaMeasureProbability(QCUDA::structComplex_t<float>*,
 			       int,
 			       int,
 			       bool);
+
+extern template __global__
+void	sumKernel(double *,
+                int);
+extern template __global__
+void	sumKernel(float *,
+                int);
+extern template __global__
+void	sumKernel(QCUDA::structComplex_t<double> *,
+                int);
+extern template __global__
+void	sumKernel(QCUDA::structComplex_t<float> *,
+                int);
+                                   

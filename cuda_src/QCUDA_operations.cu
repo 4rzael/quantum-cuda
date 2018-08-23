@@ -80,14 +80,13 @@ void	cudaKronecker(QCUDA::structComplex_t<T>* a,
 
 
 template<typename T> __global__
-void	cudaTrace(QCUDA::structComplex_t<T>* c,
-		  QCUDA::structComplex_t<T>* result,
-		  int n) {
+void	cudaTraceMover(QCUDA::structComplex_t<T>* c, int n) {
   int idx;
 
   idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx < n)
-    (*result) += c[idx * n + idx];
+  if (idx < n) {
+    c[idx] = c[idx * n + idx];
+  }
 }
 
 
@@ -114,21 +113,39 @@ void	cudaTranspose(QCUDA::structComplex_t<T>* c1,
 template<typename T> __global__
 void	cudaNormalize(QCUDA::structComplex_t<T>* a,
 		      QCUDA::structComplex_t<T>* res,
-		      T* norm,
+		      T* sums,
 		      int n) {
   int	idx = threadIdx.x;
 
-  if (idx < n) {
-	*norm += a[idx].norm();
-
-	__syncthreads();
-
-	if (idx == 0 && abs(*norm) < 0.001f) { *norm = 1.0f; }
-
-	__syncthreads();
-
-	res[idx] = a[idx] / sqrt(*norm);
+  // compute norm
+  int stride = n / 2;
+  if (idx < stride) {
+    sums[idx] = a[idx].norm() + a[idx + stride].norm();
   }
+  stride /= 2;
+  __syncthreads();
+  T tmp;
+  while (stride) {
+    if (idx < stride) {
+      tmp = sums[idx] + sums[idx + stride];
+    }
+    // no syncthreads in an if !
+    __syncthreads();
+    if (idx < stride) {
+      sums[idx] = tmp;
+    }
+    stride /= 2;
+  }
+  // now sums[0] contains the norm
+
+	__syncthreads();
+
+	if (idx == 0 && abs(sums[0]) < 0.001f) { sums[0] = 1.0f; }
+
+	__syncthreads();
+
+  // divide by the norm
+	res[idx] = a[idx] / sqrt(sums[0]);
 }
 
 
@@ -164,6 +181,25 @@ void	cudaMeasureOutcome(QCUDA::structComplex_t<T>* c1,
     TIA = (((idx / blockSize) % 2) == (int)v);
     result[idx].real_ = c1[idx].real_ * (T)TIA;
     result[idx].imag_ = c1[idx].imag_ * (T)TIA;
+  }
+}
+
+template<typename T> __global__
+void 	sumKernel(T * input,
+      				  int n) {
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  int stride = n / 2;
+  T tmp;
+  while (stride) {
+    if (idx < stride) {
+      tmp = input[idx] + input[idx + stride];
+    }
+    // no syncthreads in an if !
+    __syncthreads();
+    if (idx < stride) {
+      input[idx] = tmp;
+    }
+    stride /= 2;
   }
 }
 
@@ -220,15 +256,11 @@ void	cudaKronecker(QCUDA::structComplex_t<float>*,
 
 
 template __global__
-void	cudaTrace(QCUDA::structComplex_t<double>*,
-		  QCUDA::structComplex_t<double>*,
-		  int);
+void	cudaTraceMover(QCUDA::structComplex_t<double>*, int);
 
 
 template __global__
-void	cudaTrace(QCUDA::structComplex_t<float>*,
-		  QCUDA::structComplex_t<float>*,
-		  int);
+void	cudaTraceMover(QCUDA::structComplex_t<float>*, int);
 
 
 template __global__
@@ -273,3 +305,16 @@ void	cudaMeasureProbability(QCUDA::structComplex_t<double>*,
 template __global__
 void	cudaMeasureProbability(QCUDA::structComplex_t<float>*,
 			       float*, int, int, bool);
+
+template __global__
+void	sumKernel(double *,
+                int);
+template __global__
+void	sumKernel(float *,
+                int);
+template __global__
+void	sumKernel(QCUDA::structComplex_t<double> *,
+                int);
+template __global__
+void	sumKernel(QCUDA::structComplex_t<float> *,
+                int);
