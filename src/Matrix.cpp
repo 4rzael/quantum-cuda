@@ -81,7 +81,7 @@ Matrix Matrix::normalize() const {
 
   // LOG(Logger::ERROR, "Normalizing " << *this);
   Matrix result = Matrix(exec->normalize(m_content), m_dim.first, m_dim.second);
-  // LOG(Logger::ERROR, "Result " << *this);
+  // LOG(Logger::ERROR, "Result " << result);
   return result;
 }
 

@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: MatrixStore.hpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-07-19T13:28:01+01:00
+ * @Last modified time: 2018-08-22T19:26:00+02:00
  * @License: MIT License
  */
 

@@ -116,7 +116,7 @@ Matrix Simulator::simulate() {
       m_shouldNormalize = false;
     // Initializing the gate vectors
     m_gates = std::vector<Matrix>(m_size, MatrixStore::i2);
-    m_extraGates = std::vector<Matrix>(m_size, MatrixStore::null2);
+    m_extraGates = std::vector<Matrix>(m_size, MatrixStore::i2);
     for (auto &substep: *it) {
       // Applying defined tranformations in the visitor.
       boost::apply_visitor(visitor, substep);
@@ -128,5 +128,6 @@ Matrix Simulator::simulate() {
 
     if (m_shouldNormalize) m_state = m_state.normalize();
   }
+  // LOG(Logger::DEBUG, "State after simulation:" << m_state);
   return m_state;
 }

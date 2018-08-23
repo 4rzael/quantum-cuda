@@ -15,7 +15,7 @@ void Worker::operator()() {
     try {
         do {
             task = m_scheduler.getNextTask();
-            LOG(Logger::DEBUG, "Task found:" << task);
+            LOG(Logger::DEBUG, "Executing task:" << task);
             if (task->id == TASK_ID_NONE) break;
 
             // Detecting the type of task
@@ -29,7 +29,7 @@ void Worker::operator()() {
                 m_stateStore.storeState(task->outputStates[0], state);
                 m_stateStore.deleteState(task->inputStates[0]);
 
-                LOG(Logger::INFO, "State:" << state);
+                // LOG(Logger::INFO, "State:" << state);
             }
             else if (auto measureTask = std::dynamic_pointer_cast<DuplicateAndMeasureTask>(task)) {
                 Measurer measurer(*measureTask, m_stateStore, m_measurementResults);

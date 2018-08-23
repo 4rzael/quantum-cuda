@@ -4,7 +4,7 @@
 # @Project: CUDA-Based Simulator of Quantum Systems
 # @Filename: Makefile
 # @Last modified by:   l3ninj
-# @Last modified time: 2018-07-05T14:34:34+01:00
+# @Last modified time: 2018-08-21T20:59:18+02:00
 # @License: MIT License
 
 CXX?=	g++
@@ -127,7 +127,7 @@ CUOBJS=	$(patsubst %,$(CUODIR)/%,$(_CUOBJS))
 
 # Maccro that contains all the dynamic libraries that will be linked
 # to the created objects in order to get our executable.
-LDIR=	-L$(CUDA_HOME)/lib64 -lcuda -lcudart -lboost_system -lboost_filesystem
+LDIR=	-L$(CUDA_HOME)/lib64 -lcuda -lcudart -lboost_system -lboost_filesystem -lboost_program_options
 
 # Default rule that will be called when the user types 'make'.
 # Here, it will create 'ODIR' and 'CUODIR' repositories and call the 'NAME' rule.
