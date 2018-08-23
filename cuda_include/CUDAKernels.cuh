@@ -57,3 +57,20 @@ void	cudaNormalize(QCUDA::structComplex_t<T>*,
 		      QCUDA::structComplex_t<T>*,
 		      int);
 
+
+template<typename T> __global__
+void	cudaMeasureOutcome(QCUDA::structComplex_t<T>*,
+			   QCUDA::structComplex_t<T>*,
+			   int, int, bool);
+
+
+template<typename T> __global__
+void	cudaMeasureProbability(QCUDA::structComplex_t<T>*,
+			       T*, int, int, bool);
+
+
+// template<typename T> __global__
+// void	cudaMultiply(QCUDA::structComplex_t<T>*,
+// 		     QCUDA::structComplex_t<T>*,
+// 		     QCUDA::structComplex_t<T>*,
+// 		     int, int, bool);
