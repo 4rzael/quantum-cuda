@@ -120,6 +120,7 @@ void	QCUDA::CUDADim::initGridAndBlock(const cudaDeviceProp& prop,
   switch (op) {
   case QCUDA::QOperation::ADDITION:
     this->linearAllocation(prop, m);
+    break;
   case QCUDA::QOperation::DOT:
     this->cartesianAllocation(prop, m, n);
     break;
