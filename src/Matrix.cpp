@@ -15,6 +15,7 @@
 #include "Matrix.hpp"
 #include "ExecutorManager.hpp"
 #include "CPUExecutor.hpp"
+#include "Logger.hpp"
 
 Matrix::Matrix(std::shared_ptr<Tvcplxd> content, int m, int n) {
   //m_content = content;

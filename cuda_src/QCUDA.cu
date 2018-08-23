@@ -23,11 +23,12 @@ void	QCUDA::CUDAGPU<T>::dumpStruct(structComplex_t<T>* c,
 	      << c[i].real_
 	      << ", "
 	      << c[i].imag_
-	      << ")"
+	      << "i)"
 	      << std::endl;
   }
   std::cout << std::endl;
 }
+
 
 template<typename T> __host__
 QCUDA::CUDAGPU<T>::CUDAGPU()
@@ -88,47 +89,31 @@ void	QCUDA::CUDAGPU<T>::initComplexVecs(Tvcplxd const * const hostA,
       this->cudaComplexVecA_ = new structComplex_t<T>[hostA->size()];
       this->lenA_ = hostA->size();   
       for (int i = 0; i < hostA->size(); ++i) {
-	std::cout << "("
-		  << (*hostA)[i].real()
-		  << ", "
-		  << (*hostA)[i].imag()
-		  << ")"
-		  << std::endl;
 	this->cudaComplexVecA_[i].real_ = (*hostA)[i].real();
 	this->cudaComplexVecA_[i].imag_ = (*hostA)[i].imag();
       }
     }
-    std::cout << std::endl;
-    dumpStruct(this->cudaComplexVecA_, this->lenA_);
     if (hostB) {
       this->cudaComplexVecB_ = new structComplex_t<T>[hostB->size()];
       this->lenB_ = hostB->size();   
       for (int i = 0; i < hostB->size(); ++i) {
-	std::cout << "("
-		  << (*hostB)[i].real()
-		  << ", "
-		  << (*hostB)[i].imag()
-		  << ")"
-		  << std::endl;	
 	this->cudaComplexVecB_[i].real_ = (*hostB)[i].real();
 	this->cudaComplexVecB_[i].imag_ = (*hostB)[i].imag();
       }
     }
-    std::cout << std::endl;
-    dumpStruct(this->cudaComplexVecB_, this->lenB_);
   } catch(const std::bad_alloc& err) {
     std::cerr << err.what() << std::endl;
-    throw std::runtime_error("Error while allocating memory with new !");
+    throw std::runtime_error("Error while allocating memory for host containers !");
   }
 }
 
 
 template<typename T> __host__
-QCUDA::structComplex_t<T>*	QCUDA::CUDAGPU<T>::allocMemOnGPU(structComplex_t<T>* c,
-								 unsigned int len) {
+void*	QCUDA::CUDAGPU<T>::allocMemOnGPU(void* c,
+					 unsigned int len) {
   if ((this->error_.errorCode
        = cudaMalloc((void**)&c,
-		    sizeof(structComplex_t<T>) * len)) != cudaSuccess) {
+		    len)) != cudaSuccess) {
     this->error_.fmtOutputError();
     std::cerr << this->error_.outputError << std::endl;
     throw std::bad_alloc();
@@ -138,8 +123,8 @@ QCUDA::structComplex_t<T>*	QCUDA::CUDAGPU<T>::allocMemOnGPU(structComplex_t<T>* 
 
 
 template<typename T> __host__
-void	QCUDA::CUDAGPU<T>::freeMemOnGPU(structComplex_t<T>* c) {
-  if ((this->error_.errorCode = cudaFree((void*)c)) != cudaSuccess) {
+void	QCUDA::CUDAGPU<T>::freeMemOnGPU(void* c) {
+  if ((this->error_.errorCode = cudaFree(c)) != cudaSuccess) {
     this->error_.fmtOutputError();
     std::cerr << this->error_.outputError << std::endl;
     std::cerr << "Error occured while freeing memory in the GPU !" << std::endl;
@@ -172,6 +157,22 @@ void			QCUDA::CUDAGPU<T>::copyHostDataToGPU(structComplex_t<T>* deviceData,
 
 
 template<typename T> __host__
+void	QCUDA::CUDAGPU<T>::copyDataToGPU(void* hostData,
+					 void* deviceData,
+					 unsigned int size) {
+  if ((this->error_.errorCode
+       = cudaMemcpy(deviceData,
+		    hostData,
+		    size,
+		    cudaMemcpyHostToDevice)) != cudaSuccess) {
+    this->error_.fmtOutputError();
+    std::cerr << this->error_.outputError << std::endl;
+    throw std::runtime_error("Couldn't able to transfer the data from the host to the GPU !");
+  }
+}
+
+
+template<typename T> __host__
 void	QCUDA::CUDAGPU<T>::copyGPUDataToHost(structComplex_t<T>* device,
 					     structComplex_t<T>* host,
 					     unsigned int size) {
@@ -188,13 +189,29 @@ void	QCUDA::CUDAGPU<T>::copyGPUDataToHost(structComplex_t<T>* device,
 
 
 template<typename T> __host__
-void	QCUDA::CUDAGPU<T>::setGPUData(structComplex_t<T>* c,
+void	QCUDA::CUDAGPU<T>::copyDataFromGPU(void* deviceData,
+					   void* hostData,
+					   unsigned int size) {
+  if ((this->error_.errorCode
+       = cudaMemcpy(hostData,
+		    deviceData,
+		    size,
+		    cudaMemcpyDeviceToHost)) != cudaSuccess) {
+    this->error_.fmtOutputError();
+    std::cerr << this->error_.outputError << std::endl;
+    throw std::runtime_error("Couldn't able to transfer the data from the GPU to the host !");
+  }
+}
+
+
+template<typename T> __host__
+void	QCUDA::CUDAGPU<T>::setGPUData(void* c,
 				      unsigned int size,
 				      int byte) {
   if ((this->error_.errorCode
-       = cudaMemset((void*)c,
+       = cudaMemset(c,
 		    byte,
-		    sizeof(structComplex_t<T>) * size)) != cudaSuccess) {
+		    size)) != cudaSuccess) {
     this->error_.fmtOutputError();
     std::cerr << this->error_.outputError << std::endl;
     throw std::runtime_error("Couldn't able to set the memory of a mandatory container ");
@@ -210,28 +227,24 @@ Tvcplxd*			QCUDA::CUDAGPU<T>::additionOnGPU() {
   structComplex_t<T>*		device = nullptr;
   Tvcplxd*			ret = nullptr;
 
-  c1 = this->allocMemOnGPU(c1, this->lenA_);
+  c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
-  dumpStruct(this->cudaComplexVecA_, this->lenA_);
 
-  c2 = this->allocMemOnGPU(c2, this->lenB_);
+  c2 = (structComplex_t<T>*)this->allocMemOnGPU(c2, sizeof(structComplex_t<T>) * this->lenB_);
   this->copyHostDataToGPU(c2, QCUDA::Vectors::VECTOR_B);
-  dumpStruct(this->cudaComplexVecB_, this->lenB_);
 
   host = new structComplex_t<T> [this->lenA_];
+  device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>) * this->lenA_);
 
-  device = this->allocMemOnGPU(device, this->lenA_);
-
-  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), this->lenA_);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::ADDITION, this->lenA_, 0);
   cudaAddition<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, c2, device, this->lenA_);
 
   this->copyGPUDataToHost(device, host, this->lenA_);
-  dumpStruct(host, this->lenA_);
+  ret = convertCUDAVecToHostVec(host, this->lenA_);
 
   freeMemOnGPU(c1);
   freeMemOnGPU(c2);
   freeMemOnGPU(device);
-  ret = convertCUDAVecToHostVec(host, this->lenA_);
   delete []host;
   return (ret);
 }
@@ -248,65 +261,58 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::dotProductOnGPU(int mA,
   structComplex_t<T>*	device = nullptr;
   Tvcplxd*		ret = nullptr;
 
-  c1 = this->allocMemOnGPU(c1, mA * nA);
+  c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * (mA * nA));
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
 
-  c2 = this->allocMemOnGPU(c2, mB * nB);
+  c2 = (structComplex_t<T>*)this->allocMemOnGPU(c2, sizeof(structComplex_t<T>) * (mB * nB));
   this->copyHostDataToGPU(c2, QCUDA::Vectors::VECTOR_B);
 
   host = new structComplex_t<T> [nA * mB];
+  device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>) * (nA * mB));
 
-  device = this->allocMemOnGPU(device, nA * mB);
-  this->setGPUData(device, (nA * mB), 0);
-
-  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), 1024); //DANGEROUS !!!!!
-  cudaDotProduct<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, c2,	device,
-									mA, mB, nA, nB, (nA * mB));
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::DOT, mB, nA);
+  cudaDotProduct<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, c2,	device, mA, mB, nA, nB, (nA * mB));
 
   this->copyGPUDataToHost(device, host, nA * mB);
+  ret = convertCUDAVecToHostVec(host, nA * mB);
 
   freeMemOnGPU(c1);
   freeMemOnGPU(c2);
   freeMemOnGPU(device);
-  ret = convertCUDAVecToHostVec(host, nA * mB);
   delete []host;
   return (ret);
 }
 
 
 template<typename T> __host__
-Tvcplxd*		QCUDA::CUDAGPU<T>::kroneckerOnGPU(int halfMA,
-							  int halfMB,
-							  int ma,
-							  int mb) {
+Tvcplxd*		QCUDA::CUDAGPU<T>::kroneckerOnGPU(int ma,
+							  int mb,
+							  int na,
+							  int nb) {
   structComplex_t<T>*	c1 = nullptr;
   structComplex_t<T>*	c2 = nullptr;
   structComplex_t<T>*	host = nullptr;
   structComplex_t<T>*	device = nullptr;
   Tvcplxd*		ret;
 
-  c1 = this->allocMemOnGPU(c1, this->lenA_);
+  c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
 
-  c2 = this->allocMemOnGPU(c2, this->lenB_);
+  c2 = (structComplex_t<T>*)this->allocMemOnGPU(c2, sizeof(structComplex_t<T>) * this->lenB_);
   this->copyHostDataToGPU(c2, QCUDA::Vectors::VECTOR_B);
 
-  host = new structComplex_t<T> [halfMA * halfMB * ma * mb];
+  host = new structComplex_t<T> [ma * mb * na * nb];
+  device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>) * ma * mb * na * nb);
 
-  device = this->allocMemOnGPU(device, halfMA * halfMB * ma * mb);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::KRONECKER, (ma * mb), (na * nb));
+  cudaKronecker<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, c2, device, ma, mb, na, nb, ma * mb * na * nb);
 
-  // this->initGridAndBlock(QCUDA::QOperation::KRONECKER, ma * mb, halfMA * halfMB);
-  // cudaDot<<<this->dimGrid_, this->dimBlock_>>>(c1, c2, device,
-  // 					       this->hostVecA_.size(),
-  // 					       this->hostVecB_.size(),
-  // 					       ma, mb);
-
-  this->copyGPUDataToHost(device, host, halfMA * halfMB * ma * mb);
+  this->copyGPUDataToHost(device, host, ma * mb * na * nb);
+  ret = convertCUDAVecToHostVec(host, ma * mb * na * nb);
 
   freeMemOnGPU(c1);
   freeMemOnGPU(c2);
   freeMemOnGPU(device);
-  ret = convertCUDAVecToHostVec(host, halfMA * halfMB * ma * mb);
   delete []host;
   return (ret);
 }
@@ -317,27 +323,25 @@ std::complex<T>		QCUDA::CUDAGPU<T>::traceOnGPU(int n) {
 
   structComplex_t<T>*	c1 = nullptr;
   structComplex_t<T>*	host = nullptr;
-  structComplex_t<T>*	device = nullptr;
   std::complex<T>	ret;
 
-  c1 = this->allocMemOnGPU(c1, this->lenA_);
+  c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
 
   host = new structComplex_t<T>;
 
-  device = this->allocMemOnGPU(device, 1);
-  this->setGPUData(device, 1, 0);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::TRACE, n, 0);
+  cudaTraceMover<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, n);
 
-  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), n);
-  cudaTrace<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, n);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::SUMKERNEL, n, 0);
+  sumKernel<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, n);
 
-  this->copyGPUDataToHost(device, host, 1);
+  this->copyGPUDataToHost(c1, host, 1);
 
   ret.real(host->real_);
   ret.imag(host->imag_);
 
   freeMemOnGPU(c1);
-  freeMemOnGPU(device);
   delete host;
   return (ret);
 }
@@ -351,21 +355,20 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::transposeOnGPU(int m, int n) {
   structComplex_t<T>*	device = nullptr;
   Tvcplxd*		ret;
 
-  c1 = this->allocMemOnGPU(c1, this->lenA_);
+  c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
 
   host = new structComplex_t<T> [m * n];
+  device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>) * (m * n));
 
-  device = this->allocMemOnGPU(device, m * n);
- 
-  // this->initGridAndBlock(QCUDA::QOperation::TRANSPOSE, m, n);
-  // cudaTranspose<<<this->dimGrid_, this->dimBlock_>>>(c1, device, m, n);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::TRANSPOSE, m, n);
+  cudaTranspose<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, m, n);
 
   this->copyGPUDataToHost(device, host, m * n);
+  ret = convertCUDAVecToHostVec(host, m * n);
 
   freeMemOnGPU(c1);
   freeMemOnGPU(device);
-  ret = convertCUDAVecToHostVec(host, m * n);
   delete []host;
   return (ret);
 }
@@ -374,31 +377,89 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::transposeOnGPU(int m, int n) {
 template<typename T> __host__
 Tvcplxd*		QCUDA::CUDAGPU<T>::normalizeOnGPU() {
   structComplex_t<T>*	c1 = nullptr;
-  structComplex_t<T>*	sum = nullptr;
+  T*			sums = nullptr;
   structComplex_t<T>*	host = nullptr;
   structComplex_t<T>*	device = nullptr;
   Tvcplxd*		ret;
 
-  c1 = this->allocMemOnGPU(c1, this->lenA_);
+  c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
 
-  sum = this->allocMemOnGPU(sum, 1);
-  this->setGPUData(sum, 1, 0);
+  sums = (T*)this->allocMemOnGPU(sums, sizeof(T) * this->lenA_ / 2);
+  this->setGPUData(sums, sizeof(T) * this->lenA_ / 2, 0);
 
   host = new structComplex_t<T> [this->lenA_];
+  device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>) * this->lenA_);
 
-  device = this->allocMemOnGPU(device, this->lenA_);
-
-  // this->initGridAndBlock(QCUDA::QOperation::NORMALIZE, this->hostVecA_.size(), 1);
-  // cudaNormalize<<<this->dimGrid_, this->dimBlock_>>>(c1, device, sum);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::NORMALIZE, this->lenA_, 0);
+  cudaNormalize<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, sums, this->lenA_);
 
   this->copyGPUDataToHost(device, host, this->lenA_);
+  ret = convertCUDAVecToHostVec(host, this->lenA_);
+  
+  freeMemOnGPU(c1);
+  freeMemOnGPU(device);
+  delete []host;
+  return (ret);
+}
+
+
+template<typename T> __host__
+T			QCUDA::CUDAGPU<T>::measureProbabilityOnGPU(int q, bool v) {
+  structComplex_t<T>*	c1 = nullptr;
+  T			host;
+  T*			device = nullptr;
+  int			qubitCount;
+  int			blockSize;
+
+  c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
+  this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
+
+  device = (T*)this->allocMemOnGPU(device, sizeof(T) * this->lenA_/2);
+  this->setGPUData(device, sizeof(T) * this->lenA_/2, 0);
+
+  qubitCount = log2(this->lenA_);
+  blockSize = pow(2, qubitCount - q - 1);
+
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::M_PROBABILITY, this->lenA_ / 2, 1);
+  cudaMeasureProbability<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, this->lenA_ / 2, blockSize, v);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::SUMKERNEL, this->lenA_ / 2, 1);
+  sumKernel<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(device, this->lenA_ / 2);
+  
+  this->copyDataFromGPU(device, &host, sizeof(T));
 
   freeMemOnGPU(c1);
-  freeMemOnGPU(sum);
   freeMemOnGPU(device);
- 
+  return (host);
+}
+
+
+template<typename T> __host__
+Tvcplxd*		QCUDA::CUDAGPU<T>::measureOutcomeOnGPU(int q, bool v) {
+  structComplex_t<T>*	c1 = nullptr;
+  structComplex_t<T>*	host = nullptr;
+  structComplex_t<T>*	device = nullptr;
+  Tvcplxd*		ret;
+  int			qubitCount;
+  int			blockSize;
+
+  c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
+  this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
+
+  host = new structComplex_t<T> [this->lenA_];
+  device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>) * this->lenA_);
+
+  qubitCount = log2(this->lenA_);
+  blockSize = pow(2, qubitCount - q - 1);
+
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::M_OUTCOME, this->lenA_, 1);
+  cudaMeasureOutcome<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, device, this->lenA_, blockSize, v);
+
+  this->copyGPUDataToHost(device, host, this->lenA_);
   ret = convertCUDAVecToHostVec(host, this->lenA_);
+
+  freeMemOnGPU(c1);
+  freeMemOnGPU(device);
   delete []host;
   return (ret);
 }
@@ -413,16 +474,16 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::normalizeOnGPU() {
 //! your GPUs.
 //!
 //! For more information, see CUDAGPU class in QCUDA.cuh header.
-//! LINK
-
+//!
 template class QCUDA::CUDAGPU<double>;
+
 template class QCUDA::CUDAGPU<float>;
 
 //! Since the kernels' definition are in another file -e.g. QCUDA_operations.cu
 //! in our case- we have to inform, thanks to the c++ extern keyword,
 //! during its compilation that the instances of these kernels are in
 //! another file, e.g. QCUDA_operations. This will primarily prevent a
-//! redundancy of intantiations.
+//! redundancy of instantiations.
 //!
 //! However, these kernels are not bound to any structures, classes,
 //! or even namespaces, therefore, we have to inform the cu files, where these
@@ -434,8 +495,6 @@ void	cudaAddition(QCUDA::structComplex_t<double>*,
 		     QCUDA::structComplex_t<double>*,
 		     QCUDA::structComplex_t<double>*,
 		     int);
-
-
 extern template __global__
 void	cudaAddition(QCUDA::structComplex_t<float>*,
 		     QCUDA::structComplex_t<float>*,
@@ -448,8 +507,6 @@ void	cudaDotProduct(QCUDA::structComplex_t<double>*,
 		       QCUDA::structComplex_t<double>*,
 		       QCUDA::structComplex_t<double>*,
 		       int, int, int, int, int);
-
-
 extern template __global__
 void	cudaDotProduct(QCUDA::structComplex_t<float>*,
 		       QCUDA::structComplex_t<float>*,
@@ -462,8 +519,6 @@ void	cudaKronecker(QCUDA::structComplex_t<double>*,
 		      QCUDA::structComplex_t<double>*,
 		      QCUDA::structComplex_t<double>*,
 		      int, int, int, int, int);
-
-
 extern template __global__
 void	cudaKronecker(QCUDA::structComplex_t<float>*,
 		      QCUDA::structComplex_t<float>*,
@@ -472,38 +527,75 @@ void	cudaKronecker(QCUDA::structComplex_t<float>*,
 
 
 extern template __global__
-void	cudaTrace(QCUDA::structComplex_t<double>*,
-		  QCUDA::structComplex_t<double>*,
+void	cudaTraceMover(QCUDA::structComplex_t<double>*,
 		  int);
-
-
 extern template __global__
-void	cudaTrace(QCUDA::structComplex_t<float>*,
-		  QCUDA::structComplex_t<float>*,
+void	cudaTraceMover(QCUDA::structComplex_t<float>*,
 		  int);
 
 
 extern template __global__
 void	cudaTranspose(QCUDA::structComplex_t<double>*,
 		      QCUDA::structComplex_t<double>*,
-		      int, int, int);
-
-
+		      int,
+		      int);
 extern template __global__
 void	cudaTranspose(QCUDA::structComplex_t<float>*,
 		      QCUDA::structComplex_t<float>*,
-		      int, int, int);
+		      int,
+		      int);
 
 
 extern template __global__
 void	cudaNormalize(QCUDA::structComplex_t<double>*,
 		      QCUDA::structComplex_t<double>*,
-		      QCUDA::structComplex_t<double>*,
+		      double*,
+		      int);
+extern template __global__
+void	cudaNormalize(QCUDA::structComplex_t<float>*,
+		      QCUDA::structComplex_t<float>*,
+		      float*,
 		      int);
 
 
 extern template __global__
-void	cudaNormalize(QCUDA::structComplex_t<float>*,
-		      QCUDA::structComplex_t<float>*,
-		      QCUDA::structComplex_t<float>*,
-		      int);
+void	cudaMeasureOutcome(QCUDA::structComplex_t<double>*,
+			   QCUDA::structComplex_t<double>*,
+			   int,
+			   int,
+			   bool);
+extern template __global__
+void	cudaMeasureOutcome(QCUDA::structComplex_t<float>*,
+			   QCUDA::structComplex_t<float>*,
+			   int,
+			   int,
+			   bool);
+
+
+extern template __global__
+void	cudaMeasureProbability(QCUDA::structComplex_t<double>*,
+			       double*,
+			       int,
+			       int,
+			       bool);
+extern template __global__
+void	cudaMeasureProbability(QCUDA::structComplex_t<float>*,
+			       float*,
+			       int,
+			       int,
+			       bool);
+
+
+extern template __global__
+void	sumKernel(double*, int);
+extern template __global__
+void	sumKernel(float*, int);
+
+
+extern template __global__
+void	sumKernel(QCUDA::structComplex_t<double>*,
+		  int);
+extern template __global__
+void	sumKernel(QCUDA::structComplex_t<float>*,
+		  int);
+                                   

@@ -1,6 +1,6 @@
 /**
  * @Author: Julien Vial-Detambel <l3ninj>
- * @Date:   2018-06-12T11:57:49+01:00
+ * @Date:   2018-06-12T11:57:649+01:00
  * @Email:  julien.vial-detambel@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: main.cpp
@@ -75,6 +75,20 @@ int main(int ac, char **av) {
     LOG(Logger::ERROR, "Need at least the file argument");
     return EXIT_FAILURE;
   }
+
+  // Matrix m1(new Tvcplxd(64*64, 1.0), 64, 64);
+  // Matrix m2(new Tvcplxd(64*64, 1.0), 64, 64);
+  // Matrix m3(new Tvcplxd(64*64), 64, 64);
+  // Matrix v1(new Tvcplxd(1*64, 1.0), 1, 64);
+  // std::cout << "NORM " << v1.normalize() << std::endl;
+  // Matrix v2(new Tvcplxd(1*64), 1, 64);
+  // std::cout << "TRACE " << m1.trace() << std::endl;
+
+  // m3 = m1 * m2;
+  // std::cout << "multiplication (matrix)" << m3 << std::endl;
+  // v2 = m1 * v1;
+  // std::cout << "multiplication (vector)" << v2 << std::endl;
+
 
   Parser::AST::t_AST ast;
   /* Reads the file and generate an AST */

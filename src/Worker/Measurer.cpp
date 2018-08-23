@@ -26,8 +26,6 @@ void Measurer::operator()() {
         m_qRegOffsets.find(m_task.measurement.source.registerName)->second
         + m_task.measurement.source.element;
 
-    LOG(Logger::DEBUG, "State: " << m_state);
-
     double proba = m_state.measureStateProbability(qubitOffset, 0);
     m_measurementsTree.addMeasurement(m_task.measurementNodeId, proba);
 

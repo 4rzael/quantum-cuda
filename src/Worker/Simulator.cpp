@@ -62,6 +62,7 @@ void Simulator::StepVisitor::operator()(const Circuit::UGate& value) {
 void Simulator::StepVisitor::operator()(const Circuit::CXGate& value) {
   // Apparently this method requires us to normalize the state afterward
   m_simulator.m_shouldNormalize = true;
+  m_simulator.m_shouldAddSecondMatrix = true;
 
   // Computing the offset of the control qubit.
   Circuit::Qubit control = value.control;
@@ -113,20 +114,29 @@ Matrix Simulator::simulate() {
   // Looping through each steps of the circuit.
   for (std::vector<Circuit::Step>::iterator it = m_task.circuit.steps.begin();
     it != m_task.circuit.steps.end(); ++it) {
+      // LOG(Logger::DEBUG, "State before step:" << m_state);
       m_shouldNormalize = false;
+      m_shouldAddSecondMatrix = false;
     // Initializing the gate vectors
     m_gates = std::vector<Matrix>(m_size, MatrixStore::i2);
-    m_extraGates = std::vector<Matrix>(m_size, MatrixStore::null2);
+    m_extraGates = std::vector<Matrix>(m_size, MatrixStore::i2);
     for (auto &substep: *it) {
       // Applying defined tranformations in the visitor.
       boost::apply_visitor(visitor, substep);
     }
     // Computing the new state as the dot product between the kroenecker product
     // of the transformation gates for each qubits and the actual simulator state.
-    Matrix op = Matrix::kron(m_gates) + Matrix::kron(m_extraGates);
+    Matrix op = Matrix::kron(m_gates);
+    if (m_shouldAddSecondMatrix) op = op + Matrix::kron(m_extraGates);
+    // for (auto const &g : m_extraGates) {
+    //   LOG(Logger::ERROR, g);
+    // }
+    // LOG(Logger::DEBUG, "Applying matrix:" << op);
+    // LOG(Logger::DEBUG, "Submatrices:" << Matrix::kron(m_gates) << Matrix::kron(m_extraGates));
     m_state = op * m_state;
 
     if (m_shouldNormalize) m_state = m_state.normalize();
+      // LOG(Logger::DEBUG, "State after step:" << m_state);
   }
   return m_state;
 }

@@ -99,13 +99,13 @@ public:
 
   //! \public
   //! \brief Performs a kroenecker product between two
-  //! std::valarray<std::complex<T>>, i.e. Matrices..
+  //! std::vector<std::complex<T>>, i.e. Matrices..
   //!
   //! \param a A matrix content.
   //! \param b B matrix content.
   //! \param ma A matrix m dimension.
   //! \param mb B matrix m dimension.
-  //! \return The dot product result as a std::valarray<std::complex<T>>.
+  //! \return The dot product result as a std::vector<std::complex<T>>.
   //!
   //! Those Matrices will be converted in order to fit with the requirements
   //! to run on an Nvidia's GPU.
@@ -114,7 +114,7 @@ public:
 
 
   //! \public
-  //! \brief Compute the trace of a std::valarray<std::complex<T>>,
+  //! \brief Compute the trace of a std::vector<std::complex<T>>,
   //! i.e. Matrix.
   //!
   //! \param a A matrix content.
@@ -128,12 +128,12 @@ public:
 
 
   //! \public
-  //! \brief Compute the transpose of a std::valarray<std::complex<T>>.
+  //! \brief Compute the transpose of a std::vector<std::complex<T>>.
   //!
   //! \param a A matrix content.
   //! \param m A matrix m dimension.
   //! \param n A matrix n dimension.
-  //! \return The transpose as a std::valarray<std::complex<T>>.
+  //! \return The transpose as a std::vector<std::complex<T>>.
   //!
   //! The Matrix will be converted in order to fit with the requirements
   //! to run on an Nvidia's GPU.
@@ -142,7 +142,7 @@ public:
 
 
   //! \public
-  //! \brief Compute the normalized std::valarray<std::complex<T>>.
+  //! \brief Compute the normalized std::vector<std::complex<T>>.
   //!
   //! \Param a A matrix content.
   //! \return The normalized matrix as a point.
@@ -152,32 +152,34 @@ public:
   //!
   virtual Tvcplxd* normalize(Tvcplxd* a);
 
-  /**
-   * Compute the probability of ending with value v when measuring qubit number q
-   *
-   * @param a A Vector content
-   * @param q The qubit's index
-   * @param v The expected outcome
-   * @return double The probability of the outcome v on qubit q
-   */
+  //! \public
+  //! \brief Compute the probability of ending with value v when measuring
+  //!        qubit number q.
+  //!
+  //! \param a A Vector content.
+  //! \param q The qubit's index.
+  //! \param v The expected outcome.
+  //! \return double The probability of the outcome v on qubit q.
+  //!
   virtual double measureProbability(Tvcplxd *a, int q, bool v);
 
-  /**
-   * @brief Compute the resulting vector state after measuring the value v on qubit q
-   *
-   * @param a A Vector content
-   * @param q The qubit's index
-   * @param v The expected outcome
-   * @return Tvcplxd* The vector state after measurement outcome v on qubit q
-   */
+  //! \public
+  //! \brief Compute the resulting vector state after measuring
+  //!        the value v on qubit number q.
+  //!
+  //! \param a A Vector content.
+  //! \param q The qubit's index.
+  //! \param v The expected outcome.
+  //! \return Tvcplxd* The vector state after measurement outcome v on qubit q.
+  //!/
   virtual Tvcplxd* measureOutcome(Tvcplxd *a, int q, bool v);
 
-  /**
-   * @brief Perform Matrx-scalar multiplication
-   *
-   * @param a The matrix content
-   * @param scalar A scalar
-   * @return Tvcplxd* The resulting Matrix
-   */
+  //! \public
+  //! \brief Perform Matrx-scalar multiplication.
+  //!
+  //! \param a The matrix content.
+  //! \param scalar A scalar.
+  //! \return Tvcplxd* The resulting Matrix.
+  //!
   virtual Tvcplxd* multiply(Tvcplxd *a, const std::complex<double> &scalar);
 };

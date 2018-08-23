@@ -11,13 +11,13 @@
 
 #pragma once
 
-#include <valarray>
+#include <vector>
 #include <complex>
 #include <vector>
 #include <memory>
 
- /** A convenient typedef for std::valarray<std::complex<double>> */
- typedef std::valarray<std::complex<double>> Tvcplxd;
+/** A convenient typedef for std::vector<std::complex<double>> */
+typedef std::vector<std::complex<double>> Tvcplxd;
 
  /**
  * @brief Matrix representation class.
@@ -54,7 +54,7 @@ class Matrix {
     std::pair<int, int> getDimensions() const;
     /**
     * Matrix content getter
-    * @return Return the content of the matrix as a std::valarray<std::complex<double>>
+    * @return Return the content of the matrix as a std::vector<std::complex<double>>
     */
     Tvcplxd* getContent() const;
     /**
@@ -91,6 +91,10 @@ class Matrix {
     double measureStateProbability(int qubitIndex, bool value) const;
 
     Matrix measureStateOutcome(int qubitIndex, bool value) const;
+
+    // ~Matrix() {
+    //   if (m_content) delete m_content;
+    // }
 };
 
 /**

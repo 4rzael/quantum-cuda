@@ -40,6 +40,12 @@ public:
      * @brief Marks a task as done, therefore "unlocking" the ones depending on it
      */
     virtual void            markTaskAsDone(TaskGraph::TaskId) = 0;
+    /**
+     * @brief Marks a node and all of its childrens, grandchildrens, etc, as done without needing to perform the computation
+     * 
+     * This is used when a task has no sample left, and is therefore not required in the simulation
+     */
+    virtual void            markBranchAsUseless(TaskGraph::TaskId) = 0;
 
     virtual ~ITaskScheduler() {}
 };

@@ -11,15 +11,7 @@
 
 # include "QCUDA_struct.cuh"
 
-/**
- * This file contains all the definitions of the structure 'struct s_complex'.
- */
 
-/**
- * Each instance of the structure 'struct s_complex' will initialize
- * the real part 'real_' and the imaginary part 'imag_' to 0, thanks to the
- * initializer list.
- */
 template<typename T> __host__ __device__
 QCUDA::s_complex<T>::s_complex()
   : real_(0), imag_(0)
@@ -27,50 +19,38 @@ QCUDA::s_complex<T>::s_complex()
 
 
 template<typename T> __host__ __device__
-QCUDA::s_complex<T>::~s_complex()
+QCUDA::s_complex<T>::s_complex(T r, T i)
+  : real_(r), imag_(i)
+{}  
+
+
+template<typename T> __host__ __device__
+QCUDA::s_complex<T>::s_complex(const struct s_complex& cpy)
+  : real_(cpy.real_), imag_(cpy.imag_)
 {}
 
 
 template<typename T> __host__ __device__
-T	QCUDA::s_complex<T>::getReal() {
-  return (this->real_);
+QCUDA::s_complex<T>::~s_complex() = default;
+
+
+template<typename T> __host__ __device__
+struct QCUDA::s_complex<T>&	QCUDA::s_complex<T>::operator=(const struct s_complex& cpy) {
+  this->real_ = cpy.real_;
+  this->imag_ = cpy.imag_;
+  return (*this);
 }
 
 
 template<typename T> __host__ __device__
-void	QCUDA::s_complex<T>::setReal(const T& v) {
-  this->real_ = v;
+T QCUDA::s_complex<T>::norm() {
+  return real_ * real_ + imag_ * imag_;
 }
 
 
 template<typename T> __host__ __device__
-void	QCUDA::s_complex<T>::aggregateReal(const T& v) {
-  this->real_ += v;
-}
-
-
-template<typename T> __host__ __device__
-T	QCUDA::s_complex<T>::getImag() {
-  return (this->imag_);
-}
-
-
-template<typename T> __host__ __device__
-void	QCUDA::s_complex<T>::setImag(const T& v) {
-  this->imag_ = v;
-}
-
-
-template<typename T> __host__ __device__
-void	QCUDA::s_complex<T>::aggregateImag(const T& v) {
-  this->imag_ += v;
-}
-
-
-template<typename T> __host__ __device__
-void	QCUDA::s_complex<T>::operator+=(const struct s_complex<T>& c) {
-  this->real_ += c.real_;
-  this->imag_ += c.imag_;
+QCUDA::s_complex<T> QCUDA::s_complex<T>::operator/(const T &v) {
+  return QCUDA::s_complex<T>(real_ / v, imag_ / v);
 }
 
 
@@ -84,18 +64,37 @@ struct QCUDA::s_complex<T>	QCUDA::s_complex<T>::operator+(const struct s_complex
 }
 
 
+template<typename T> __host__ __device__
+struct QCUDA::s_complex<T>	QCUDA::s_complex<T>::operator*(const struct s_complex<T>& c) {
+  struct s_complex<T> tmp;
+
+  tmp.real_ = (this->real_ * c.real_) + (this->imag_ * c.imag_ * -1);
+  tmp.imag_ = (this->real_ * c.imag_) + (this->imag_ * c.real_);
+  return (tmp);
+}
+
+
+template<typename T> __host__ __device__
+struct QCUDA::s_complex<T>&	QCUDA::s_complex<T>::operator+=(const struct s_complex<T>& c) {
+  this->real_ += c.real_;
+  this->imag_ += c.imag_;
+  return (*this);
+}
+
+
 template<typename T> __host__
 std::ostream&	operator<<(std::ostream& os, const struct QCUDA::s_complex<T>& c) {
-  os << c.real_ << std::endl;
-  os << c.imag_ << std::endl;
+  os << "(" << c.real_ << ", " << c.imag_ << "i)" << std::endl;
   return (os);
 }
 
-/**
- * Since templates are defined outside of the header file, due to the fact that
- * CUDA source codes must be defined within a '.cu' file, therefore we have to
- * explicitly instantiate all the types that can be handled by the structure
- * 'struct s_complex'.Hence 'float' and 'double' types.
- */
+
+//!
+//! Since templates are defined outside of the header file, due to the fact that
+//! CUDA source codes must be defined within a '.cu' file, therefore we have to
+//! explicitly instantiate all the types that can be handled by the structure
+//! 'struct s_complex'.Hence 'float' and 'double' types.
+//!
 template struct QCUDA::s_complex<double>;
+
 template struct QCUDA::s_complex<float>;

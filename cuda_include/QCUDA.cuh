@@ -264,6 +264,35 @@ namespace QCUDA {
     //!
     __host__
     Tvcplxd*	normalizeOnGPU();
+
+
+    //! \public
+    //! \brief measureProbabilityOnGPU is a wapprer method that contains all the
+    //!       management to perform a probability measurement of a template matrix,
+    //!       or vector.
+    //!
+    //! \param q Corresponds to the qubit number.
+    //! \param v Corresponds to the value of the qubit number.
+    //! keep in mind that the return value is templated because of the different
+    //! compute capability of some Nvidia GPU.
+    //!
+    __host__
+    T		measureProbabilityOnGPU(int q, bool v);
+
+
+    //! \public
+    //! \brief measureOutcomeOnGPU is a wapprer method that contains all the
+    //!       management to perform an outcome measurement of a template matrix,
+    //!       or vector.
+    //!
+    //! \param q Corresponds to the qubit number.
+    //! \param v Corresponds to the value of the qubit number.
+    //! keep in mind that the return value is templated because of the different
+    //! compute capability of some Nvidia GPU.
+    //!
+    __host__
+    Tvcplxd*	measureOutcomeOnGPU(int q, bool v);
+
   private:
     //! \private
     //! \brief allocMemOnGPU is a wrapper method that encapsulates the
@@ -277,8 +306,8 @@ namespace QCUDA {
     //! -error handling- in order to inform the user.
     //!
     __host__
-    structComplex_t<T>*	allocMemOnGPU(structComplex_t<T>* c,
-				      unsigned int len);
+    void*	allocMemOnGPU(void* c,
+			      unsigned int len);
 
 
     //! \private
@@ -289,7 +318,7 @@ namespace QCUDA {
     //! \param c holds the address we want to free in the GPU memory.
     //! The method will inform the user if the free has failed.
     __host__
-    void	freeMemOnGPU(structComplex_t<T>* c);
+    void	freeMemOnGPU(void* c);
 
 
     //! \private
@@ -313,6 +342,25 @@ namespace QCUDA {
 
 
     //! \private
+    //! \brief The behavior of copyDataToGPU is the same as copyHostDataGPU,
+    //!        except that this one is related to non typedef parameter.
+    //!
+    //! \param hostData holds the address we allocated from the memory related
+    //!            to the CPU, i.e. RAM.
+    //! \param deviceData holds the address in the GPU memory that we allocated
+    //!        earlier in order to copy the content of the host data in the GPU,
+    //!        thanks to the address.
+    //! \param size Correponds the size of host data.
+    //! The method might throw a runtime error -thanks to the error handling-
+    //! if the copy failed, in order to inform the user.
+    //!
+    __host__
+    void	copyDataToGPU(void* hostData,
+			      void* deviceData,
+			      unsigned int size);
+
+
+    //! \private
     //! \brief copyGPUDataToHost is a wrapper method that encapsulates the
     //!        CUDA memcpy -cudaMemcpy-. it will "transfer" the data
     //!        we want to process from device part to host part, i.e. the CPU.
@@ -332,6 +380,25 @@ namespace QCUDA {
 
 
     //! \private
+    //! \brief The behavior of copyDataFromGPU is the same as copyGPUDataToHost,
+    //!        except that this one is related to non typedef parameter.
+    //!
+    //! \param hostData holds the address we allocated from the memory related
+    //!            to the CPU, i.e. RAM.
+    //! \param deviceData holds the address in the GPU memory that we allocated
+    //!        earlier in order to copy the content of the host data in the GPU,
+    //!        thanks to the address.
+    //! \param size Correponds the size of device data.
+    //! The method might throw a runtime error -thanks to the error handling-
+    //! if the copy failed, in order to inform the user.
+    //!
+    __host__
+    void	copyDataFromGPU(void* deviceData,
+				void* hostData,
+				unsigned int size);
+
+
+    //! \private
     //! \brief setGPUData is a wrapper method that encapsulates the CUDA memset
     //!        -cudaMemset-. It will set each byte of the allocated data on the
     //!        GPU to a specific byte value chosen by the user.
@@ -343,13 +410,14 @@ namespace QCUDA {
     //! if the copy failed, in order to inform the user.
     //!
     __host__
-    void	setGPUData(structComplex_t<T>* c,
+    void	setGPUData(void* c,
 			   unsigned int size,
 			   int byte);
 
   private:  
     //! \private
-    //! \brief debug method
+    //! \brief debug method for internal use.
+    //!
     __host__
     void	dumpStruct(structComplex_t<T>* c,
 			   unsigned int len);

@@ -34,8 +34,10 @@ std::shared_ptr<ITask> BasicTaskScheduler::getNextTask() {
     auto task = m_graph.getTask(state->to);
     auto sID = state->id;
     std::remove_if(m_availableStates.begin(), m_availableStates.end(),
-                   [sID](auto elem) { return elem == sID; });
-
+                   [&](auto elem) { return elem == sID || state->status != StateStatus::AVAILABLE; });
+    if (state->status != StateStatus::AVAILABLE) {
+        return getNextTask();
+    }
     state->status = StateStatus::IN_USE;
     task->status = TaskStatus::PROCESSING;
     return task;
@@ -50,7 +52,27 @@ void BasicTaskScheduler::markTaskAsDone(TaskId tID) {
     }
 
     for (auto sID : task->outputStates) {
-        m_graph.getState(sID)->status = StateStatus::AVAILABLE;
-        m_availableStates.push_back(sID);
+        if (m_graph.getState(sID)->status == StateStatus::AWAITING) {
+            m_graph.getState(sID)->status = StateStatus::AVAILABLE;
+            m_availableStates.push_back(sID);
+        }
+    }
+}
+
+void BasicTaskScheduler::markBranchAsUseless(TaskGraph::TaskId tID) {
+    if (tID == TASK_ID_NONE) return;
+    auto task = m_graph.getTask(tID);
+    task->status = TaskStatus::DONE;
+
+    for (auto stateId: task->outputStates) {
+        if (stateId != STATE_ID_NONE) {
+            auto state = m_graph.getState(stateId);
+            state->status = StateStatus::CONSUMED;
+            markBranchAsUseless(state->to);
+
+            std::remove_if(m_availableStates.begin(), m_availableStates.end(),
+                [&](auto elem) { return elem == stateId || state->status != StateStatus::AVAILABLE; }
+            );
+        }
     }
 }

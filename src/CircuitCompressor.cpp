@@ -14,8 +14,11 @@
 #include "Circuit.hpp"
 #include "Logger.hpp"
 
+/**
+ * Disable until we change the way we make CX gates in the simulator, as it brakes it
+ */
 Circuit &CircuitCompressor::operator()() {
-    shrinkCircuit();
+    // shrinkCircuit();
     // removeUselessQubits();
     // removeUselessGates();
     // shrinkCircuit();
@@ -41,7 +44,8 @@ void CircuitCompressor::shrinkCircuit() {
                     for (auto const &qubit : getGateTargets(gate)) {
                         if ((*std::prev(step)).isQubitUsed(qubit)
                             || (gate.type().hash_code() == typeid(Circuit::Measurement).hash_code()
-                              && (*std::prev(step)).containsMeasurement())) {
+                              && (*std::prev(step)).containsMeasurement())
+                            || (gate.type().hash_code() == typeid(Circuit::Barrier).hash_code())) {
                             canMove = false;
                             break;
                         }
