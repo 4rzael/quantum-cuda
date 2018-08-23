@@ -59,23 +59,32 @@ void	cudaDotProduct(QCUDA::structComplex_t<T>* c1,
 
 
 template<typename T> __global__
-void	cudaKronecker(QCUDA::structComplex_t<T>* a,
-		      QCUDA::structComplex_t<T>* b,
+void	cudaKronecker(QCUDA::structComplex_t<T>* c1,
+		      QCUDA::structComplex_t<T>* c2,
 		      QCUDA::structComplex_t<T>* res,
-		      int sizeA,
-		      int sizeB,
 		      int ma,
 		      int mb,
-		      int n) {
-  // int na = sizeA / ma;
-  int nb = sizeB / mb;
-  int idx = threadIdx.x;
-  int idy = threadIdx.y;
+		      int na,
+		      int nb,
+		      int nSteps) {
+  int idx;
+  int idy;
+
+  idx = blockIdx.x * blockDim.x + threadIdx.x;
+  idy = blockIdx.y * blockDim.y + threadIdx.y;
+
+  if (idx < (ma * mb) && idy < (na * nb)) {
+    res[idy * ma * mb + idx] = c1[idx / mb + (idy / nb) * ma] * c2[idx % mb + (idy % nb) * mb];
+  }
+  // // int na = sizeA / ma;
+  // int nb = sizeB / mb;
+  // int idx = threadIdx.x;
+  // int idy = threadIdx.y;
   
-  res[idx + idy * ma * mb].setReal(b[idx % mb + (idy % nb) * mb].getReal()
-				   * a[idx / mb + (idy / nb) * ma].getReal());
-  res[idx + idy * ma * mb].setImag(b[idx % mb + (idy % nb) * mb].getImag()
-				   * a[idx / mb + (idy / nb) * ma].getImag());
+  // res[idx + idy * ma * mb].setReal(b[idx % mb + (idy % nb) * mb].getReal()
+  // 				   * a[idx / mb + (idy / nb) * ma].getReal());
+  // res[idx + idy * ma * mb].setImag(b[idx % mb + (idy % nb) * mb].getImag()
+  // 				   * a[idx / mb + (idy / nb) * ma].getImag());
 }
 
 
