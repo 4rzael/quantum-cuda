@@ -75,12 +75,13 @@ Tvcplxd* CPUExecutor::transpose(Tvcplxd* a, int m, int n) {
 
 Tvcplxd* CPUExecutor::normalize(Tvcplxd* a) {
   Tvcplxd* result = new Tvcplxd(a->size());
-  std::complex<double> sum = 0;
+  double sum = 0;
 
   for (uint i = 0; i < a->size(); i++) {
-    sum += (*a)[i] * (*a)[i];
+    // norm of the vector
+    sum += (*a)[i].real() * (*a)[i].real() + (*a)[i].imag() * (*a)[i].imag();
   }
-  if (sum == std::complex<double>(0)) {
+  if (std::abs(sum) < 0.001) {
     sum = 1;
   }
   sum = sqrt(sum);
@@ -97,8 +98,8 @@ double CPUExecutor::measureProbability(Tvcplxd *a, int q, bool v) {
   double prob = 0;
   for (uint i = 0; i < a->size(); ++i) {
     bool takeIntoAccount = (i / blockSize) % 2 == (int)v;
-    std::complex<double> squared = (*a)[i] * (*a)[i];
-    prob += squared.real() * (int)takeIntoAccount;
+    double norm = (*a)[i].real() * (*a)[i].real() + (*a)[i].imag() * (*a)[i].imag();
+    prob += norm * (int)takeIntoAccount;
   }
 
   return prob;
