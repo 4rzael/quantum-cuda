@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Matrix.cpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-08-16T15:33:37+02:00
+ * @Last modified time: 2018-08-23T11:24:58+02:00
  * @License: MIT License
  */
 
@@ -14,6 +14,7 @@
 #include <valarray>
 #include <complex>
 #include <vector>
+#include <memory>
 
  /** A convenient typedef for std::valarray<std::complex<double>> */
  typedef std::valarray<std::complex<double>> Tvcplxd;
@@ -33,7 +34,7 @@ class Matrix {
     /**
     * The matrix content state n dimension
     */
-    Tvcplxd* m_content;
+    std::shared_ptr<Tvcplxd> m_content;
   public:
     /**
      * Default matrix constructor
@@ -45,7 +46,7 @@ class Matrix {
      * @param m The m dimension of the matrix
      * @param n The n dimension of the matrix
      */
-    Matrix(Tvcplxd* matrix, int m, int n);
+    Matrix(std::shared_ptr<Tvcplxd> matrix, int m, int n);
     /**
      * Matrix dimensions getter
      * @return Return the matrix dimensions as a pair of integers

@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.cpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-07-19T13:31:52+01:00
+ * @Last modified time: 2018-08-23T12:13:08+02:00
  * @License: MIT License
  */
 
@@ -45,12 +45,12 @@ void Simulator::StepVisitor::operator()(const Circuit::UGate& value) {
   // Creating a gate according to the phi, theta and lambda parameters and
   // setting it as the target qubit transformation gate.
   using namespace std::complex_literals;
-  m_simulator.m_gates[id] = Matrix(new Tvcplxd({exp(-1i * (value.phi + value.lambda) / 2.0)
+  m_simulator.m_gates[id] = Matrix(std::shared_ptr<Tvcplxd>(new Tvcplxd({exp(-1i * (value.phi + value.lambda) / 2.0)
     * cos(value.theta / 2.0),
     -exp(-1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2.0),
     exp(1i * (value.phi - value.lambda) / 2.0) * sin(value.theta / 2.0),
     exp(1i * (value.phi + value.lambda) / 2.0) * cos(value.theta / 2.0)
-  }), 2, 2);
+  })), 2, 2);
 
   // Debug logs
   LOG(Logger::DEBUG, "Applying a U Gate:" << "\nU Gate:\n\ttheta: "

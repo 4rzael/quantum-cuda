@@ -22,7 +22,7 @@ Measurer::Measurer(DuplicateAndMeasureTask &task,
 }
 
 void Measurer::operator()() {
-    const auto qubitOffset = 
+    const auto qubitOffset =
         m_qRegOffsets.find(m_task.measurement.source.registerName)->second
         + m_task.measurement.source.element;
 
@@ -36,8 +36,8 @@ void Measurer::operator()() {
     m_stateStore.storeState(m_task.outputStates[0], m_state.measureStateOutcome(qubitOffset, 0));
     m_stateStore.deleteState(m_task.inputStates[0]);
     // And perform a copy for the second
-    m_stateStore.storeState(m_task.outputStates[1], 
-        Matrix(new Tvcplxd(*m_state.measureStateOutcome(qubitOffset, 1).getContent()),
+    m_stateStore.storeState(m_task.outputStates[1],
+        Matrix(std::shared_ptr<Tvcplxd>(new Tvcplxd(*m_state.measureStateOutcome(qubitOffset, 1).getContent())),
             m_state.getDimensions().first,
             m_state.getDimensions().second));
 }

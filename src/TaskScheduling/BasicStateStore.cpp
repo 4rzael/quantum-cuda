@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: BasicStateStore.cpp
- * @Last modified by:   4rzael
- * @Last modified time: Sun Aug 12 2018, 20:05:42
+ * @Last modified by:   l3ninj
+ * @Last modified time: 2018-08-23T11:28:01+02:00
  * @License: MIT License
  */
 
@@ -18,7 +18,7 @@ using namespace TaskGraph;
 BasicStateStore::BasicStateStore(Graph const &graph) {
     for (auto avail : graph.getAvailableStates()) {
         const size_t size = pow(2, graph.getState(avail)->qubitCount);
-        auto mat = Matrix(new Tvcplxd(size), 1, size);
+        auto mat = Matrix(std::shared_ptr<Tvcplxd>(new Tvcplxd(size)), 1, size);
         (*mat.getContent())[0] = 1;
         _map[graph.getState(avail)->id] = mat;
     }
