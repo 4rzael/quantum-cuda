@@ -264,9 +264,21 @@ namespace QCUDA {
     //!
     __host__
     Tvcplxd*	normalizeOnGPU();
+
+
+    __host__
+    T		measureProbabilityOnGPU(int q, bool v);
+
+
+    __host__
+    Tvcplxd*	measureOutcomeOnGPU(int q, bool v);
+
+
+    __host__
+    Tvcplxd*	multiplyOnPGU(const std::complex<T>& s);
   private:
     //! \private
-    //! \brief allocMemOnGPU is a wrapper method that encapsulates the
+    //! \brief allocMemOnGPU is a wrapper method that enOBcapsulates the
     //!        CUDA malloc -cudaMalloc-. It will alloc the data in the
     //!        GPU memory.
     //!
@@ -277,8 +289,8 @@ namespace QCUDA {
     //! -error handling- in order to inform the user.
     //!
     __host__
-    structComplex_t<T>*	allocMemOnGPU(structComplex_t<T>* c,
-				      unsigned int len);
+    void*	allocMemOnGPU(void* c,
+			      unsigned int len);
 
 
     //! \private
@@ -289,7 +301,7 @@ namespace QCUDA {
     //! \param c holds the address we want to free in the GPU memory.
     //! The method will inform the user if the free has failed.
     __host__
-    void	freeMemOnGPU(structComplex_t<T>* c);
+    void	freeMemOnGPU(void* c);
 
 
     //! \private
@@ -312,6 +324,11 @@ namespace QCUDA {
 				  const QCUDA::Vectors&& v);
 
 
+    __host__
+    void	copyDataToGPU(void* hostData,
+			      void* deviceData,
+			      unsigned int size);
+
     //! \private
     //! \brief copyGPUDataToHost is a wrapper method that encapsulates the
     //!        CUDA memcpy -cudaMemcpy-. it will "transfer" the data
@@ -331,6 +348,10 @@ namespace QCUDA {
 				  unsigned int size);
 
 
+    __host__
+    void	copyDataFromGPU(void* deviceData,
+				void* hostData,
+				unsigned int size);
     //! \private
     //! \brief setGPUData is a wrapper method that encapsulates the CUDA memset
     //!        -cudaMemset-. It will set each byte of the allocated data on the
@@ -343,7 +364,7 @@ namespace QCUDA {
     //! if the copy failed, in order to inform the user.
     //!
     __host__
-    void	setGPUData(structComplex_t<T>* c,
+    void	setGPUData(void* c,
 			   unsigned int size,
 			   int byte);
 

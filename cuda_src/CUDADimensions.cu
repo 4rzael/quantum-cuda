@@ -175,8 +175,8 @@ void	QCUDA::CUDADim::initGridAndBlock(const cudaDeviceProp& prop,
     this->naiveInit(prop, m);
     break;
   }
-  std::cout << "this->gridDim_.x: " << this->gridDim_.x << std::endl;
-  std::cout << "this->gridDim_.y: " << this->gridDim_.y << std::endl;
-  std::cout << "this->blockDim_.x: " << this->blockDim_.x << std::endl;
-  std::cout << "this->blockDim_.y: " << this->blockDim_.y << std::endl;
+  // std::cout << "this->gridDim_.x: " << this->gridDim_.x << std::endl;
+  // std::cout << "this->gridDim_.y: " << this->gridDim_.y << std::endl;
+  // std::cout << "this->blockDim_.x: " << this->blockDim_.x << std::endl;
+  // std::cout << "this->blockDim_.y: " << this->blockDim_.y << std::endl;
 }

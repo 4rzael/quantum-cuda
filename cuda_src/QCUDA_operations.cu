@@ -135,11 +135,48 @@ void	cudaNormalize(QCUDA::structComplex_t<T>* a,
 }
 
 
+template<typename T> __global__
+void	cudaMeasureProbability(QCUDA::structComplex_t<T>* c1,
+			       T* result,
+			       int nSteps,
+			       int blockSize,
+			       bool v) {
+  int	idx;
+  bool	TIA;
+
+  idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx < nSteps) {
+    TIA = (((idx / blockSize) % 2) == (int)v);
+    (*result) += (c1[idx] * c1[idx]).real_ * (T)TIA;
+    // TON AGREGATION à la place de la mienne au dessus
+  }
+}
+
+
+template<typename T> __global__
+void	cudaMeasureOutcome(QCUDA::structComplex_t<T>* c1,
+			   QCUDA::structComplex_t<T>* result,
+			   int nSteps,
+			   int blockSize,
+			   bool v) {
+  int	idx;
+  bool	TIA;
+
+  idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx < nSteps) {
+    TIA = (((idx / blockSize) % 2) == (int)v);
+    result[idx].real_ = c1[idx].real_ * (T)TIA;
+    result[idx].imag_ = c1[idx].imag_ * (T)TIA;
+  }
+}
+
+
 /**
  * Below, all the explicit template specialization.
  */
 
 template class QCUDA::CUDAGPU<double>;
+
 template class QCUDA::CUDAGPU<float>;
 
 
@@ -222,3 +259,20 @@ void	cudaNormalize(QCUDA::structComplex_t<float>*,
 		      QCUDA::structComplex_t<float>*,
 		      int);
 
+
+template __global__
+void	cudaMeasureOutcome(QCUDA::structComplex_t<double>*,
+			   QCUDA::structComplex_t<double>*,
+			   int, int, bool);
+template __global__
+void	cudaMeasureOutcome(QCUDA::structComplex_t<float>*,
+			   QCUDA::structComplex_t<float>*,
+			   int, int, bool);
+
+
+template __global__
+void	cudaMeasureProbability(QCUDA::structComplex_t<double>*,
+			       double*, int, int, bool);
+template __global__
+void	cudaMeasureProbability(QCUDA::structComplex_t<float>*,
+			       float*, int, int, bool);

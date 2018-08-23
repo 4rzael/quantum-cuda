@@ -139,30 +139,51 @@ Tvcplxd*	GPUExecutor::normalize(Tvcplxd* a) {
 }
 
 double GPUExecutor::measureProbability(Tvcplxd *a, int q, bool v) {
-  int qubitCount = log2(a->size());
-  int blockSize = pow(2, qubitCount - q - 1);
+  // int qubitCount = log2(a->size());
+  // int blockSize = pow(2, qubitCount - q - 1);
 
-  double prob = 0;
-  for (uint i = 0; i < a->size(); ++i) {
-    bool takeIntoAccount = (i / blockSize) % 2 == (int)v;
-    std::complex<double> squared = (*a)[i] * (*a)[i];
-    prob += squared.real() * (int)takeIntoAccount;
+  // double prob = 0;
+  // for (uint i = 0; i < a->size(); ++i) {
+  //   bool takeIntoAccount = (i / blockSize) % 2 == (int)v;
+  //   std::complex<double> squared = (*a)[i] * (*a)[i];
+  //   prob += squared.real() * (int)takeIntoAccount;
+  // }
+
+  // return prob;
+  
+  try {
+    this->cgpu_.initComplexVecs(a, nullptr);
+    return (this->cgpu_.measureProbabilityOnGPU(q, v));
+  } catch (const std::exception& err) {
+    std::cerr << err.what() << std::endl;
+    std::cerr << "Couldn't perform the transpose on the GPU !" << std::endl;
+    return (0);
   }
-
-  return prob;
 }
 
 Tvcplxd* GPUExecutor::measureOutcome(Tvcplxd *a, int q, bool v) {
-  int qubitCount = log2(a->size());
-  int blockSize = pow(2, qubitCount - q - 1);
+ //  int qubitCount = log2(a->size());
+ //  int blockSize = pow(2, qubitCount - q - 1);
 
-  Tvcplxd* result = new Tvcplxd(a->size());
-  for (uint i = 0; i < a->size(); ++i) {
-    bool takeIntoAccount = (i / blockSize) % 2 == (int)v;
-    (*result)[i] = (*a)[i] * (double)takeIntoAccount;
+ //  Tvcplxd* result = new Tvcplxd(a->size());
+ //  for (uint i = 0; i < a->size(); ++i) {
+ //    bool takeIntoAccount = (i / blockSize) % 2 == (int)v;
+ //    (*result)[i] = (*a)[i] * (double)takeIntoAccount;
+ // }
+ //  return normalize(result);
+  Tvcplxd* ret;
+  
+  try {
+    this->cgpu_.initComplexVecs(a, nullptr);
+    ret = this->cgpu_.measureOutcomeOnGPU(q, v);
+    return(this->normalize(ret));
+  } catch (const std::exception& err) {
+    std::cerr << err.what() << std::endl;
+    std::cerr << "Couldn't perform the transpose on the GPU !" << std::endl;
+    return (nullptr);
   }
-  return normalize(result);
 }
+
 
 Tvcplxd* GPUExecutor::multiply(Tvcplxd *a, const std::complex<double> &scalar) {
   Tvcplxd* result = new Tvcplxd(a->size());
