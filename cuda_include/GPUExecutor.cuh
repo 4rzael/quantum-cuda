@@ -152,32 +152,34 @@ public:
   //!
   virtual Tvcplxd* normalize(Tvcplxd* a);
 
-  /**
-   * Compute the probability of ending with value v when measuring qubit number q
-   *
-   * @param a A Vector content
-   * @param q The qubit's index
-   * @param v The expected outcome
-   * @return double The probability of the outcome v on qubit q
-   */
+  //! \public
+  //! \brief Compute the probability of ending with value v when measuring
+  //!        qubit number q.
+  //!
+  //! \param a A Vector content.
+  //! \param q The qubit's index.
+  //! \param v The expected outcome.
+  //! \return double The probability of the outcome v on qubit q.
+  //!
   virtual double measureProbability(Tvcplxd *a, int q, bool v);
 
-  /**
-   * @brief Compute the resulting vector state after measuring the value v on qubit q
-   *
-   * @param a A Vector content
-   * @param q The qubit's index
-   * @param v The expected outcome
-   * @return Tvcplxd* The vector state after measurement outcome v on qubit q
-   */
+  //! \public
+  //! \brief Compute the resulting vector state after measuring
+  //!        the value v on qubit number q.
+  //!
+  //! \param a A Vector content.
+  //! \param q The qubit's index.
+  //! \param v The expected outcome.
+  //! \return Tvcplxd* The vector state after measurement outcome v on qubit q.
+  //!/
   virtual Tvcplxd* measureOutcome(Tvcplxd *a, int q, bool v);
 
-  /**
-   * @brief Perform Matrx-scalar multiplication
-   *
-   * @param a The matrix content
-   * @param scalar A scalar
-   * @return Tvcplxd* The resulting Matrix
-   */
+  //! \public
+  //! \brief Perform Matrx-scalar multiplication.
+  //!
+  //! \param a The matrix content.
+  //! \param scalar A scalar.
+  //! \return Tvcplxd* The resulting Matrix.
+  //!
   virtual Tvcplxd* multiply(Tvcplxd *a, const std::complex<double> &scalar);
 };

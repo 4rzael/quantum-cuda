@@ -266,19 +266,36 @@ namespace QCUDA {
     Tvcplxd*	normalizeOnGPU();
 
 
+    //! \public
+    //! \brief measureProbabilityOnGPU is a wapprer method that contains all the
+    //!       management to perform a probability measurement of a template matrix,
+    //!       or vector.
+    //!
+    //! \param q Corresponds to the qubit number.
+    //! \param v Corresponds to the value of the qubit number.
+    //! keep in mind that the return value is templated because of the different
+    //! compute capability of some Nvidia GPU.
+    //!
     __host__
     T		measureProbabilityOnGPU(int q, bool v);
 
 
+    //! \public
+    //! \brief measureOutcomeOnGPU is a wapprer method that contains all the
+    //!       management to perform an outcome measurement of a template matrix,
+    //!       or vector.
+    //!
+    //! \param q Corresponds to the qubit number.
+    //! \param v Corresponds to the value of the qubit number.
+    //! keep in mind that the return value is templated because of the different
+    //! compute capability of some Nvidia GPU.
+    //!
     __host__
     Tvcplxd*	measureOutcomeOnGPU(int q, bool v);
 
-
-    __host__
-    Tvcplxd*	multiplyOnPGU(const std::complex<T>& s);
   private:
     //! \private
-    //! \brief allocMemOnGPU is a wrapper method that enOBcapsulates the
+    //! \brief allocMemOnGPU is a wrapper method that encapsulates the
     //!        CUDA malloc -cudaMalloc-. It will alloc the data in the
     //!        GPU memory.
     //!
@@ -324,10 +341,24 @@ namespace QCUDA {
 				  const QCUDA::Vectors&& v);
 
 
+    //! \private
+    //! \brief The behavior of copyDataToGPU is the same as copyHostDataGPU,
+    //!        except that this one is related to non typedef parameter.
+    //!
+    //! \param hostData holds the address we allocated from the memory related
+    //!            to the CPU, i.e. RAM.
+    //! \param deviceData holds the address in the GPU memory that we allocated
+    //!        earlier in order to copy the content of the host data in the GPU,
+    //!        thanks to the address.
+    //! \param size Correponds the size of host data.
+    //! The method might throw a runtime error -thanks to the error handling-
+    //! if the copy failed, in order to inform the user.
+    //!
     __host__
     void	copyDataToGPU(void* hostData,
 			      void* deviceData,
 			      unsigned int size);
+
 
     //! \private
     //! \brief copyGPUDataToHost is a wrapper method that encapsulates the
@@ -348,10 +379,25 @@ namespace QCUDA {
 				  unsigned int size);
 
 
+    //! \private
+    //! \brief The behavior of copyDataFromGPU is the same as copyGPUDataToHost,
+    //!        except that this one is related to non typedef parameter.
+    //!
+    //! \param hostData holds the address we allocated from the memory related
+    //!            to the CPU, i.e. RAM.
+    //! \param deviceData holds the address in the GPU memory that we allocated
+    //!        earlier in order to copy the content of the host data in the GPU,
+    //!        thanks to the address.
+    //! \param size Correponds the size of device data.
+    //! The method might throw a runtime error -thanks to the error handling-
+    //! if the copy failed, in order to inform the user.
+    //!
     __host__
     void	copyDataFromGPU(void* deviceData,
 				void* hostData,
 				unsigned int size);
+
+
     //! \private
     //! \brief setGPUData is a wrapper method that encapsulates the CUDA memset
     //!        -cudaMemset-. It will set each byte of the allocated data on the
@@ -370,7 +416,8 @@ namespace QCUDA {
 
   private:  
     //! \private
-    //! \brief debug method
+    //! \brief debug method for internal use.
+    //!
     __host__
     void	dumpStruct(structComplex_t<T>* c,
 			   unsigned int len);

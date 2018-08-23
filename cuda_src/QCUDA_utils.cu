@@ -11,9 +11,12 @@
 
 #include "QCUDA_utils.cuh"
 
+
 __host__ QCUDA::s_errorHandler::s_errorHandler() = default;
 
+
 __host__ QCUDA::s_errorHandler::~s_errorHandler() = default;
+
 
 __host__
 void	QCUDA::s_errorHandler::fmtOutputError() {
