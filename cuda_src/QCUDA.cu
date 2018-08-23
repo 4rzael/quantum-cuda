@@ -393,14 +393,7 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::transposeOnGPU(int m, int n) {
 
   this->copyGPUDataToHost(device, host, m * n);
   ret = convertCUDAVecToHostVec(host, m * n);
-  int u = 0;
-  for (unsigned int i = 0; i < m; ++i) {
-    for (unsigned int j = 0; j < m; ++j) {
-      std::cout << "(" << host[u].real_ << ", " << host[u].imag_ << "i) ";
-      u++;
-    }
-    std::cout << std::endl;
-  }
+
   freeMemOnGPU(c1);
   freeMemOnGPU(device);
   delete []host;
