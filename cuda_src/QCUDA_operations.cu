@@ -145,7 +145,9 @@ void	cudaNormalize(QCUDA::structComplex_t<T>* a,
 	__syncthreads();
 
   // divide by the norm
-	res[idx] = a[idx] / sqrt(sums[0]);
+  if (idx < n) {
+    res[idx] = a[idx] / sqrt(sums[0]);
+  }
 }
 
 

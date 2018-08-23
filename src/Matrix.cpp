@@ -15,6 +15,7 @@
 #include "Matrix.hpp"
 #include "ExecutorManager.hpp"
 #include "CPUExecutor.hpp"
+#include "Logger.hpp"
 
 Matrix::Matrix(Tvcplxd* content, int m, int n) {
   m_content = content;
@@ -78,7 +79,9 @@ Matrix Matrix::transpose() const {
 Matrix Matrix::normalize() const {
   IExecutor* exec = ExecutorManager::getInstance().getExecutor();
 
+  // LOG(Logger::ERROR, "Normalizing " << *this);
   Matrix result = Matrix(exec->normalize(m_content), m_dim.first, m_dim.second);
+  // LOG(Logger::ERROR, "Result " << *this);
   return result;
 }
 
