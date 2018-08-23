@@ -413,9 +413,6 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::normalizeOnGPU() {
 
   sums = (T*)this->allocMemOnGPU(sums, sizeof(T) * this->lenA_ / 2);
   this->setGPUData(sums, sizeof(T) * this->lenA_ / 2, 0);
-  // TODO check errors ?
-  // cudaMalloc((void**)&sums, sizeof(T));
-  // cudaMemset(sums, 0, sizeof(T));
 
   host = new structComplex_t<T> [this->lenA_];
   device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>) * this->lenA_);

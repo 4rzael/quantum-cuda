@@ -34,18 +34,18 @@ int main(int ac, char **av) {
     std::cout << "Need an argument" << std::endl;
   }
 
-  Matrix m1(new Tvcplxd(64*64, 1.0), 64, 64);
-  Matrix m2(new Tvcplxd(64*64, 1.0), 64, 64);
-  Matrix m3(new Tvcplxd(64*64), 64, 64);
-  Matrix v1(new Tvcplxd(1*64, 1.0), 1, 64);
-  std::cout << "NORM " << v1.normalize() << std::endl;
-  Matrix v2(new Tvcplxd(1*64), 1, 64);
-  std::cout << "TRACE " << m1.trace() << std::endl;
+  // Matrix m1(new Tvcplxd(64*64, 1.0), 64, 64);
+  // Matrix m2(new Tvcplxd(64*64, 1.0), 64, 64);
+  // Matrix m3(new Tvcplxd(64*64), 64, 64);
+  // Matrix v1(new Tvcplxd(1*64, 1.0), 1, 64);
+  // std::cout << "NORM " << v1.normalize() << std::endl;
+  // Matrix v2(new Tvcplxd(1*64), 1, 64);
+  // std::cout << "TRACE " << m1.trace() << std::endl;
 
-  m3 = m1 * m2;
-  std::cout << "multiplication (matrix)" << m3 << std::endl;
-  v2 = m1 * v1;
-  std::cout << "multiplication (vector)" << v2 << std::endl;
+  // m3 = m1 * m2;
+  // std::cout << "multiplication (matrix)" << m3 << std::endl;
+  // v2 = m1 * v1;
+  // std::cout << "multiplication (vector)" << v2 << std::endl;
 
 
   Parser::AST::t_AST ast;
