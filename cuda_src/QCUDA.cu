@@ -299,15 +299,15 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::kroneckerOnGPU(int ma,
   structComplex_t<T>*	device = nullptr;
   Tvcplxd*		ret;
 
-  c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, this->lenA_);
+  c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
 
-  c2 = (structComplex_t<T>*)this->allocMemOnGPU(c2, this->lenB_);
+  c2 = (structComplex_t<T>*)this->allocMemOnGPU(c2, sizeof(structComplex_t<T>) * this->lenB_);
   this->copyHostDataToGPU(c2, QCUDA::Vectors::VECTOR_B);
 
   host = new structComplex_t<T> [ma * mb * na * nb];
 
-  device = (structComplex_t<T>*)this->allocMemOnGPU(device, ma * mb * na * nb);
+  device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>) * ma * mb * na * nb);
 
   this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(),
 			      QCUDA::QOperation::KRONECKER,
@@ -323,6 +323,7 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::kroneckerOnGPU(int ma,
 								       ma * mb * na * nb);
 
   this->copyGPUDataToHost(device, host, ma * mb * na * nb);
+  
   ret = convertCUDAVecToHostVec(host, ma * mb * na * nb);
 
   freeMemOnGPU(c1);

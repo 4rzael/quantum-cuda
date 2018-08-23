@@ -123,8 +123,7 @@ struct QCUDA::s_complex<T>&	QCUDA::s_complex<T>::operator+=(const struct s_compl
 
 template<typename T> __host__
 std::ostream&	operator<<(std::ostream& os, const struct QCUDA::s_complex<T>& c) {
-  os << c.real_ << std::endl;
-  os << c.imag_ << std::endl;
+  os << "(" << c.real_ << ", " << c.imag_ << "i)" << std::endl;
   return (os);
 }
 
