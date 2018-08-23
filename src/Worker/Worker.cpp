@@ -45,6 +45,7 @@ void Worker::operator()() {
                 for (uint i = 0; i < task->inputStates.size(); ++i) {
                     m_stateStore.deleteState(task->inputStates[i]);
                 }
+                // m_scheduler.markTaskAsDone(task->id);
                 m_scheduler.markBranchAsUseless(task->id);
             }
         } while (true);

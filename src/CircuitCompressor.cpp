@@ -14,6 +14,9 @@
 #include "Circuit.hpp"
 #include "Logger.hpp"
 
+/**
+ * Disable until we change the way we make CX gates in the simulator, as it brakes it
+ */
 Circuit &CircuitCompressor::operator()() {
     // shrinkCircuit();
     // removeUselessQubits();
