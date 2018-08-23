@@ -5,7 +5,7 @@
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: ExecutorManager.hpp
  * @Last modified by:   l3ninj
- * @Last modified time: 2018-07-05T14:25:28+01:00
+ * @Last modified time: 2018-08-21T23:07:20+02:00
  * @License: MIT License
  */
 
@@ -25,8 +25,6 @@ class ExecutorManager
       static ExecutorManager m_instance;
       return m_instance;
     }
-    ExecutorManager(ExecutorManager const&) = delete;
-    void operator=(ExecutorManager const&) = delete;
     /**
     * ExecutorManager instantiated executor getter.
     * @return The ExecutorManager instanciated executor.
@@ -38,6 +36,9 @@ class ExecutorManager
     * ExecutorManager constructor
     */
     ExecutorManager();
+    ExecutorManager(ExecutorManager const&) = delete;
+    void operator=(ExecutorManager const&) = delete;
+    ~ExecutorManager(){}
     /**
     * The ExecutorManager executor object.
     */

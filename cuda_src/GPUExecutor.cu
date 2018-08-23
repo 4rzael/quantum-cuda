@@ -124,7 +124,7 @@ Tvcplxd*	GPUExecutor::transpose(Tvcplxd* a, int m, int n) {
 
 
 Tvcplxd*	GPUExecutor::normalize(Tvcplxd* a) {
-  //*
+  /*
   Tvcplxd* result = new Tvcplxd(a->size());
   std::complex<double> sum = 0;
 
