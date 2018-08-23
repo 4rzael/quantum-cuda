@@ -90,6 +90,10 @@ class Matrix {
     double measureStateProbability(int qubitIndex, bool value) const;
 
     Matrix measureStateOutcome(int qubitIndex, bool value) const;
+
+    // ~Matrix() {
+    //   if (m_content) delete m_content;
+    // }
 };
 
 /**

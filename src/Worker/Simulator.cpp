@@ -126,7 +126,7 @@ Matrix Simulator::simulate() {
     Matrix op = Matrix::kron(m_gates) + Matrix::kron(m_extraGates);
     m_state = op * m_state;
 
-    if (m_shouldNormalize) m_state = m_state.normalize();
+    if (m_shouldNormalize || true) m_state = m_state.normalize();
   }
   return m_state;
 }

@@ -151,6 +151,7 @@ void	cudaNormalize(QCUDA::structComplex_t<T>* a,
 }
 
 
+// Moves the interesting data to result. The aggregation will be done separately
 template<typename T> __global__
 void	cudaMeasureProbability(QCUDA::structComplex_t<T>* c1,
 			       T* result,
@@ -158,13 +159,11 @@ void	cudaMeasureProbability(QCUDA::structComplex_t<T>* c1,
 			       int blockSize,
 			       bool v) {
   int	idx;
-  bool	TIA;
-
   idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+  int fullIdx = (v * blockSize + (idx / blockSize) * (2 * blockSize) + (idx % blockSize));
   if (idx < nSteps) {
-    TIA = (((idx / blockSize) % 2) == (int)v);
-    (*result) += (c1[idx] * c1[idx]).real_ * (T)TIA;
-    // TON AGREGATION à la place de la mienne au dessus
+    result[idx] = c1[fullIdx].norm();
   }
 }
 

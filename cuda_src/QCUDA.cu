@@ -436,21 +436,28 @@ T			QCUDA::CUDAGPU<T>::measureProbabilityOnGPU(int q, bool v) {
   c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
 
-  device = (T*)this->allocMemOnGPU(device, sizeof(T));
-  this->setGPUData(device, sizeof(T), 0);
+  device = (T*)this->allocMemOnGPU(device, sizeof(T) * this->lenA_/2);
+  this->setGPUData(device, sizeof(T) * this->lenA_/2, 0);
 
   qubitCount = log2(this->lenA_);
   blockSize = pow(2, qubitCount - q - 1);
 
   this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(),
 			      QCUDA::QOperation::M_PROBABILITY,
-			      this->lenA_,
+			      this->lenA_ / 2,
 			      1);
   cudaMeasureProbability<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1,
 										device,
-										this->lenA_,
+										this->lenA_ / 2,
 										blockSize,
 										v);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(),
+  QCUDA::QOperation::SUMKERNEL,
+  this->lenA_ / 2,
+  1);
+  sumKernel<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(device,
+            this->lenA_ / 2);
+  
   this->copyDataFromGPU(device, &host, sizeof(T));
   freeMemOnGPU(c1);
   freeMemOnGPU(device);
