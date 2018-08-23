@@ -59,7 +59,7 @@ Tvcplxd*	GPUExecutor::dot(Tvcplxd* a, Tvcplxd* b,
 
 
 Tvcplxd*	GPUExecutor::kron(Tvcplxd* a, Tvcplxd* b, int ma, int mb) {
-  //*
+  /*
   int na = a->size() / ma;
   int nb = b->size() / mb;
 
@@ -75,7 +75,7 @@ Tvcplxd*	GPUExecutor::kron(Tvcplxd* a, Tvcplxd* b, int ma, int mb) {
   /*/
   try {
     this->cgpu_.initComplexVecs(a, b);
-    return (this->cgpu_.kroneckerOnGPU(a.size() / ma, b.size() / mb, ma, mb));
+    return (this->cgpu_.kroneckerOnGPU(ma, mb, a->size() / ma, b->size() / mb));
   } catch (const std::exception& err) {
     std::cerr << err.what() << std::endl;
     std::cerr << "Couldn't perform the kronecker on the GPU !" << std::endl;

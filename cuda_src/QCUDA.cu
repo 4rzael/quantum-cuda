@@ -289,38 +289,46 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::dotProductOnGPU(int mA,
 
 
 template<typename T> __host__
-Tvcplxd*		QCUDA::CUDAGPU<T>::kroneckerOnGPU(int halfMA,
-							  int halfMB,
-							  int ma,
-							  int mb) {
+Tvcplxd*		QCUDA::CUDAGPU<T>::kroneckerOnGPU(int ma,
+							  int mb,
+							  int na,
+							  int nb) {
   structComplex_t<T>*	c1 = nullptr;
   structComplex_t<T>*	c2 = nullptr;
   structComplex_t<T>*	host = nullptr;
   structComplex_t<T>*	device = nullptr;
   Tvcplxd*		ret;
 
-  c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, this->lenA_);
+  c1 = (structComplex_t<T>*)this->allocMemOnGPU(c1, sizeof(structComplex_t<T>) * this->lenA_);
   this->copyHostDataToGPU(c1, QCUDA::Vectors::VECTOR_A);
 
-  c2 = (structComplex_t<T>*)this->allocMemOnGPU(c2, this->lenB_);
+  c2 = (structComplex_t<T>*)this->allocMemOnGPU(c2, sizeof(structComplex_t<T>) * this->lenB_);
   this->copyHostDataToGPU(c2, QCUDA::Vectors::VECTOR_B);
 
-  host = new structComplex_t<T> [halfMA * halfMB * ma * mb];
+  host = new structComplex_t<T> [ma * mb * na * nb];
 
-  device = (structComplex_t<T>*)this->allocMemOnGPU(device, halfMA * halfMB * ma * mb);
+  device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>) * ma * mb * na * nb);
 
-  // this->initGridAndBlock(QCUDA::QOperation::KRONECKER, ma * mb, halfMA * halfMB);
-  // cudaDot<<<this->dimGrid_, this->dimBlock_>>>(c1, c2, device,
-  // 					       this->hostVecA_.size(),
-  // 					       this->hostVecB_.size(),
-  // 					       ma, mb);
+  this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(),
+			      QCUDA::QOperation::KRONECKER,
+			      (ma * mb), (na * nb));
+  
+  cudaKronecker<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1,
+								       c2,
+								       device,
+								       ma,
+								       mb,
+								       na,
+								       nb,
+								       ma * mb * na * nb);
 
-  this->copyGPUDataToHost(device, host, halfMA * halfMB * ma * mb);
+  this->copyGPUDataToHost(device, host, ma * mb * na * nb);
+  
+  ret = convertCUDAVecToHostVec(host, ma * mb * na * nb);
 
   freeMemOnGPU(c1);
   freeMemOnGPU(c2);
   freeMemOnGPU(device);
-  ret = convertCUDAVecToHostVec(host, halfMA * halfMB * ma * mb);
   delete []host;
   return (ret);
 }
