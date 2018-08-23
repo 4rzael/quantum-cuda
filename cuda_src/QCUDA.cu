@@ -269,6 +269,7 @@ Tvcplxd*		QCUDA::CUDAGPU<T>::dotProductOnGPU(int mA,
 
   host = new structComplex_t<T> [nA * mB];
   device = (structComplex_t<T>*)this->allocMemOnGPU(device, sizeof(structComplex_t<T>) * (nA * mB));
+  this->setGPUData(device, sizeof(structComplex_t<T>) * (nA * mB), 0);
 
   this->dim_.initGridAndBlock(this->gpu_.getDeviceProp(), QCUDA::QOperation::DOT, mB, nA);
   cudaDotProduct<<<this->dim_.getGridDim(), this->dim_.getBlockDim()>>>(c1, c2,	device, mA, mB, nA, nB, (nA * mB));
