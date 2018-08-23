@@ -27,6 +27,8 @@ public:
 
     virtual std::shared_ptr<TaskGraph::ITask> getNextTask();
     virtual void             markTaskAsDone(TaskGraph::TaskId);
+    virtual void             markBranchAsUseless(TaskGraph::TaskId);
+
 
     virtual ~BasicTaskScheduler() {}
 

@@ -72,6 +72,13 @@ std::shared_ptr<State> Graph::addState(StateId id, uint qubitCount, bool startSt
     return state;
 }
 
+bool Graph::isTaskDone(TaskId id) const {
+    if (id == TASK_ID_NONE) return false;
+
+    auto task = getTask(id);
+    return task->status == TaskStatus::DONE;
+}
+
 bool Graph::isTaskReady(TaskId id) const {
     if (id == TASK_ID_NONE) return false;
 

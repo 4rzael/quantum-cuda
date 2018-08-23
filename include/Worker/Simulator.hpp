@@ -79,6 +79,7 @@ class Simulator
     TaskGraph::SimulateCircuitTask                 &m_task;
     MeasurementResultsTree::IMeasurementResultsTree &m_measurementsTree;
     bool m_shouldNormalize;
+    bool m_shouldAddSecondMatrix;
 
     /**
     * The qbit registers offsets.

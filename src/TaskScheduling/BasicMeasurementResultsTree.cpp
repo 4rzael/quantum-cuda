@@ -82,10 +82,12 @@ std::vector<std::shared_ptr<MeasurementResultsNode>> BasicMeasurementResultsTree
     parent->results[0].measuredCBit = creg;
     parent->results[0].value = 0;
     parent->results[0].probability = 0;
+    parent->results[0].node->samples = 0;
     parent->results[1].node = std::make_shared<MeasurementResultsNode>(this, ++greatestId);
     parent->results[1].measuredCBit = creg;
     parent->results[1].value = 1;
     parent->results[1].probability = 0;
+    parent->results[1].node->samples = 0;
     return {parent->results[0].node, parent->results[1].node};
 }
 

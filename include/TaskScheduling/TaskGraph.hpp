@@ -197,6 +197,14 @@ namespace TaskGraph {
          */
         bool isTaskReady(TaskId id) const;
         /**
+         * @brief Whether the task with given id has been completed
+         * 
+         * @param id The task's ID
+         * @return true If it has been completed
+         * @return false otherwise
+         */
+        bool isTaskDone(TaskId id) const;
+        /**
          * @brief Get the currently available states
          * 
          * @return std::vector<StateId> A list of state IDs

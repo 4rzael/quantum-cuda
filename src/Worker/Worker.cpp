@@ -15,31 +15,38 @@ void Worker::operator()() {
     try {
         do {
             task = m_scheduler.getNextTask();
-            LOG(Logger::DEBUG, "Executing task:" << task);
             if (task->id == TASK_ID_NONE) break;
 
-            // Detecting the type of task
-            if (auto simulateTask = std::dynamic_pointer_cast<SimulateCircuitTask>(task)) {
-                // TODO: Change if/when we will support multiple input states
-                state = m_stateStore.getStateData(task->inputStates[0]);
-                // Actually do the work here
-                Simulator simulator(*simulateTask, m_measurementResults, state);
-                state = simulator.simulate();
-                // Then register new state and remove old one
-                m_stateStore.storeState(task->outputStates[0], state);
-                m_stateStore.deleteState(task->inputStates[0]);
+            if (m_measurementResults.getNodeWithId(task->measurementNodeId)->samples > 0) {
+                LOG(Logger::DEBUG, "Executing task:" << task);
+                // Detecting the type of task
+                if (auto simulateTask = std::dynamic_pointer_cast<SimulateCircuitTask>(task)) {
+                    // TODO: Change if/when we will support multiple input states
+                    state = m_stateStore.getStateData(task->inputStates[0]);
+                    // Actually do the work here
+                    Simulator simulator(*simulateTask, m_measurementResults, state);
+                    state = simulator.simulate();
+                    // Then register new state and remove old one
+                    m_stateStore.storeState(task->outputStates[0], state);
+                    m_stateStore.deleteState(task->inputStates[0]);
 
-                // LOG(Logger::INFO, "State:" << state);
+                    // LOG(Logger::INFO, "State:" << state);
+                }
+                else if (auto measureTask = std::dynamic_pointer_cast<DuplicateAndMeasureTask>(task)) {
+                    Measurer measurer(*measureTask, m_stateStore, m_measurementResults);
+                    measurer();
+                }
+                else {
+                    throw std::logic_error("Unknown task type found. Stopping the worker");
+                }
+                m_scheduler.markTaskAsDone(task->id);
+            } else {
+                LOG(Logger::WARNING, "Samples exhausted: Ignoring the task branch");
+                for (uint i = 0; i < task->inputStates.size(); ++i) {
+                    m_stateStore.deleteState(task->inputStates[i]);
+                }
+                m_scheduler.markBranchAsUseless(task->id);
             }
-            else if (auto measureTask = std::dynamic_pointer_cast<DuplicateAndMeasureTask>(task)) {
-                Measurer measurer(*measureTask, m_stateStore, m_measurementResults);
-                measurer();
-            }
-            else {
-                throw std::logic_error("Unknown task type found. Stopping the worker");
-            }
-
-            m_scheduler.markTaskAsDone(task->id);
         } while (true);
     } catch (NoTaskAvailable err) {}; // No problem
     LOG(Logger::INFO, "No more tasks available");
