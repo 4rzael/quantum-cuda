@@ -102,20 +102,29 @@ void	cudaTraceMover(QCUDA::structComplex_t<T>* c, int n) {
 template<typename T> __global__
 void	cudaTranspose(QCUDA::structComplex_t<T>* c1,
 		      QCUDA::structComplex_t<T>* result,
-		      int TILE_DIM,
-		      int BLOCK_ROWS) {
-  int	idx;
-  int	idy;
-  int	width;
+		      int m,
+		      int n) {
+  int idx;
+  int idy;
 
-  idx = blockIdx.x * TILE_DIM + threadIdx.x;
-  idy = blockIdx.y * TILE_DIM + threadIdx.y;
-  width = gridDim.x * TILE_DIM;
+  idx = blockIdx.x * blockDim.x + threadIdx.x;
+  idy = blockIdx.y * blockDim.y + threadIdx.y;
 
-  for (int j = 0; j < TILE_DIM; j+= BLOCK_ROWS) {
-    result[idx * width + (idy + j)].real_ = c1[(idy + j) * width + idx].real_;
-    result[idx * width + (idy + j)].imag_ = c1[(idy + j) * width + idx].imag_;
+  if (idx < m && idy < n) {
+    result[idx * m + idy] = c1[idy * m + idx];
   }
+  // int	idx;
+  // int	idy;
+  // int	width;
+
+  // idx = blockIdx.x * TILE_DIM + threadIdx.x;
+  // idy = blockIdx.y * TILE_DIM + threadIdx.y;
+  // width = gridDim.x * TILE_DIM;
+
+  // for (int j = 0; j < TILE_DIM; j+= BLOCK_ROWS) {
+  //   result[idx * width + (idy + j)].real_ = c1[(idy + j) * width + idx].real_;
+  //   result[idx * width + (idy + j)].imag_ = c1[(idy + j) * width + idx].imag_;
+  // }
 }
 
 
