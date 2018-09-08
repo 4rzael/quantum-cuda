@@ -18,7 +18,7 @@ void Worker::operator()() {
             if (task->id == TASK_ID_NONE) break;
 
             if (m_measurementResults.getNodeWithId(task->measurementNodeId)->samples > 0) {
-                LOG(Logger::DEBUG, "Executing task:" << task);
+                LOG(Logger::DEBUG, "Executing task:" << task->id);
                 // Detecting the type of task
                 if (task->type == TaskType::SIMULATE) {
                     auto simulateTask = std::dynamic_pointer_cast<SimulateCircuitTask>(task);
