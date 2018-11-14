@@ -2,10 +2,10 @@
  * @Author: Maxime Agor (4rzael)
  * @Date:   Sat Jun 23 2018
  * @Email:  maxime.agor23@gmail.com
- * @Project: include
+ * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Circuit.hpp
- * @Last modified by:   l3ninj
- * @Last modified time: 2018-06-28T22:39:43+01:00
+ * @Last modified by:   vial-dj
+ * @Last modified time: Wed Nov 14 2018, 11:27:21
  * @License: MIT License
  */
 
@@ -32,7 +32,7 @@ struct Circuit {
 
     struct Qubit {
         Qubit(const std::string &n, const uint &e) : registerName(n), element(e) {}
-        Qubit(const Parser::AST::t_bit &b) : registerName(b.name), element(b.value) {}
+        explicit Qubit(const Parser::AST::t_bit &b) : registerName(b.name), element(b.value) {}
         bool operator==(const Qubit &other) const;
         std::string registerName;
         uint        element;
@@ -74,7 +74,7 @@ struct Circuit {
     };
 
     struct Reset : public GateInterface {
-        Reset(const Qubit &trgt)
+        explicit Reset(const Qubit &trgt)
         : target(trgt) {}
         std::vector<Qubit> getTargets() const;
 
@@ -82,7 +82,7 @@ struct Circuit {
     };
 
     struct Barrier : public GateInterface {
-        Barrier(const Qubit &trgt)
+        explicit Barrier(const Qubit &trgt)
         : target(trgt) {}
         std::vector<Qubit> getTargets() const;
 

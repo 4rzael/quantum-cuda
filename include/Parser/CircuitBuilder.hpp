@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CircuitBuilder.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Sat Jun 23 2018, 14:30:25
+ * @Last modified by:   vial-dj
+ * @Last modified time: Wed Nov 14 2018, 11:57:03
  * @License: MIT License
  */
 
@@ -134,7 +134,7 @@ public:
      * 
      * @param filename The file this Circuit Builder will parse
      */
-    CircuitBuilder(std::string const &filename);
+    explicit CircuitBuilder(std::string const &filename);
 
     /**
      * @brief Construct a new Circuit Builder object

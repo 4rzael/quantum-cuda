@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: BasicStateStore.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Sun Aug 12 2018, 20:05:37
+ * @Last modified by:   vial-dj
+ * @Last modified time: Wed Nov 14 2018, 12:06:57
  * @License: MIT License
  */
 
@@ -27,7 +27,7 @@ namespace StateStore {
          * 
          * @param graph The TaskGraph containing informations about the states
          */
-        BasicStateStore(TaskGraph::Graph const &graph);
+        explicit BasicStateStore(TaskGraph::Graph const &graph);
 
         virtual bool storeState(StateId id, StateData const &state);
         virtual bool deleteState(StateId id);

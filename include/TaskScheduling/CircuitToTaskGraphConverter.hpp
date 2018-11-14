@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CircuitToTaskGraphConverter.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Wed Aug 15 2018, 22:22:40
+ * @Last modified by:   vial-dj
+ * @Last modified time: Wed Nov 14 2018, 12:14:58
  * @License: MIT License
  */
 
@@ -26,7 +26,7 @@ public:
      * 
      * @param circuit The circuit to convert
      */
-    CircuitToTaskGraphConverter(Circuit const &circuit):
+    explicit CircuitToTaskGraphConverter(Circuit const &circuit):
     m_circuit(circuit) {}
 
     /**

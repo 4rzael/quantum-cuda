@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: ITaskScheduler.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Sun Aug 12 2018, 20:05:30
+ * @Last modified by:   vial-dj
+ * @Last modified time: Wed Nov 14 2018, 14:47:44
  * @License: MIT License
  */
 
@@ -18,7 +18,7 @@
  */
 class NoTaskAvailable : public std::logic_error {
 public:
-    NoTaskAvailable(std::string const &msg) :std::logic_error(msg) {}
+    explicit NoTaskAvailable(std::string const &msg): std::logic_error(msg) {}
 };
 
 /**
