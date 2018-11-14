@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: Parser
  * @Filename: AST.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Sat Jun 23 2018, 11:23:56
+ * @Last modified by:   vial-dj
+ * @Last modified time: Wed Nov 14 2018, 11:57:41
  * @License: MIT License
  */
 
@@ -303,10 +303,10 @@ namespace Parser {
         private:
             std::ostream & m_out;
         public:
-            OpenQASMPrintingVisitor(std::ostream & out) : m_out(out) {}
+            explicit OpenQASMPrintingVisitor(std::ostream & out) : m_out(out) {}
             void operator()(const t_statement &s) const {m_out << s;}
             void operator()(const t_conditional_statement &s) const {m_out << s;}
-            void operator()(const t_gate_declaration &d) const {m_out << d;}            
+            void operator()(const t_gate_declaration &d) const {m_out << d;}
         };
 
         /**

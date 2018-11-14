@@ -49,6 +49,6 @@ void Worker::operator()() {
                 m_scheduler.markBranchAsUseless(task->id);
             }
         } while (true);
-    } catch (NoTaskAvailable err) {}; // No problem
+    } catch (NoTaskAvailable &err) {}; // No problem
     LOG(Logger::INFO, "No more tasks available");
 }

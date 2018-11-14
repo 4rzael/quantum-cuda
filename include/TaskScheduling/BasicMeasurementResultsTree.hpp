@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: BasicMeasurementResultsTree.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Sat Aug 18 2018, 23:36:57
+ * @Last modified by:   vial-dj
+ * @Last modified time: Wed Nov 14 2018, 12:05:21
  * @License: MIT License
  */
 
@@ -25,7 +25,7 @@ namespace MeasurementResultsTree {
          * 
          * @param samples The number of measurement samples to generate.
          */
-        BasicMeasurementResultsTree(uint samples=1000);
+        explicit BasicMeasurementResultsTree(uint samples=1000);
 
         virtual std::shared_ptr<MeasurementResultsNode> getRoot() const;
         virtual std::shared_ptr<MeasurementResultsNode> getNodeWithId(NodeId id) const;

@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: FloatExpressionEvaluator.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Sat Jun 23 2018, 14:30:53
+ * @Last modified by:   vial-dj
+ * @Last modified time: Wed Nov 14 2018, 12:03:06
  * @License: MIT License
  */
 
@@ -35,7 +35,7 @@ namespace FloatExpressionEvaluator {
     class FloatBasicVisitor: boost::static_visitor<double> {
         StringFloatSubstituter m_substituter;
     public:
-        FloatBasicVisitor(StringFloatSubstituter substituter)
+        explicit FloatBasicVisitor(StringFloatSubstituter substituter)
         : m_substituter(substituter) {}
 
         double operator()(double d) const;
@@ -49,7 +49,7 @@ namespace FloatExpressionEvaluator {
     class FloatExpressionVisitor: boost::static_visitor<double> {
         StringFloatSubstituter m_floatSubstituter;
     public:
-        FloatExpressionVisitor(StringFloatSubstituter substituter)
+        explicit FloatExpressionVisitor(StringFloatSubstituter substituter)
         : m_floatSubstituter(substituter) {}
 
         double operator()(t_float_expr_nil const &) const;

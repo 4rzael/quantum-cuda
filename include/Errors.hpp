@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Errors.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Mon Jul 02 2018, 13:24:55
+ * @Last modified by:   vial-dj
+ * @Last modified time: Wed Nov 14 2018, 11:22:22
  * @License: MIT License
  */
 
@@ -18,6 +18,6 @@
  */
 class OpenQASMError: public std::logic_error {
 public:
-    OpenQASMError(std::string const &message="")
+    explicit OpenQASMError(std::string const &message="")
     : std::logic_error(message) {}
 };

@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: FloatExprAst.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Sat Jun 23 2018, 14:30:47
+ * @Last modified by:   vial-dj
+ * @Last modified time: Wed Nov 14 2018, 12:00:20
  * @License: MIT License
  */
 
@@ -79,7 +79,7 @@ namespace Parser {
         private:
             std::ostream & m_out;
         public:
-            OperandPrinterVisitor(std::ostream & out) : m_out(out) {}
+            explicit OperandPrinterVisitor(std::ostream & out) : m_out(out) {}
             void operator()(const t_float_expr_nil &nil) const;
             void operator()(const t_float &v) const;
             void operator()(const ::boost::spirit::x3::forward_ast<t_float_expr_unaried_operand> &ast) const;
@@ -91,7 +91,7 @@ namespace Parser {
         private:
             std::ostream & m_out;
         public:
-            TFloatPrinterVisitor(std::ostream & out) : m_out(out) {}
+            explicit TFloatPrinterVisitor(std::ostream & out) : m_out(out) {}
             void operator()(const double &f) const;
             void operator()(const std::string &s) const;
         };

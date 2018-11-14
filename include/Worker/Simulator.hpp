@@ -4,8 +4,8 @@
  * @Email:  julien.vial-detambel@epitech.eu
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: Simulator.hpp
- * @Last modified by:   l3ninj
- * @Last modified time: 2018-07-18T14:35:25+01:00
+ * @Last modified by:   vialdj
+ * @Last modified time: Wed Nov 14 2018, 14:49:36
  * @License: MIT License
  */
 
@@ -43,7 +43,7 @@ class Simulator
         * Construct a visitor object from the parent simulator instance.
         * @param sim The parent simulator instance.
         */
-        StepVisitor(Simulator &simulator);
+        explicit StepVisitor(Simulator &simulator);
         /**
         * Register the transformation of a particular qubit from a UGate. .
         * @param value The UGate.

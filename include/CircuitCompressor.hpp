@@ -4,8 +4,8 @@
  * @Email:  maxime.agor23@gmail.com
  * @Project: CUDA-Based Simulator of Quantum Systems
  * @Filename: CircuitCompressor.hpp
- * @Last modified by:   4rzael
- * @Last modified time: Mon Jul 16 2018, 23:09:30
+ * @Last modified by:   vial-dj
+ * @Last modified time: Wed Nov 14 2018, 11:22:33
  * @License: MIT License
  */
 
@@ -23,7 +23,7 @@ private:
     Circuit &m_circuit;
 
 public:
-    CircuitCompressor(Circuit &c): m_circuit(c) {}
+    explicit CircuitCompressor(Circuit &c): m_circuit(c) {}
     Circuit &operator()();
 
 private:
