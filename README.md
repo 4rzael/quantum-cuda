@@ -1,6 +1,7 @@
 # quantum-cuda
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/492cb830738c4c58881e2fd2b34fee12)](https://app.codacy.com/app/vial-dj/quantum-cuda?utm_source=github.com&utm_medium=referral&utm_content=4rzael/quantum-cuda&utm_campaign=Badge_Grade_Dashboard)
+[![CodeFactor](https://www.codefactor.io/repository/github/4rzael/quantum-cuda/badge)](https://www.codefactor.io/repository/github/4rzael/quantum-cuda)
 
 CUDA-based Simulator of Quantum Systems
 
